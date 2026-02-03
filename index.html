@@ -1,0 +1,1926 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Raffle Number Game - Complete Prototype</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+
+        /* ===== SCREEN CONTAINERS ===== */
+        .screen {
+            max-width: 500px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* ===== LOGIN SCREEN ===== */
+        .login-form {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .logo {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .logo i {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .logo h1 {
+            font-size: 32px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .input-group i {
+            color: #667eea;
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .input-group input {
+            border: none;
+            background: transparent;
+            font-size: 16px;
+            width: 100%;
+            outline: none;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #667eea;
+            cursor: pointer;
+            padding: 10px;
+        }
+
+        /* ===== DEMO USERS ===== */
+        .demo-users {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .user-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .user-badges span {
+            background: #667eea;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .user-badges span:hover {
+            background: #764ba2;
+            transform: scale(1.05);
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 18px;
+        }
+
+        .balance {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 10px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab-content {
+            padding: 20px;
+            display: none;
+            min-height: 400px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== RAFFLE ITEMS ===== */
+        .items-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .item-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        .item-card h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .item-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ===== WALLET ===== */
+        .wallet-info {
+            text-align: center;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        .balance-card .amount {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .deposits {
+            margin: 20px 0;
+        }
+
+        .deposit-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 5px solid #28a745;
+        }
+
+        .deposit-item.expiring {
+            border-left-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .deposit-item.expired {
+            border-left-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        /* ===== CALCULATOR ===== */
+        .calculator {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .calc-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .calc-btn {
+            flex: 1;
+            padding: 20px;
+            font-size: 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .calc-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+
+        .number-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        #bet-number {
+            font-size: 48px;
+            text-align: center;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 20px;
+            width: 100%;
+            background: #f8f9fa;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+
+        /* ===== SWIPE AREA ===== */
+        .swipe-area {
+            background: linear-gradient(to right, #667eea, #764ba2);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+            cursor: pointer;
+            user-select: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .swipe-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .swipe-area:active {
+            transform: scale(0.98);
+        }
+
+        /* ===== QUICK BETS ===== */
+        .quick-bet {
+            margin: 20px 0;
+        }
+
+        .quick-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .quick-btn {
+            flex: 1;
+            padding: 15px;
+            background: #e9ecef;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .quick-btn:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        /* ===== CASH IN OPTIONS ===== */
+        .cashin-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .cashin-option {
+            padding: 25px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cashin-option:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        /* ===== ADMIN STYLES ===== */
+        .admin-content {
+            padding: 20px;
+        }
+
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .stat-card div {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+
+        /* ===== BET LIST ===== */
+        .bet-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .bet-item.won {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+
+        /* ===== NOTIFICATIONS ===== */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .login-form {
+                padding: 20px;
+            }
+            
+            .logo {
+                padding: 30px 20px;
+            }
+            
+            .tab {
+                font-size: 12px;
+                padding: 10px 5px;
+            }
+            
+            .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* ===== ANIMATIONS ===== */
+        .pulse {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen">
+        <div class="logo">
+            <i class="fas fa-ticket-alt"></i>
+            <h1>Raffle Number Game</h1>
+            <p>Prototype v1.0</p>
+        </div>
+        
+        <div class="login-form">
+            <h2>Login to Play</h2>
+            <p style="color: #666; margin-bottom: 20px;">Demo: Use username 1-5 with same password</p>
+            
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" id="username" placeholder="Enter username (1-5)" maxlength="20">
+            </div>
+            
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" id="password" placeholder="Enter password" value="1">
+            </div>
+            
+            <button onclick="login()" class="btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login to Game
+            </button>
+            
+            <div class="demo-users">
+                <h3>Quick Login (Click Any):</h3>
+                <div class="user-badges">
+                    <span onclick="fillLogin('1', '1')">User 1 (₱50)</span>
+                    <span onclick="fillLogin('2', '2')">User 2 (₱50)</span>
+                    <span onclick="fillLogin('3', '3')">User 3 (₱50)</span>
+                    <span onclick="fillLogin('4', '4')">User 4 (₱50)</span>
+                    <span onclick="fillLogin('5', '5')">User 5 (₱50)</span>
+                </div>
+                <p><small>All start with ₱50 play money</small></p>
+            </div>
+            
+            <div class="admin-login" style="margin-top: 30px;">
+                <button onclick="adminLogin()" class="btn-secondary">
+                    <i class="fas fa-cog"></i> Admin Login (Username: admin, Password: admin123)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- USER DASHBOARD -->
+    <div id="user-dashboard" class="screen hidden">
+        <header>
+            <button onclick="logout()" class="btn-icon" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <h2>Welcome, <span id="current-user" style="color: #ffeb3b;">User</span></h2>
+            <div class="balance">
+                <i class="fas fa-wallet"></i>
+                ₱<span id="user-balance">50.00</span>
+            </div>
+        </header>
+        
+        <nav class="tabs">
+            <button class="tab active" onclick="showTab('play')">
+                <i class="fas fa-gamepad"></i> Play
+            </button>
+            <button class="tab" onclick="showTab('wallet')">
+                <i class="fas fa-wallet"></i> Wallet
+            </button>
+            <button class="tab" onclick="showTab('bets')">
+                <i class="fas fa-history"></i> My Bets
+            </button>
+            <button class="tab" onclick="showTab('send')">
+                <i class="fas fa-paper-plane"></i> Send
+            </button>
+        </nav>
+        
+        <!-- PLAY TAB -->
+        <div id="play-tab" class="tab-content active">
+            <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Active Raffles</h3>
+            <div id="raffle-items" class="items-grid">
+                <!-- Items loaded by JavaScript -->
+            </div>
+            <p style="text-align: center; color: #666; margin-top: 20px; font-size: 14px;">
+                Tap any item to place your bet
+            </p>
+        </div>
+        
+        <!-- WALLET TAB -->
+        <div id="wallet-tab" class="tab-content">
+            <div class="wallet-info">
+                <h3 style="color: #667eea; margin-bottom: 20px;">💰 My Wallet</h3>
+                
+                <div class="balance-card">
+                    <h4>Available Play Money</h4>
+                    <div class="amount" id="wallet-balance">₱50.00</div>
+                    <p>Use for betting only</p>
+                </div>
+                
+                <div class="deposits">
+                    <h4 style="margin: 20px 0 10px 0;">📅 Active Deposits</h4>
+                    <div id="deposits-list">
+                        <!-- Deposits loaded here -->
+                    </div>
+                    <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                        ⏰ Deposits expire in 5 days. You'll be notified before expiry.
+                    </p>
+                </div>
+                
+                <button onclick="showCashIn()" class="btn-primary" style="margin-top: 30px;">
+                    <i class="fas fa-plus-circle"></i> Cash In More Money
+                </button>
+                
+                <div style="margin-top: 20px; padding: 15px; background: #f0f8ff; border-radius: 10px;">
+                    <h4 style="color: #667eea;">🏦 Wallet Info</h4>
+                    <p style="margin: 10px 0;">Shopee Wallet: <strong id="shopee-wallet">Not set</strong></p>
+                    <p>Lazada Wallet: <strong id="lazada-wallet">Not set</strong></p>
+                    <button onclick="showWalletSetup()" class="btn-secondary" style="margin-top: 10px;">
+                        Setup Wallets
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MY BETS TAB -->
+        <div id="bets-tab" class="tab-content">
+            <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Betting History</h3>
+            <div id="bets-list">
+                <!-- Bets loaded here -->
+                <p style="text-align: center; color: #999; padding: 40px;">
+                    No bets placed yet. Start playing!
+                </p>
+            </div>
+        </div>
+        
+        <!-- SEND MONEY TAB -->
+        <div id="send-tab" class="tab-content">
+            <h3 style="color: #667eea; margin-bottom: 20px;">💸 Send Play Money</h3>
+            <div style="background: #f8f9fa; padding: 20px; border-radius: 15px;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Recipient Username:</label>
+                    <input type="text" id="recipient" placeholder="Enter username" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                </div>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Amount to Send:</label>
+                    <input type="number" id="send-amount" placeholder="₱ Amount" min="1" step="0.01" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                </div>
+                
+                <button onclick="sendMoney()" class="btn-primary">
+                    <i class="fas fa-paper-plane"></i> Send Now
+                </button>
+                
+                <p style="margin-top: 20px; color: #666; font-size: 14px;">
+                    💡 You can only send to existing users. Money will be deducted from your balance.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ADMIN DASHBOARD -->
+    <div id="admin-dashboard" class="screen hidden">
+        <header>
+            <button onclick="logout()" class="btn-icon" title="Logout">
+                <i class="fas fa-sign-out-alt"></i>
+            </button>
+            <h2><i class="fas fa-cog"></i> Admin Control Panel</h2>
+        </header>
+        
+        <div class="admin-content">
+            <div class="admin-stats">
+                <div class="stat-card">
+                    <h4>Total Users</h4>
+                    <div id="total-users">5</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Balance</h4>
+                    <div id="total-balance">₱250</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Active Raffles</h4>
+                    <div id="active-raffles">3</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Bets</h4>
+                    <div id="total-bets">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Winners</h4>
+                    <div id="total-winners">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Revenue</h4>
+                    <div id="total-revenue">₱0</div>
+                </div>
+            </div>
+            
+            <div class="admin-actions" style="margin-top: 30px;">
+                <button onclick="showAddItem()" class="btn-primary" style="margin-bottom: 20px;">
+                    <i class="fas fa-plus-circle"></i> Add New Raffle Item
+                </button>
+                
+                <h3 style="color: #667eea; margin: 20px 0;">👥 All Users</h3>
+                <div id="users-list" style="max-height: 200px; overflow-y: auto;">
+                    <!-- Users loaded here -->
+                </div>
+                
+                <h3 style="color: #667eea; margin: 20px 0;">🎁 Raffle Items</h3>
+                <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
+                    <!-- Items loaded here -->
+                </div>
+                
+                <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                    <h4 style="color: #667eea;">⚙️ Admin Tools</h4>
+                    <button onclick="runRaffle()" class="btn-secondary" style="margin: 10px 5px;">
+                        Run Raffle Draw
+                    </button>
+                    <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px;">
+                        Reset Demo Data
+                    </button>
+                    <button onclick="addTestData()" class="btn-secondary" style="margin: 10px 5px;">
+                        Add Test Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- GAME MODAL -->
+    <div id="game-modal" class="modal hidden">
+        <div class="modal-content">
+            <button onclick="closeModal()" class="close-btn">&times;</button>
+            <h3 id="item-name" style="color: #667eea; text-align: center;">Loading...</h3>
+            <img id="item-image" src="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=200&fit=crop" alt="Item" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin: 15px 0;">
+            
+            <div class="betting-interface">
+                <div class="number-display">
+                    <input type="text" id="bet-number" placeholder="0.000" readonly style="font-size: 36px; padding: 15px;">
+                </div>
+                
+                <p style="text-align: center; color: #666; margin: 10px 0;">
+                    Enter your unique number (up to 3 decimal places)
+                </p>
+                
+                <div class="calculator">
+                    <div class="calc-row">
+                        <button class="calc-btn" onclick="addNumber('1')">1</button>
+                        <button class="calc-btn" onclick="addNumber('2')">2</button>
+                        <button class="calc-btn" onclick="addNumber('3')">3</button>
+                    </div>
+                    <div class="calc-row">
+                        <button class="calc-btn" onclick="addNumber('4')">4</button>
+                        <button class="calc-btn" onclick="addNumber('5')">5</button>
+                        <button class="calc-btn" onclick="addNumber('6')">6</button>
+                    </div>
+                    <div class="calc-row">
+                        <button class="calc-btn" onclick="addNumber('7')">7</button>
+                        <button class="calc-btn" onclick="addNumber('8')">8</button>
+                        <button class="calc-btn" onclick="addNumber('9')">9</button>
+                    </div>
+                    <div class="calc-row">
+                        <button class="calc-btn" onclick="addNumber('.')">.</button>
+                        <button class="calc-btn" onclick="addNumber('0')">0</button>
+                        <button class="calc-btn" onclick="clearNumber()">C</button>
+                    </div>
+                </div>
+                
+                <div class="quick-bet">
+                    <h4 style="margin: 20px 0 10px 0;">💸 Quick Bet Amounts</h4>
+                    <div class="quick-buttons">
+                        <button class="quick-btn" onclick="setBetAmount(50)">₱50</button>
+                        <button class="quick-btn" onclick="setBetAmount(100)">₱100</button>
+                        <button class="quick-btn" onclick="setBetAmount(250)">₱250</button>
+                        <button class="quick-btn" onclick="setBetAmount(500)">₱500</button>
+                    </div>
+                </div>
+                
+                <div class="bet-amount" style="margin: 20px 0;">
+                    <h4>Bet Amount: ₱<span id="current-bet-amount">50</span></h4>
+                    <input type="range" id="bet-slider" min="1" max="1000" value="50" style="width: 100%; margin: 10px 0;">
+                </div>
+                
+                <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin: 20px 0;">
+                    <p style="margin: 5px 0;">Your Balance: <strong>₱<span id="modal-balance">50</span></strong></p>
+                    <p style="margin: 5px 0;">After Bet: <strong>₱<span id="after-bet">0</span></strong></p>
+                </div>
+                
+                <div class="swipe-area" id="swipe-area" onclick="placeBet()">
+                    <div class="swipe-text">
+                        <i class="fas fa-arrow-right"></i>
+                        TAP TO PLACE YOUR BET
+                        <i class="fas fa-arrow-right"></i>
+                    </div>
+                </div>
+                
+                <div class="game-status" id="game-status" style="text-align: center; margin-top: 20px; padding: 10px; border-radius: 10px;">
+                    <!-- Status messages -->
+                </div>
+                
+                <div style="margin-top: 20px; text-align: center;">
+                    <p style="color: #666; font-size: 14px;">
+                        🎯 <strong>Game Rule:</strong> Lowest unique number wins!<br>
+                        No duplicate numbers allowed.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- CASH IN MODAL -->
+    <div id="cashin-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color: #667eea; text-align: center;">💰 Cash In</h3>
+            <p style="text-align: center; margin-bottom: 20px;">Select amount to deposit (expires in 5 days):</p>
+            
+            <div class="cashin-options">
+                <button class="cashin-option" onclick="selectAmount(50)">₱50</button>
+                <button class="cashin-option" onclick="selectAmount(100)">₱100</button>
+                <button class="cashin-option" onclick="selectAmount(250)">₱250</button>
+                <button class="cashin-option" onclick="selectAmount(500)">₱500</button>
+                <button class="cashin-option" onclick="selectAmount(750)">₱750</button>
+                <button class="cashin-option" onclick="selectAmount(1000)">₱1000</button>
+            </div>
+            
+            <div class="selected-amount" style="text-align: center; margin: 30px 0; padding: 20px; background: #f0f8ff; border-radius: 10px;">
+                <h4>Selected Amount</h4>
+                <div style="font-size: 48px; font-weight: bold; color: #28a745;" id="selected-amount">0</div>
+                <p style="margin-top: 10px;">⏰ Expires: <span id="expiry-date">--/--/----</span></p>
+            </div>
+            
+            <button onclick="confirmCashIn()" class="btn-primary" style="margin-bottom: 10px;">
+                <i class="fas fa-check-circle"></i> Confirm Cash In
+            </button>
+            <button onclick="closeModal()" class="btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
+    
+    <!-- ADD ITEM MODAL (ADMIN) -->
+    <div id="add-item-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color: #667eea; text-align: center;">➕ Add Raffle Item</h3>
+            
+            <div style="display: grid; gap: 15px; margin: 20px 0;">
+                <input type="text" id="item-name-input" placeholder="Item Name (e.g., iPhone 15)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="number" id="item-price" placeholder="Price Value (₱)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="text" id="item-image-url" placeholder="Image URL" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="date" id="start-date" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="date" id="end-date" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="datetime-local" id="raffle-date" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="datetime-local" id="winner-date" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+            </div>
+            
+            <button onclick="addNewItem()" class="btn-primary" style="margin-bottom: 10px;">
+                <i class="fas fa-plus"></i> Add Item
+            </button>
+            <button onclick="closeModal()" class="btn-secondary">
+                Cancel
+            </button>
+        </div>
+    </div>
+    
+    <!-- WALLET SETUP MODAL -->
+    <div id="wallet-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color: #667eea; text-align: center;">🏦 Setup E-Wallets</h3>
+            
+            <div style="margin: 20px 0;">
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Shopee Wallet Number:</label>
+                    <input type="text" id="shopee-input" placeholder="09XXXXXXXXX" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Lazada Wallet Number:</label>
+                    <input type="text" id="lazada-input" placeholder="09XXXXXXXXX" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                </div>
+                
+                <p style="color: #666; font-size: 14px; padding: 10px; background: #f8f9fa; border-radius: 5px;">
+                    ℹ️ Wallet details are required to receive winnings and expired balances.
+                </p>
+            </div>
+            
+            <button onclick="saveWalletInfo()" class="btn-primary" style="margin-bottom: 10px;">
+                Save Wallet Information
+            </button>
+            <button onclick="closeModal()" class="btn-secondary">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION AREA -->
+    <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
+
+    <!-- JAVASCRIPT -->
+    <script>
+        // ================ GLOBAL VARIABLES ================
+        let currentUser = null;
+        let currentItem = null;
+        let selectedAmount = 0;
+        let betNumber = '0';
+        let betAmount = 50;
+        
+        // ================ INITIAL DATA ================
+        // Initialize localStorage with demo data
+        function initializeData() {
+            if (!localStorage.getItem('raffle_users')) {
+                const demoUsers = {};
+                for (let i = 1; i <= 5; i++) {
+                    demoUsers[i] = {
+                        username: i.toString(),
+                        password: i.toString(),
+                        balance: 50.00,
+                        deposits: [],
+                        walletInfo: { shopee: '', lazada: '' },
+                        bets: []
+                    };
+                }
+                // Add admin user
+                demoUsers['admin'] = {
+                    username: 'admin',
+                    password: 'admin123',
+                    balance: 0,
+                    deposits: [],
+                    walletInfo: { shopee: '', lazada: '' },
+                    bets: [],
+                    isAdmin: true
+                };
+                localStorage.setItem('raffle_users', JSON.stringify(demoUsers));
+            }
+            
+            if (!localStorage.getItem('raffle_items')) {
+                const demoItems = [
+                    {
+                        id: 1,
+                        name: "iPhone 15 Pro",
+                        description: "Brand new iPhone 15 Pro 256GB",
+                        image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
+                        price: 69999,
+                        category: "electronics",
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        raffleDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                        winnerDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+                        status: "active",
+                        bets: []
+                    },
+                    {
+                        id: 2,
+                        name: "Samsung Galaxy S23",
+                        description: "Latest Samsung flagship phone",
+                        image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
+                        price: 45999,
+                        category: "electronics",
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                        raffleDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                        winnerDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+                        status: "active",
+                        bets: []
+                    },
+                    {
+                        id: 3,
+                        name: "PlayStation 5",
+                        description: "PS5 Digital Edition with 2 controllers",
+                        image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=400&h=300&fit=crop",
+                        price: 24999,
+                        category: "gaming",
+                        startDate: new Date().toISOString(),
+                        endDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+                        raffleDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+                        winnerDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000).toISOString(),
+                        status: "active",
+                        bets: []
+                    }
+                ];
+                localStorage.setItem('raffle_items', JSON.stringify(demoItems));
+            }
+            
+            if (!localStorage.getItem('raffle_bets')) {
+                localStorage.setItem('raffle_bets', JSON.stringify([]));
+            }
+        }
+        
+        // ================ LOGIN FUNCTIONS ================
+        function fillLogin(username, password) {
+            document.getElementById('username').value = username;
+            document.getElementById('password').value = password;
+        }
+        
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value;
+            
+            if (!username || !password) {
+                showNotification('Please enter username and password', 'error');
+                return;
+            }
+            
+            initializeData();
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            
+            if (users[username] && users[username].password === password) {
+                currentUser = username;
+                
+                if (users[username].isAdmin) {
+                    showAdminDashboard();
+                } else {
+                    showUserDashboard();
+                }
+                
+                showNotification('Login successful!', 'success');
+            } else {
+                showNotification('Invalid username or password', 'error');
+            }
+        }
+        
+        function adminLogin() {
+            document.getElementById('username').value = 'admin';
+            document.getElementById('password').value = 'admin123';
+            login();
+        }
+        
+        // ================ DASHBOARD FUNCTIONS ================
+        function showUserDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            
+            loadUserData();
+            loadRaffleItems();
+        }
+        
+        function showAdminDashboard() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+            
+            loadAdminData();
+        }
+        
+        function logout() {
+            currentUser = null;
+            currentItem = null;
+            
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('user-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '1';
+            
+            showNotification('Logged out successfully', 'success');
+        }
+        
+        function showTab(tabName) {
+            // Remove active class from all tabs and content
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Add active class to selected tab
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
+            
+            // Load data for the tab
+            if (tabName === 'wallet') {
+                loadDeposits();
+            } else if (tabName === 'bets') {
+                loadUserBets();
+            }
+        }
+        
+        // ================ USER DATA FUNCTIONS ================
+        function loadUserData() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            
+            if (!user) return;
+            
+            document.getElementById('current-user').textContent = currentUser;
+            document.getElementById('user-balance').textContent = user.balance.toFixed(2);
+            document.getElementById('wallet-balance').textContent = user.balance.toFixed(2);
+            document.getElementById('modal-balance').textContent = user.balance.toFixed(2);
+            
+            // Update wallet info
+            document.getElementById('shopee-wallet').textContent = 
+                user.walletInfo.shopee || 'Not set';
+            document.getElementById('lazada-wallet').textContent = 
+                user.walletInfo.lazada || 'Not set';
+        }
+        
+        function loadDeposits() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            const depositsList = document.getElementById('deposits-list');
+            
+            if (!user.deposits || user.deposits.length === 0) {
+                depositsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No active deposits</p>';
+                return;
+            }
+            
+            let html = '';
+            user.deposits.forEach((deposit, index) => {
+                const depositDate = new Date(deposit.depositDate);
+                const expiryDate = new Date(deposit.expiryDate);
+                const now = new Date();
+                const daysLeft = Math.ceil((expiryDate - now) / (1000 * 60 * 60 * 24));
+                
+                let statusClass = '';
+                if (deposit.status === 'expiring') {
+                    statusClass = 'expiring';
+                } else if (deposit.status === 'expired') {
+                    statusClass = 'expired';
+                }
+                
+                html += `
+                    <div class="deposit-item ${statusClass}">
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>₱${deposit.amount.toFixed(2)}</strong>
+                            <span>${daysLeft} days left</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Deposited: ${depositDate.toLocaleDateString()}<br>
+                            Expires: ${expiryDate.toLocaleDateString()}
+                        </div>
+                        ${deposit.status === 'expiring' ? 
+                            '<div style="color: #ff9800; font-size: 12px; margin-top: 5px;"><i class="fas fa-exclamation-triangle"></i> Expires tomorrow!</div>' : ''}
+                        ${deposit.status === 'expired' ? 
+                            '<div style="color: #f44336; font-size: 12px; margin-top: 5px;"><i class="fas fa-clock"></i> Expired</div>' : ''}
+                    </div>
+                `;
+            });
+            
+            depositsList.innerHTML = html;
+        }
+        
+        // ================ RAFFLE ITEMS FUNCTIONS ================
+        function loadRaffleItems() {
+            const items = JSON.parse(localStorage.getItem('raffle_items')) || [];
+            const container = document.getElementById('raffle-items');
+            
+            if (items.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No raffle items available</p>';
+                return;
+            }
+            
+            let html = '';
+            items.forEach(item => {
+                const endDate = new Date(item.endDate);
+                const now = new Date();
+                const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                
+                html += `
+                    <div class="item-card" onclick="openGameModal(${item.id})">
+                        <h4>${item.name}</h4>
+                        <p style="color: #666; font-size: 14px;">${item.description}</p>
+                        <img src="${item.image}" alt="${item.name}">
+                        <div class="item-info">
+                            <div>
+                                <strong style="color: #28a745;">₱${item.price.toLocaleString()}</strong><br>
+                                <small>Prize Value</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <strong>${daysLeft} days left</strong><br>
+                                <small>Ends: ${endDate.toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; text-align: center;">
+                            <button class="btn-primary" style="padding: 10px 20px; font-size: 14px;">
+                                <i class="fas fa-play"></i> Play Now
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+        
+        // ================ GAME FUNCTIONS ================
+        function openGameModal(itemId) {
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            currentItem = items.find(item => item.id === itemId);
+            
+            if (!currentItem) return;
+            
+            document.getElementById('item-name').textContent = currentItem.name;
+            document.getElementById('item-image').src = currentItem.image;
+            
+            // Reset bet
+            betNumber = '0';
+            betAmount = 50;
+            document.getElementById('bet-number').value = betNumber;
+            document.getElementById('current-bet-amount').textContent = betAmount;
+            document.getElementById('bet-slider').value = betAmount;
+            
+            // Update balance display
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            document.getElementById('modal-balance').textContent = user.balance.toFixed(2);
+            updateAfterBet();
+            
+            // Show modal
+            document.getElementById('game-modal').classList.remove('hidden');
+            showNotification(`Playing for: ${currentItem.name}`, 'info');
+        }
+        
+        function addNumber(num) {
+            if (num === '.' && betNumber.includes('.')) {
+                showNotification('Decimal point already added', 'warning');
+                return;
+            }
+            
+            if (betNumber.includes('.')) {
+                const decimalPart = betNumber.split('.')[1];
+                if (decimalPart.length >= 3) {
+                    showNotification('Maximum 3 decimal places', 'warning');
+                    return;
+                }
+            }
+            
+            if (betNumber === '0' && num !== '.') {
+                betNumber = num;
+            } else {
+                betNumber += num;
+            }
+            
+            document.getElementById('bet-number').value = betNumber;
+        }
+        
+        function clearNumber() {
+            betNumber = '0';
+            document.getElementById('bet-number').value = betNumber;
+        }
+        
+        function setBetAmount(amount) {
+            betAmount = amount;
+            document.getElementById('current-bet-amount').textContent = betAmount;
+            document.getElementById('bet-slider').value = betAmount;
+            updateAfterBet();
+        }
+        
+        document.getElementById('bet-slider').addEventListener('input', function() {
+            betAmount = parseInt(this.value);
+            document.getElementById('current-bet-amount').textContent = betAmount;
+            updateAfterBet();
+        });
+        
+        function updateAfterBet() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            const afterBet = user.balance - betAmount;
+            document.getElementById('after-bet').textContent = afterBet.toFixed(2);
+            
+            if (afterBet < 0) {
+                document.getElementById('after-bet').style.color = '#f44336';
+            } else {
+                document.getElementById('after-bet').style.color = '#333';
+            }
+        }
+        
+        function placeBet() {
+            // Validate number
+            const numValue = parseFloat(betNumber);
+            if (isNaN(numValue) || numValue < 0) {
+                showNotification('Please enter a valid number', 'error');
+                return;
+            }
+            
+            // Check decimal places
+            const decimalPart = betNumber.includes('.') ? betNumber.split('.')[1] : '';
+            if (decimalPart.length !== 3) {
+                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
+                return;
+            }
+            
+            // Check balance
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            
+            if (user.balance < betAmount) {
+                showNotification('Insufficient balance! Please cash in.', 'error');
+                return;
+            }
+            
+            // Check if number is already taken for this item
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            const existingBet = bets.find(bet => 
+                bet.itemId === currentItem.id && bet.number === numValue
+            );
+            
+            if (existingBet) {
+                showNotification('This number is already taken! Choose another.', 'error');
+                return;
+            }
+            
+            // Place the bet
+            const newBet = {
+                id: Date.now(),
+                userId: currentUser,
+                itemId: currentItem.id,
+                number: numValue,
+                amount: betAmount,
+                placedAt: new Date().toISOString(),
+                status: 'active'
+            };
+            
+            bets.push(newBet);
+            localStorage.setItem('raffle_bets', JSON.stringify(bets));
+            
+            // Deduct from user balance
+            user.balance -= betAmount;
+            user.bets = user.bets || [];
+            user.bets.push(newBet.id);
+            users[currentUser] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Add to item bets
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const itemIndex = items.findIndex(item => item.id === currentItem.id);
+            items[itemIndex].bets = items[itemIndex].bets || [];
+            items[itemIndex].bets.push(newBet.id);
+            localStorage.setItem('raffle_items', JSON.stringify(items));
+            
+            // Show success
+            const statusDiv = document.getElementById('game-status');
+            statusDiv.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
+                    <h4><i class="fas fa-check-circle"></i> Bet Placed Successfully!</h4>
+                    <p>Number: <strong>${betNumber}</strong></p>
+                    <p>Amount: <strong>₱${betAmount}</strong></p>
+                    <p>Remaining Balance: <strong>₱${user.balance.toFixed(2)}</strong></p>
+                </div>
+            `;
+            
+            // Update UI
+            loadUserData();
+            updateAfterBet();
+            
+            // Auto close after 3 seconds
+            setTimeout(() => {
+                closeModal();
+                showNotification('Bet placed successfully! Good luck!', 'success');
+            }, 3000);
+        }
+        
+        // ================ CASH IN FUNCTIONS ================
+        function showCashIn() {
+            selectedAmount = 0;
+            document.getElementById('selected-amount').textContent = '0';
+            
+            // Calculate expiry date (5 days from now)
+            const expiryDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+            document.getElementById('expiry-date').textContent = expiryDate.toLocaleDateString();
+            
+            document.getElementById('cashin-modal').classList.remove('hidden');
+        }
+        
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('selected-amount').textContent = amount;
+            
+            // Highlight selected button
+            document.querySelectorAll('.cashin-option').forEach(btn => {
+                btn.style.background = '#f8f9fa';
+                btn.style.color = '#333';
+                btn.style.borderColor = '#dee2e6';
+            });
+            
+            event.target.style.background = '#667eea';
+            event.target.style.color = 'white';
+            event.target.style.borderColor = '#667eea';
+        }
+        
+        function confirmCashIn() {
+            if (selectedAmount <= 0) {
+                showNotification('Please select an amount', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            
+            // Create deposit
+            const deposit = {
+                amount: selectedAmount,
+                depositDate: new Date().toISOString(),
+                expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'active',
+                notificationSent: false
+            };
+            
+            user.deposits = user.deposits || [];
+            user.deposits.push(deposit);
+            
+            // Add to balance
+            user.balance += selectedAmount;
+            
+            // Save
+            users[currentUser] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Close modal and update
+            closeModal();
+            loadUserData();
+            loadDeposits();
+            
+            showNotification(`Successfully cashed in ₱${selectedAmount}!`, 'success');
+        }
+        
+        // ================ SEND MONEY FUNCTIONS ================
+        function sendMoney() {
+            const recipient = document.getElementById('recipient').value.trim();
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            
+            if (!recipient || isNaN(amount) || amount <= 0) {
+                showNotification('Please enter valid recipient and amount', 'error');
+                return;
+            }
+            
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            
+            // Check recipient exists
+            if (!users[recipient] || recipient === currentUser) {
+                showNotification('Invalid recipient username', 'error');
+                return;
+            }
+            
+            // Check sender balance
+            if (users[currentUser].balance < amount) {
+                showNotification('Insufficient balance', 'error');
+                return;
+            }
+            
+            // Transfer money
+            users[currentUser].balance -= amount;
+            users[recipient].balance += amount;
+            
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Clear form
+            document.getElementById('recipient').value = '';
+            document.getElementById('send-amount').value = '';
+            
+            // Update UI
+            loadUserData();
+            
+            showNotification(`Successfully sent ₱${amount} to ${recipient}`, 'success');
+        }
+        
+        // ================ ADMIN FUNCTIONS ================
+        function loadAdminData() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const items = JSON.parse(localStorage.getItem('raffle_items')) || [];
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            
+            // Calculate stats
+            let totalBalance = 0;
+            let userCount = 0;
+            let activeRaffles = 0;
+            let totalBets = bets.length;
+            let totalWinners = 0;
+            let totalRevenue = bets.reduce((sum, bet) => sum + bet.amount, 0);
+            
+            Object.keys(users).forEach(username => {
+                if (!users[username].isAdmin) {
+                    totalBalance += users[username].balance;
+                    userCount++;
+                }
+            });
+            
+            items.forEach(item => {
+                if (item.status === 'active') activeRaffles++;
+                if (item.winner) totalWinners++;
+            });
+            
+            // Update stats
+            document.getElementById('total-users').textContent = userCount;
+            document.getElementById('total-balance').textContent = `₱${totalBalance.toFixed(2)}`;
+            document.getElementById('active-raffles').textContent = activeRaffles;
+            document.getElementById('total-bets').textContent = totalBets;
+            document.getElementById('total-winners').textContent = totalWinners;
+            document.getElementById('total-revenue').textContent = `₱${totalRevenue.toFixed(2)}`;
+            
+            // Load users list
+            const usersList = document.getElementById('users-list');
+            let usersHtml = '';
+            
+            Object.keys(users).forEach(username => {
+                if (users[username].isAdmin) return;
+                
+                const user = users[username];
+                usersHtml += `
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>${username}</strong>
+                            <span>₱${user.balance.toFixed(2)}</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666;">
+                            Deposits: ${user.deposits?.length || 0} | Bets: ${user.bets?.length || 0}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            usersList.innerHTML = usersHtml || '<p>No users found</p>';
+            
+            // Load items list
+            const itemsList = document.getElementById('admin-items-list');
+            let itemsHtml = '';
+            
+            items.forEach(item => {
+                const endDate = new Date(item.endDate);
+                itemsHtml += `
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid ${item.status === 'active' ? '#28a745' : '#6c757d'}">
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div>
+                                <strong>${item.name}</strong><br>
+                                <small>₱${item.price.toLocaleString()} • ${item.status}</small>
+                            </div>
+                            <div style="text-align: right;">
+                                <small>Bets: ${item.bets?.length || 0}</small><br>
+                                <small>Ends: ${endDate.toLocaleDateString()}</small>
+                            </div>
+                        </div>
+                        <div style="margin-top: 10px; display: flex; gap: 5px;">
+                            <button onclick="runItemRaffle(${item.id})" class="btn-secondary" style="padding: 5px 10px; font-size: 12px;">
+                                Run Draw
+                            </button>
+                            <button onclick="deleteItem(${item.id})" class="btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #dc3545;">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            itemsList.innerHTML = itemsHtml || '<p>No raffle items</p>';
+        }
+        
+        function showAddItem() {
+            // Set default dates
+            const now = new Date();
+            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const weekAfter = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            document.getElementById('item-name-input').value = '';
+            document.getElementById('item-price').value = '';
+            document.getElementById('item-image-url').value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
+            document.getElementById('start-date').value = now.toISOString().split('T')[0];
+            document.getElementById('end-date').value = nextWeek.toISOString().split('T')[0];
+            document.getElementById('raffle-date').value = nextWeek.toISOString().slice(0, 16);
+            document.getElementById('winner-date').value = weekAfter.toISOString().slice(0, 16);
+            
+            document.getElementById('add-item-modal').classList.remove('hidden');
+        }
+        
+        function addNewItem() {
+            const name = document.getElementById('item-name-input').value.trim();
+            const price = parseFloat(document.getElementById('item-price').value);
+            const image = document.getElementById('item-image-url').value.trim();
+            
+            if (!name || isNaN(price) || !image) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            const items = JSON.parse(localStorage.getItem('raffle_items')) || [];
+            const newItem = {
+                id: items.length > 0 ? Math.max(...items.map(i => i.id)) + 1 : 1,
+                name: name,
+                description: `Win this amazing ${name}`,
+                image: image,
+                price: price,
+                category: "electronics",
+                startDate: document.getElementById('start-date').value,
+                endDate: document.getElementById('end-date').value,
+                raffleDate: document.getElementById('raffle-date').value,
+                winnerDate: document.getElementById('winner-date').value,
+                status: "active",
+                bets: []
+            };
+            
+            items.push(newItem);
+            localStorage.setItem('raffle_items', JSON.stringify(items));
+            
+            closeModal();
+            loadAdminData();
+            showNotification(`Added new raffle item: ${name}`, 'success');
+        }
+        
+        function runItemRaffle(itemId) {
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            
+            const itemIndex = items.findIndex(item => item.id === itemId);
+            if (itemIndex === -1) return;
+            
+            const itemBets = bets.filter(bet => bet.itemId === itemId);
+            
+            if (itemBets.length === 0) {
+                showNotification('No bets placed for this item', 'warning');
+                return;
+            }
+            
+            // Find lowest unique number
+            const numberCounts = {};
+            itemBets.forEach(bet => {
+                numberCounts[bet.number] = (numberCounts[bet.number] || 0) + 1;
+            });
+            
+            const uniqueBets = itemBets.filter(bet => numberCounts[bet.number] === 1);
+            
+            if (uniqueBets.length === 0) {
+                showNotification('No unique numbers found for this raffle', 'warning');
+                return;
+            }
+            
+            // Find lowest number
+            uniqueBets.sort((a, b) => a.number - b.number);
+            const winningBet = uniqueBets[0];
+            
+            // Mark winner
+            items[itemIndex].winner = {
+                userId: winningBet.userId,
+                winningNumber: winningBet.number,
+                announced: true
+            };
+            items[itemIndex].status = 'completed';
+            
+            // Update user (give prize value as bonus)
+            const winnerUsername = winningBet.userId;
+            if (users[winnerUsername]) {
+                users[winnerUsername].balance += items[itemIndex].price;
+            }
+            
+            // Save everything
+            localStorage.setItem('raffle_items', JSON.stringify(items));
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Update admin view
+            loadAdminData();
+            
+            showNotification(`Winner declared for ${items[itemIndex].name}: ${winnerUsername} with number ${winningBet.number}`, 'success');
+        }
+        
+        function deleteItem(itemId) {
+            if (!confirm('Are you sure you want to delete this raffle item?')) return;
+            
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const filteredItems = items.filter(item => item.id !== itemId);
+            
+            localStorage.setItem('raffle_items', JSON.stringify(filteredItems));
+            loadAdminData();
+            showNotification('Item deleted successfully', 'success');
+        }
+        
+        function runRaffle() {
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const activeItems = items.filter(item => item.status === 'active');
+            
+            if (activeItems.length === 0) {
+                showNotification('No active raffles to run', 'warning');
+                return;
+            }
+            
+            activeItems.forEach(item => {
+                runItemRaffle(item.id);
+            });
+            
+            showNotification(`Ran raffle for ${activeItems.length} item(s)`, 'success');
+        }
+        
+        function resetAllData() {
+            if (!confirm('This will reset ALL data to initial demo state. Continue?')) return;
+            
+            localStorage.removeItem('raffle_users');
+            localStorage.removeItem('raffle_items');
+            localStorage.removeItem('raffle_bets');
+            
+            initializeData();
+            loadAdminData();
+            
+            showNotification('All data reset to demo state', 'success');
+        }
+        
+        function addTestData() {
+            // Add some test bets
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            
+            if (items.length > 0) {
+                const testBet = {
+                    id: Date.now(),
+                    userId: '1',
+                    itemId: items[0].id,
+                    number: 123.456,
+                    amount: 50,
+                    placedAt: new Date().toISOString(),
+                    status: 'active'
+                };
+                
+                bets.push(testBet);
+                localStorage.setItem('raffle_bets', JSON.stringify(bets));
+                
+                // Update user
+                users['1'].bets = users['1'].bets || [];
+                users['1'].bets.push(testBet.id);
+                localStorage.setItem('raffle_users', JSON.stringify(users));
+                
+                // Update item
+                items[0].bets = items[0].bets || [];
+                items[0].bets.push(testBet.id);
+                localStorage.setItem('raffle_items', JSON.stringify(items));
+            }
+            
+            loadAdminData();
+            showNotification('Test data added successfully', 'success');
+        }
+        
+        function loadUserBets() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            
+            const user = users[currentUser];
+            if (!user.bets || user.bets.length === 0) {
+                document.getElementById('bets-list').innerHTML = 
+                    '<p style="text-align: center; color: #999; padding: 40px;">No bets placed yet. Start playing!</p>';
+                return;
+            }
+            
+            const userBets = bets.filter(bet => bet.userId === currentUser);
+            let html = '';
+            
+            userBets.forEach(bet => {
+                const item = items.find(i => i.id === bet.itemId);
+                const placedDate = new Date(bet.placedAt);
+                
+                html += `
+                    <div class="bet-item">
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong>${item?.name || 'Unknown Item'}</strong>
+                            <span style="color: #667eea;">₱${bet.amount}</span>
+                        </div>
+                        <div style="margin-top: 5px;">
+                            <span style="background: #e0e7ff; color: #667eea; padding: 3px 8px; border-radius: 15px; font-size: 12px;">
+                                Number: ${bet.number.toFixed(3)}
+                            </span>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            Placed: ${placedDate.toLocaleDateString()} ${placedDate.toLocaleTimeString()}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            document.getElementById('bets-list').innerHTML = html;
+        }
+        
+        // ================ WALLET FUNCTIONS ================
+        function showWalletSetup() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            
+            document.getElementById('shopee-input').value = user.walletInfo.shopee || '';
+            document.getElementById('lazada-input').value = user.walletInfo.lazada || '';
+            
+            document.getElementById('wallet-modal').classList.remove('hidden');
+        }
+        
+        function saveWalletInfo() {
+            const shopee = document.getElementById('shopee-input').value.trim();
+            const lazada = document.getElementById('lazada-input').value.trim();
+            
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            
+            user.walletInfo = {
+                shopee: shopee,
+                lazada: lazada
+            };
+            
+            users[currentUser] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            closeModal();
+            loadUserData();
+            
+            showNotification('Wallet information saved successfully', 'success');
+        }
+        
+        // ================ UTILITY FUNCTIONS ================
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.classList.add('hidden');
+            });
+        }
+        
+        function showNotification(message, type = 'info') {
+            const notificationArea = document.getElementById('notification-area');
+            
+            let backgroundColor = '#667eea';
+            let icon = 'fas fa-info-circle';
+            
+            switch(type) {
+                case 'success':
+                    backgroundColor = '#28a745';
+                    icon = 'fas fa-check-circle';
+                    break;
+                case 'error':
+                    backgroundColor = '#dc3545';
+                    icon = 'fas fa-exclamation-circle';
+                    break;
+                case 'warning':
+                    backgroundColor = '#ffc107';
+                    icon = 'fas fa-exclamation-triangle';
+                    break;
+                case 'info':
+                    backgroundColor = '#17a2b8';
+                    icon = 'fas fa-info-circle';
+                    break;
+            }
+            
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="${icon}" style="font-size: 20px;"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            notification.style.background = backgroundColor;
+            
+            notificationArea.appendChild(notification);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+        
+        // ================ INITIALIZATION ================
+        window.onload = function() {
+            initializeData();
+            showNotification('Welcome to Raffle Game Prototype! Use username 1-5 with same password.', 'info');
+        };
+    </script>
+</body>
+</html>
