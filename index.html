@@ -991,6 +991,59 @@
             transform: none !important;
             box-shadow: none !important;
         }
+        
+        /* ===== COLLAPSIBLE SECTIONS ===== */
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 5px solid #667eea;
+        }
+        
+        .collapsible-header:hover {
+            background: #e9ecef;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .collapsible-content.expanded {
+            max-height: 500px;
+        }
+        
+        .collapsible-icon {
+            transition: transform 0.3s;
+        }
+        
+        .collapsible-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .view-all-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .view-all-btn:hover {
+            background: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -1095,20 +1148,35 @@
                 
                 <!-- Wallet Logs Section -->
                 <div class="wallet-logs">
-                    <h4 style="margin: 20px 0 10px 0;">📋 Wallet Logs</h4>
-                    <div id="wallet-logs-list">
-                        <!-- Wallet logs loaded here -->
+                    <div class="collapsible-header" onclick="toggleCollapsible('wallet-logs')">
+                        <h4 style="margin: 0; color: #667eea;">
+                            <i class="fas fa-file-alt"></i> Wallet Logs
+                        </h4>
+                        <i class="fas fa-chevron-down collapsible-icon" id="wallet-logs-icon"></i>
+                    </div>
+                    <div class="collapsible-content" id="wallet-logs-content">
+                        <div id="wallet-logs-list">
+                            <!-- Wallet logs loaded here -->
+                        </div>
+                        <button class="view-all-btn" onclick="viewAllLogs()">View All Logs</button>
                     </div>
                 </div>
                 
                 <div class="deposits">
-                    <h4 style="margin: 20px 0 10px 0;">📅 Active Deposits (Last 3)</h4>
-                    <div id="deposits-list">
-                        <!-- Deposits loaded here -->
+                    <div class="collapsible-header" onclick="toggleCollapsible('deposits')">
+                        <h4 style="margin: 0; color: #667eea;">
+                            <i class="fas fa-calendar-alt"></i> Active Deposits
+                        </h4>
+                        <i class="fas fa-chevron-down collapsible-icon" id="deposits-icon"></i>
                     </div>
-                    <p style="color: #666; font-size: 12px; margin-top: 10px;">
-                        ⏰ Deposits expire in 5 days. You'll be notified before expiry.
-                    </p>
+                    <div class="collapsible-content" id="deposits-content">
+                        <div id="deposits-list">
+                            <!-- Deposits loaded here -->
+                        </div>
+                        <p style="color: #666; font-size: 12px; margin-top: 10px;">
+                            ⏰ Deposits expire in 5 days. You'll be notified before expiry.
+                        </p>
+                    </div>
                 </div>
                 
                 <button onclick="showCashIn()" class="btn-primary" style="margin-top: 30px;">
@@ -1117,10 +1185,10 @@
                 
                 <div style="margin-top: 20px; padding: 15px; background: #f0f8ff; border-radius: 10px;">
                     <h4 style="color: #667eea;">🏦 Wallet Info</h4>
-                    <p style="margin: 10px 0;">Shopee Wallet: <span id="shopee-wallet">Not set</span> 
+                    <p style="margin: 10px 0;">Shopee Wallet: <span id="shopee-wallet"></span> 
                         <button class="wallet-transfer-btn" onclick="transferToShopee()">Transfer</button>
                     </p>
-                    <p>Lazada Wallet: <span id="lazada-wallet">Not set</span>
+                    <p>Lazada Wallet: <span id="lazada-wallet"></span>
                         <button class="wallet-transfer-btn" onclick="transferToLazada()">Transfer</button>
                     </p>
                     <button onclick="showWalletSetup()" class="btn-secondary" style="margin-top: 10px;">
@@ -1133,7 +1201,6 @@
                     <p style="margin: 5px 0; font-size: 14px;">• 2% service fee for wallet transfers</p>
                     <p style="margin: 5px 0; font-size: 14px;">• 2% service fee on refunded bets</p>
                     <p style="margin: 5px 0; font-size: 14px;">• Deposits expire in 5 days</p>
-                    <p style="margin: 5px 0; font-size: 14px;">• Only last 3 deposits kept in wallet</p>
                 </div>
             </div>
         </div>
@@ -1608,6 +1675,8 @@
         let autoBetNumbers = [];
         let manualBetNumbers = [];
         let drawCheckInterval = null;
+        let showAllLogs = false;
+        let showAllDeposits = false;
         
         // ================ INITIAL DATA ================
         function initializeData() {
@@ -1827,6 +1896,30 @@
             }
         }
         
+        // ================ COLLAPSIBLE FUNCTIONS ================
+        function toggleCollapsible(sectionId) {
+            const content = document.getElementById(`${sectionId}-content`);
+            const icon = document.getElementById(`${sectionId}-icon`);
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+            }
+        }
+        
+        function viewAllLogs() {
+            showAllLogs = !showAllLogs;
+            loadWalletLogs();
+        }
+        
+        function viewAllDeposits() {
+            showAllDeposits = !showAllDeposits;
+            loadDeposits();
+        }
+        
         // ================ USER DATA FUNCTIONS ================
         function loadUserData() {
             const users = JSON.parse(localStorage.getItem('raffle_users'));
@@ -1838,9 +1931,9 @@
             document.getElementById('user-balance').textContent = formatDecimal(user.balance);
             document.getElementById('wallet-balance').textContent = formatDecimal(user.balance);
             
-            // Update wallet info
-            document.getElementById('shopee-wallet').textContent = user.walletInfo.shopee || 'Not set';
-            document.getElementById('lazada-wallet').textContent = user.walletInfo.lazada || 'Not set';
+            // Update wallet info - show empty string if not set
+            document.getElementById('shopee-wallet').textContent = user.walletInfo.shopee || '';
+            document.getElementById('lazada-wallet').textContent = user.walletInfo.lazada || '';
         }
         
         function loadDeposits() {
@@ -1853,11 +1946,11 @@
                 return;
             }
             
-            // Keep only last 3 deposits
-            const lastThreeDeposits = user.deposits.slice(-3);
+            // Show only last 3 deposits by default, or all if showAllDeposits is true
+            const depositsToShow = showAllDeposits ? user.deposits : user.deposits.slice(-3);
             
             let html = '';
-            lastThreeDeposits.forEach((deposit, index) => {
+            depositsToShow.forEach((deposit, index) => {
                 const depositDate = new Date(deposit.depositDate);
                 const expiryDate = new Date(deposit.expiryDate);
                 const now = new Date();
@@ -1880,7 +1973,7 @@
                     statusText = `<div style="color: #f44336; font-size: 12px; margin-top: 5px;">
                         <i class="fas fa-clock"></i> EXPIRED - Transfer required
                     </div>`;
-                    actionButton = `<button onclick="showTransferModal(${user.deposits.length - 3 + index})" class="btn-warning" style="margin-top: 10px; width: 100%;">
+                    actionButton = `<button onclick="showTransferModal(${index})" class="btn-warning" style="margin-top: 10px; width: 100%;">
                         <i class="fas fa-exchange-alt"></i> Transfer to E-Wallet
                     </button>`;
                 }
@@ -1914,8 +2007,11 @@
                 return;
             }
             
+            // Show only last 3 logs by default, or all if showAllLogs is true
+            const logsToShow = showAllLogs ? user.walletLogs : user.walletLogs.slice(-3);
+            
             let html = '';
-            user.walletLogs.slice(-10).reverse().forEach(log => {
+            logsToShow.reverse().forEach(log => {
                 const logDate = new Date(log.date);
                 let logClass = '';
                 let logIcon = '';
@@ -1967,6 +2063,12 @@
             });
             
             logsList.innerHTML = html;
+            
+            // Update View All button text
+            const viewAllBtn = document.querySelector('.view-all-btn');
+            if (viewAllBtn) {
+                viewAllBtn.textContent = showAllLogs ? 'Show Less' : 'View All Logs';
+            }
         }
         
         function addWalletLog(userId, type, description, amount) {
