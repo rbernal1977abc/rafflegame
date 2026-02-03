@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raffle Number Game - Prototype</title>
+    <title>Raffle Number Game - Prototype 888</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== RESET & BASE STYLES ===== */
@@ -432,33 +432,22 @@
             font-family: monospace;
         }
 
-        /* ===== QUICK BETS ===== */
-        .quick-bet {
+        /* ===== BET AMOUNT SLIDER ===== */
+        .bet-amount {
             margin: 20px 0;
         }
 
-        .quick-buttons {
+        .bet-slider-container {
             display: flex;
+            align-items: center;
             gap: 10px;
-            flex-wrap: wrap;
-            margin-top: 10px;
+            margin: 10px 0;
         }
 
-        .quick-btn {
-            flex: 1;
-            padding: 15px;
-            background: #e9ecef;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: all 0.2s;
-        }
-
-        .quick-btn:hover {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
+        .bet-slider-label {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
         }
 
         /* ===== CASH IN OPTIONS ===== */
@@ -665,94 +654,13 @@
             margin-top: 5px;
         }
         
-        /* ===== RANDOM BET SECTION ===== */
-        .random-bet-section {
+        /* ===== MANUAL BET SECTION ===== */
+        .manual-bet-section {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
             margin: 20px 0;
-        }
-        
-        .random-controls {
-            display: grid;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .random-btn {
-            background: #6f42c1;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .random-btn:hover {
-            background: #5a32a3;
-        }
-        
-        .random-numbers-display {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-            max-height: 100px;
-            overflow-y: auto;
-            padding: 10px;
-            background: white;
-            border-radius: 8px;
-        }
-        
-        .random-number-badge {
-            background: #e9ecef;
-            padding: 5px 10px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-family: monospace;
-        }
-        
-        .bet-controls {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .bet-control-btn {
-            flex: 1;
-            padding: 10px;
-            border: 2px solid #dee2e6;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .bet-control-btn.active {
-            background: #667eea;
-            color: white;
-            border-color: #667eea;
-        }
-        
-        .use-max-btn {
-            background: #20c997;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 10px;
-            width: 100%;
-        }
-        
-        .use-max-btn:hover {
-            background: #1aa179;
+            border-left: 5px solid #667eea;
         }
         
         /* ===== AUTO BET SECTION ===== */
@@ -760,7 +668,7 @@
             background: #fff3cd;
             padding: 15px;
             border-radius: 10px;
-            margin: 15px 0;
+            margin: 20px 0;
             border-left: 5px solid #ffc107;
         }
         
@@ -800,9 +708,39 @@
             color: #666;
         }
         
+        /* ===== BALANCE SUMMARY ===== */
+        .balance-summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .balance-label {
+            color: #666;
+        }
+        
+        .balance-value {
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        .fee-warning {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 10px;
+            text-align: center;
+        }
+        
         /* ===== PLACE GAME BUTTON ===== */
         .place-game-btn-container {
-            margin: 30px 0;
+            margin: 15px 0;
         }
         
         .place-game-btn {
@@ -884,7 +822,7 @@
         <div class="logo">
             <i class="fas fa-ticket-alt"></i>
             <h1>Raffle Number Game</h1>
-            <p>Prototype v1.0</p>
+            <p>Prototype v888</p>
         </div>
         
         <div class="login-form">
@@ -1137,86 +1075,75 @@
                     Enter your unique number (format: X.XXX where X=0-9)
                 </p>
                 
-                <div class="calculator">
-                    <div class="calc-row">
-                        <button class="calc-btn" onclick="addNumber('1')">1</button>
-                        <button class="calc-btn" onclick="addNumber('2')">2</button>
-                        <button class="calc-btn" onclick="addNumber('3')">3</button>
-                    </div>
-                    <div class="calc-row">
-                        <button class="calc-btn" onclick="addNumber('4')">4</button>
-                        <button class="calc-btn" onclick="addNumber('5')">5</button>
-                        <button class="calc-btn" onclick="addNumber('6')">6</button>
-                    </div>
-                    <div class="calc-row">
-                        <button class="calc-btn" onclick="addNumber('7')">7</button>
-                        <button class="calc-btn" onclick="addNumber('8')">8</button>
-                        <button class="calc-btn" onclick="addNumber('9')">9</button>
-                    </div>
-                    <div class="calc-row">
-                        <button class="calc-btn" onclick="addNumber('.')">.</button>
-                        <button class="calc-btn" onclick="addNumber('0')">0</button>
-                        <button class="calc-btn" onclick="clearNumber()">C</button>
-                    </div>
-                </div>
-                
-                <div class="quick-bet">
-                    <h4 style="margin: 20px 0 10px 0;">💸 Quick Bet Amounts</h4>
-                    <div class="quick-buttons">
-                        <button class="quick-btn" onclick="setBetAmount(50)">₱50.000</button>
-                        <button class="quick-btn" onclick="setBetAmount(100)">₱100.000</button>
-                        <button class="quick-btn" onclick="setBetAmount(150)">₱150.000</button>
-                        <button class="quick-btn" onclick="setBetAmount(200)">₱200.000</button>
-                        <button class="quick-btn" onclick="setBetAmount(250)">₱250.000</button>
-                        <button class="quick-btn" onclick="setBetAmount(500)">₱500.000</button>
-                    </div>
-                </div>
-                
-                <div class="bet-amount" style="margin: 20px 0;">
-                    <h4>Bet Amount: ₱<span id="current-bet-amount" class="decimal-format">50.000</span></h4>
-                    <input type="range" id="bet-slider" min="1" max="1000" value="50" step="1" style="width: 100%; margin: 10px 0;">
-                </div>
-                
-                <div style="background: #e9ecef; padding: 15px; border-radius: 10px; margin: 20px 0;">
-                    <p style="margin: 5px 0;">Your Balance: <strong class="decimal-format">₱<span id="modal-balance">50.000</span></strong></p>
-                    <p style="margin: 5px 0;">After Bet: <strong class="decimal-format">₱<span id="after-bet">0.000</span></strong></p>
-                    <p style="margin: 5px 0; font-size: 12px; color: #dc3545;" id="fee-warning"></p>
-                </div>
-                
-                <!-- RANDOM BET SECTION -->
-                <div class="random-bet-section">
-                    <h4 style="color: #667eea; margin-bottom: 10px;"><i class="fas fa-random"></i> Random Bet Options</h4>
+                <!-- MANUAL BET SECTION -->
+                <div class="manual-bet-section">
+                    <h4 style="color: #667eea; margin-bottom: 15px; text-align: center;">
+                        <i class="fas fa-keyboard"></i> Manual Betting
+                    </h4>
                     
-                    <div class="random-controls">
-                        <button class="random-btn" onclick="generateRandomNumber()">
-                            <i class="fas fa-dice"></i> Generate Random Number
-                        </button>
-                        
-                        <div class="bet-controls">
-                            <button class="bet-control-btn active" onclick="setRandomCount(1)">
-                                1 Number
-                            </button>
-                            <button class="bet-control-btn" onclick="setRandomCount(5)">
-                                5 Numbers
-                            </button>
-                            <button class="bet-control-btn" onclick="setRandomCount(10)">
-                                10 Numbers
-                            </button>
+                    <div class="calculator">
+                        <div class="calc-row">
+                            <button class="calc-btn" onclick="addNumber('1')">1</button>
+                            <button class="calc-btn" onclick="addNumber('2')">2</button>
+                            <button class="calc-btn" onclick="addNumber('3')">3</button>
                         </div>
-                        
-                        <div id="random-numbers-display" class="random-numbers-display">
-                            <!-- Random numbers will appear here -->
+                        <div class="calc-row">
+                            <button class="calc-btn" onclick="addNumber('4')">4</button>
+                            <button class="calc-btn" onclick="addNumber('5')">5</button>
+                            <button class="calc-btn" onclick="addNumber('6')">6</button>
                         </div>
-                        
-                        <button class="use-max-btn" onclick="useMaxBalance()">
-                            <i class="fas fa-money-bill-wave"></i> Use All Balance for Random Bets
+                        <div class="calc-row">
+                            <button class="calc-btn" onclick="addNumber('7')">7</button>
+                            <button class="calc-btn" onclick="addNumber('8')">8</button>
+                            <button class="calc-btn" onclick="addNumber('9')">9</button>
+                        </div>
+                        <div class="calc-row">
+                            <button class="calc-btn" onclick="addNumber('.')">.</button>
+                            <button class="calc-btn" onclick="addNumber('0')">0</button>
+                            <button class="calc-btn" onclick="clearNumber()">C</button>
+                        </div>
+                    </div>
+                    
+                    <!-- BET AMOUNT SLIDER -->
+                    <div class="bet-amount">
+                        <h4 style="margin: 20px 0 10px 0;">Bet Amount: ₱<span id="current-bet-amount" class="decimal-format">50.000</span></h4>
+                        <div class="bet-slider-container">
+                            <span class="bet-slider-label">₱1.000</span>
+                            <input type="range" id="bet-slider" min="1" max="1000" value="50" step="1" style="width: 100%;">
+                            <span class="bet-slider-label">₱1000.000</span>
+                        </div>
+                    </div>
+                    
+                    <!-- MANUAL BET BALANCE SUMMARY -->
+                    <div class="balance-summary" id="manual-balance-summary">
+                        <div class="balance-row">
+                            <span class="balance-label">Your Balance:</span>
+                            <span class="balance-value decimal-format" id="manual-balance">₱50.000</span>
+                        </div>
+                        <div class="balance-row">
+                            <span class="balance-label">Bet Amount:</span>
+                            <span class="balance-value decimal-format" id="manual-bet-amount">₱50.000</span>
+                        </div>
+                        <div class="balance-row">
+                            <span class="balance-label">After Bet:</span>
+                            <span class="balance-value decimal-format" id="manual-after-bet">₱0.000</span>
+                        </div>
+                        <div class="fee-warning" id="manual-fee-warning"></div>
+                    </div>
+                    
+                    <!-- MANUAL PLACE GAME BUTTON -->
+                    <div class="place-game-btn-container">
+                        <button class="place-game-btn" id="manual-place-game-btn" onclick="placeBet()">
+                            <i class="fas fa-play-circle"></i> PLACE GAME (Manual)
                         </button>
                     </div>
                 </div>
                 
                 <!-- AUTO BET SECTION -->
                 <div class="auto-bet-section">
-                    <h4 style="color: #856404; margin-bottom: 10px;"><i class="fas fa-bolt"></i> Auto Bet</h4>
+                    <h4 style="color: #856404; margin-bottom: 15px; text-align: center;">
+                        <i class="fas fa-bolt"></i> Auto Bet
+                    </h4>
                     
                     <div class="auto-bet-controls">
                         <button class="auto-bet-btn" id="auto-bet-btn" onclick="toggleAutoBet()">
@@ -1224,16 +1151,33 @@
                         </button>
                         
                         <div class="auto-bet-status" id="auto-bet-status">
-                            Ready to place random bets automatically
+                            Ready to place random bets automatically. All balance in your wallet will be used.
                         </div>
                     </div>
-                </div>
-                
-                <!-- PLACE GAME BUTTON -->
-                <div class="place-game-btn-container">
-                    <button class="place-game-btn" id="place-game-btn" onclick="placeBet()">
-                        <i class="fas fa-play-circle"></i> PLACE GAME
-                    </button>
+                    
+                    <!-- AUTO BET BALANCE SUMMARY -->
+                    <div class="balance-summary" id="auto-balance-summary">
+                        <div class="balance-row">
+                            <span class="balance-label">Your Balance:</span>
+                            <span class="balance-value decimal-format" id="auto-balance">₱50.000</span>
+                        </div>
+                        <div class="balance-row">
+                            <span class="balance-label">Bet Amount:</span>
+                            <span class="balance-value decimal-format" id="auto-bet-amount">₱50.000</span>
+                        </div>
+                        <div class="balance-row">
+                            <span class="balance-label">Max Bets Possible:</span>
+                            <span class="balance-value" id="max-bets">0</span>
+                        </div>
+                        <div class="fee-warning" id="auto-fee-warning"></div>
+                    </div>
+                    
+                    <!-- AUTO PLACE GAME BUTTON -->
+                    <div class="place-game-btn-container">
+                        <button class="place-game-btn" id="auto-place-game-btn" onclick="placeAutoBet()">
+                            <i class="fas fa-bolt"></i> PLACE GAME (Auto)
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="game-status" id="game-status" style="text-align: center; margin-top: 20px; padding: 10px; border-radius: 10px;">
@@ -1408,10 +1352,9 @@
         let currentDepositId = null;
         let serviceFee = 2.00;
         let refundFeePercent = 2;
-        let randomNumbers = [];
-        let randomCount = 1;
         let isAutoBetting = false;
         let autoBetInterval = null;
+        let autoBetNumbers = [];
         
         // ================ INITIAL DATA ================
         function initializeData() {
@@ -1602,7 +1545,8 @@
             document.getElementById('current-user').textContent = currentUser;
             document.getElementById('user-balance').textContent = formatDecimal(user.balance);
             document.getElementById('wallet-balance').textContent = formatDecimal(user.balance);
-            document.getElementById('modal-balance').textContent = formatDecimal(user.balance);
+            document.getElementById('manual-balance').textContent = formatCurrency(user.balance);
+            document.getElementById('auto-balance').textContent = formatCurrency(user.balance);
             
             // Update wallet display
             const shopeeElem = document.getElementById('shopee-wallet');
@@ -1943,21 +1887,11 @@
             // Reset betting state
             betNumber = '0.000';
             betAmount = 50.000;
-            randomNumbers = [];
-            randomCount = 1;
+            autoBetNumbers = [];
             
             document.getElementById('bet-number').value = betNumber;
             document.getElementById('current-bet-amount').textContent = formatDecimal(betAmount);
             document.getElementById('bet-slider').value = betAmount;
-            
-            // Reset random numbers display
-            document.getElementById('random-numbers-display').innerHTML = '';
-            
-            // Reset button controls
-            document.querySelectorAll('.bet-control-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            document.querySelectorAll('.bet-control-btn')[0].classList.add('active');
             
             // Reset auto betting
             stopAutoBet();
@@ -1965,8 +1899,13 @@
             // Update balance display
             const users = JSON.parse(localStorage.getItem('raffle_users'));
             const user = users[currentUser];
-            document.getElementById('modal-balance').textContent = formatDecimal(user.balance);
-            updateAfterBet();
+            document.getElementById('manual-balance').textContent = formatCurrency(user.balance);
+            document.getElementById('auto-balance').textContent = formatCurrency(user.balance);
+            document.getElementById('manual-bet-amount').textContent = formatCurrency(betAmount);
+            document.getElementById('auto-bet-amount').textContent = formatCurrency(betAmount);
+            
+            updateManualBetSummary();
+            updateAutoBetSummary();
             
             document.getElementById('game-modal').classList.remove('hidden');
         }
@@ -2009,36 +1948,72 @@
             betAmount = parseFloat(amount);
             document.getElementById('current-bet-amount').textContent = formatDecimal(betAmount);
             document.getElementById('bet-slider').value = betAmount;
-            updateAfterBet();
+            updateManualBetSummary();
+            updateAutoBetSummary();
         }
         
         document.getElementById('bet-slider').addEventListener('input', function() {
             betAmount = parseFloat(this.value);
             document.getElementById('current-bet-amount').textContent = formatDecimal(betAmount);
-            updateAfterBet();
+            updateManualBetSummary();
+            updateAutoBetSummary();
         });
         
-        function updateAfterBet() {
+        function updateManualBetSummary() {
             const users = JSON.parse(localStorage.getItem('raffle_users'));
             const user = users[currentUser];
-            const afterBet = parseFloat(user.balance) - betAmount;
-            document.getElementById('after-bet').textContent = formatDecimal(afterBet);
+            const balance = parseFloat(user.balance);
+            const afterBet = balance - betAmount;
             
-            const feeWarning = document.getElementById('fee-warning');
-            const placeGameBtn = document.getElementById('place-game-btn');
+            document.getElementById('manual-balance').textContent = formatCurrency(balance);
+            document.getElementById('manual-bet-amount').textContent = formatCurrency(betAmount);
+            document.getElementById('manual-after-bet').textContent = formatCurrency(afterBet);
+            
+            const feeWarning = document.getElementById('manual-fee-warning');
+            const placeGameBtn = document.getElementById('manual-place-game-btn');
             
             if (afterBet < 0) {
-                document.getElementById('after-bet').style.color = '#f44336';
+                document.getElementById('manual-after-bet').style.color = '#f44336';
                 feeWarning.textContent = 'Insufficient balance! Please deposit more.';
                 placeGameBtn.disabled = true;
                 placeGameBtn.style.opacity = '0.6';
                 placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> INSUFFICIENT BALANCE';
             } else {
-                document.getElementById('after-bet').style.color = '#333';
+                document.getElementById('manual-after-bet').style.color = '#333';
                 feeWarning.textContent = '';
                 placeGameBtn.disabled = false;
                 placeGameBtn.style.opacity = '1';
-                placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME';
+                placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
+            }
+        }
+        
+        function updateAutoBetSummary() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            const balance = parseFloat(user.balance);
+            
+            document.getElementById('auto-balance').textContent = formatCurrency(balance);
+            document.getElementById('auto-bet-amount').textContent = formatCurrency(betAmount);
+            
+            // Calculate max bets possible
+            const maxBets = Math.floor(balance / betAmount);
+            document.getElementById('max-bets').textContent = maxBets;
+            
+            const feeWarning = document.getElementById('auto-fee-warning');
+            const placeGameBtn = document.getElementById('auto-place-game-btn');
+            
+            if (maxBets <= 0) {
+                document.getElementById('max-bets').style.color = '#f44336';
+                feeWarning.textContent = 'Insufficient balance for auto betting!';
+                placeGameBtn.disabled = true;
+                placeGameBtn.style.opacity = '0.6';
+                placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> INSUFFICIENT BALANCE';
+            } else {
+                document.getElementById('max-bets').style.color = '#333';
+                feeWarning.textContent = '';
+                placeGameBtn.disabled = false;
+                placeGameBtn.style.opacity = '1';
+                placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
             }
         }
         
@@ -2074,7 +2049,7 @@
             }
             
             // Animate button
-            const placeGameBtn = document.getElementById('place-game-btn');
+            const placeGameBtn = document.getElementById('manual-place-game-btn');
             placeGameBtn.classList.add('placed');
             placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BET PLACED!';
             
@@ -2118,12 +2093,13 @@
             
             // Update UI
             loadUserData();
-            updateAfterBet();
+            updateManualBetSummary();
+            updateAutoBetSummary();
             
             // Reset button after 2 seconds
             setTimeout(() => {
                 placeGameBtn.classList.remove('placed');
-                placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME';
+                placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
                 
                 // Clear bet number for next bet
                 betNumber = '0.000';
@@ -2136,103 +2112,12 @@
             }, 2000);
         }
         
-        // ================ RANDOM BET FUNCTIONS ================
+        // ================ AUTO BET FUNCTIONS ================
         function generateRandomNumber() {
-            // Generate random number between 0 and 999.999
+            // Generate random number between 0 and 999.999 with 3 decimal places
             const wholePart = Math.floor(Math.random() * 1000);
             const decimalPart = Math.floor(Math.random() * 1000);
-            const randomNum = parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`);
-            
-            betNumber = randomNum.toFixed(3);
-            document.getElementById('bet-number').value = betNumber;
-            
-            // Add to random numbers list
-            if (randomNumbers.length >= 20) {
-                randomNumbers.shift();
-            }
-            randomNumbers.push(betNumber);
-            
-            // Update display
-            updateRandomNumbersDisplay();
-        }
-        
-        function setRandomCount(count) {
-            randomCount = count;
-            
-            // Update button states
-            document.querySelectorAll('.bet-control-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            // Generate multiple random numbers
-            randomNumbers = [];
-            for (let i = 0; i < count; i++) {
-                const wholePart = Math.floor(Math.random() * 1000);
-                const decimalPart = Math.floor(Math.random() * 1000);
-                const randomNum = parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`);
-                randomNumbers.push(randomNum.toFixed(3));
-            }
-            
-            // Set first number as current bet
-            if (randomNumbers.length > 0) {
-                betNumber = randomNumbers[0];
-                document.getElementById('bet-number').value = betNumber;
-            }
-            
-            updateRandomNumbersDisplay();
-        }
-        
-        function updateRandomNumbersDisplay() {
-            const display = document.getElementById('random-numbers-display');
-            display.innerHTML = '';
-            
-            randomNumbers.forEach((num, index) => {
-                const badge = document.createElement('div');
-                badge.className = 'random-number-badge';
-                badge.textContent = num;
-                badge.style.cursor = 'pointer';
-                badge.onclick = () => {
-                    betNumber = num;
-                    document.getElementById('bet-number').value = betNumber;
-                };
-                display.appendChild(badge);
-            });
-        }
-        
-        function useMaxBalance() {
-            const users = JSON.parse(localStorage.getItem('raffle_users'));
-            const user = users[currentUser];
-            const balance = parseFloat(user.balance);
-            
-            if (balance <= 0) {
-                showNotification('No balance available', 'error');
-                return;
-            }
-            
-            // Calculate maximum bets we can place
-            const maxBets = Math.floor(balance / betAmount);
-            
-            if (maxBets <= 0) {
-                showNotification(`Insufficient balance for ₱${formatDecimal(betAmount)} bet`, 'error');
-                return;
-            }
-            
-            // Generate random numbers for all bets
-            randomNumbers = [];
-            const betsToPlace = Math.min(maxBets, 50); // Limit to 50 bets max
-            
-            for (let i = 0; i < betsToPlace; i++) {
-                const wholePart = Math.floor(Math.random() * 1000);
-                const decimalPart = Math.floor(Math.random() * 1000);
-                const randomNum = parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`);
-                randomNumbers.push(randomNum.toFixed(3));
-            }
-            
-            // Update display
-            updateRandomNumbersDisplay();
-            
-            showNotification(`Generated ${betsToPlace} random numbers. Click "Place Game" to bet them all.`, 'info');
+            return parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`).toFixed(3);
         }
         
         function toggleAutoBet() {
@@ -2268,12 +2153,10 @@
                     }
                     
                     // Generate random number
-                    const wholePart = Math.floor(Math.random() * 1000);
-                    const decimalPart = Math.floor(Math.random() * 1000);
-                    betNumber = parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`).toFixed(3);
+                    const randomNum = generateRandomNumber();
                     
                     // Place the bet
-                    placeSingleBet(betNumber);
+                    placeSingleAutoBet(randomNum);
                     
                 }, 2000); // Place bet every 2 seconds
                 
@@ -2290,7 +2173,7 @@
             
             autoBetBtn.innerHTML = '<i class="fas fa-play"></i> Start Auto Betting';
             autoBetBtn.style.background = '#fd7e14';
-            autoBetStatus.innerHTML = 'Ready to place random bets automatically';
+            autoBetStatus.innerHTML = 'Ready to place random bets automatically. All balance in your wallet will be used.';
             
             if (autoBetInterval) {
                 clearInterval(autoBetInterval);
@@ -2298,7 +2181,7 @@
             }
         }
         
-        function placeSingleBet(number) {
+        function placeSingleAutoBet(number) {
             const numValue = parseFloat(number);
             
             const users = JSON.parse(localStorage.getItem('raffle_users'));
@@ -2344,11 +2227,138 @@
             items[itemIndex].bets.push(newBet.id);
             localStorage.setItem('raffle_items', JSON.stringify(items));
             
+            // Store in auto bet numbers array
+            if (autoBetNumbers.length >= 50) {
+                autoBetNumbers.shift();
+            }
+            autoBetNumbers.push(number);
+            
             // Update UI
             loadUserData();
-            updateAfterBet();
+            updateManualBetSummary();
+            updateAutoBetSummary();
             
             return true;
+        }
+        
+        function placeAutoBet() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            const balance = parseFloat(user.balance);
+            
+            if (balance < betAmount) {
+                showNotification('Insufficient balance for auto betting', 'error');
+                return;
+            }
+            
+            // Calculate maximum bets we can place
+            const maxBets = Math.floor(balance / betAmount);
+            
+            if (maxBets <= 0) {
+                showNotification('Insufficient balance for auto betting', 'error');
+                return;
+            }
+            
+            // Generate unique random numbers for all bets
+            const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
+            const existingNumbers = bets.filter(bet => bet.itemId === currentItem.id).map(bet => bet.number);
+            const newBets = [];
+            
+            let betsPlaced = 0;
+            let attempts = 0;
+            const maxAttempts = maxBets * 10; // Prevent infinite loop
+            
+            while (betsPlaced < maxBets && attempts < maxAttempts) {
+                attempts++;
+                const randomNum = generateRandomNumber();
+                const numValue = parseFloat(randomNum);
+                
+                // Check if number already exists
+                if (existingNumbers.includes(numValue) || newBets.some(bet => bet.number === numValue)) {
+                    continue;
+                }
+                
+                const newBet = {
+                    id: Date.now() + attempts, // Unique ID
+                    userId: currentUser,
+                    itemId: currentItem.id,
+                    number: numValue,
+                    amount: betAmount,
+                    placedAt: new Date().toISOString(),
+                    status: 'active'
+                };
+                
+                newBets.push(newBet);
+                existingNumbers.push(numValue);
+                betsPlaced++;
+            }
+            
+            if (betsPlaced === 0) {
+                showNotification('Could not generate unique numbers. Try again.', 'error');
+                return;
+            }
+            
+            // Animate button
+            const placeGameBtn = document.getElementById('auto-place-game-btn');
+            placeGameBtn.classList.add('placed');
+            placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> AUTO BETS PLACED!';
+            
+            // Add all bets to storage
+            newBets.forEach(bet => {
+                bets.push(bet);
+            });
+            localStorage.setItem('raffle_bets', JSON.stringify(bets));
+            
+            // Deduct total bet amount
+            const totalBetAmount = betAmount * betsPlaced;
+            user.balance = formatDecimal(parseFloat(user.balance) - totalBetAmount);
+            
+            // Add bet IDs to user
+            user.bets = user.bets || [];
+            newBets.forEach(bet => {
+                user.bets.push(bet.id);
+            });
+            
+            users[currentUser] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Add bets to item
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const itemIndex = items.findIndex(item => item.id === currentItem.id);
+            items[itemIndex].bets = items[itemIndex].bets || [];
+            newBets.forEach(bet => {
+                items[itemIndex].bets.push(bet.id);
+            });
+            localStorage.setItem('raffle_items', JSON.stringify(items));
+            
+            // Show success message
+            const statusDiv = document.getElementById('game-status');
+            statusDiv.innerHTML = `
+                <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
+                    <h4><i class="fas fa-check-circle"></i> ${betsPlaced} Auto Bets Placed Successfully!</h4>
+                    <p>Total Bet Amount: <strong class="decimal-format">₱${formatDecimal(totalBetAmount)}</strong></p>
+                    <p>Remaining Balance: <strong class="decimal-format">₱${formatDecimal(user.balance)}</strong></p>
+                    <p style="font-size: 12px;">Unique random numbers with 3 decimal places generated.</p>
+                </div>
+            `;
+            
+            // Update UI
+            loadUserData();
+            updateManualBetSummary();
+            updateAutoBetSummary();
+            
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                placeGameBtn.classList.remove('placed');
+                placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+                
+                // Clear status after 5 seconds
+                setTimeout(() => {
+                    statusDiv.innerHTML = '';
+                }, 5000);
+            }, 2000);
+            
+            showNotification(`Successfully placed ${betsPlaced} auto bets with random numbers!`, 'success');
         }
         
         // ================ CASH IN FUNCTIONS ================
@@ -2934,7 +2944,8 @@
             document.getElementById('bet-slider').addEventListener('input', function() {
                 betAmount = parseFloat(this.value);
                 document.getElementById('current-bet-amount').textContent = formatDecimal(betAmount);
-                updateAfterBet();
+                updateManualBetSummary();
+                updateAutoBetSummary();
             });
         };
     </script>
