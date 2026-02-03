@@ -870,6 +870,82 @@
             text-align: center;
             font-weight: bold;
         }
+        
+        /* ===== WINNER ITEMS SECTION ===== */
+        .winner-items-section {
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+            border-radius: 15px;
+            border-left: 5px solid #28a745;
+        }
+        
+        .winner-items-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .winner-item-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            border: 2px solid #28a745;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .winner-item-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 10px 0;
+        }
+        
+        /* ===== WALLET LOGS ===== */
+        .wallet-logs {
+            margin: 20px 0;
+        }
+        
+        .log-item {
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 8px;
+            margin: 8px 0;
+            border-left: 4px solid #17a2b8;
+            font-size: 14px;
+        }
+        
+        .log-item.refund {
+            border-left-color: #6c757d;
+            background: #e9ecef;
+        }
+        
+        .log-item.win {
+            border-left-color: #28a745;
+            background: #d4edda;
+        }
+        
+        /* ===== ADMIN WINNERS LIST ===== */
+        .winners-list {
+            margin-top: 20px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .winner-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            border-left: 5px solid #28a745;
+            cursor: pointer;
+        }
+        
+        .winner-card:hover {
+            background: #e9ecef;
+            transform: translateY(-2px);
+        }
     </style>
 </head>
 <body>
@@ -942,6 +1018,9 @@
             <button class="tab" onclick="showTab('bets')">
                 <i class="fas fa-history"></i> My Bets
             </button>
+            <button class="tab" onclick="showTab('wins')">
+                <i class="fas fa-trophy"></i> My Wins
+            </button>
             <button class="tab" onclick="showTab('send')">
                 <i class="fas fa-paper-plane"></i> Send
             </button>
@@ -967,6 +1046,14 @@
                     <h4>Available Play Money</h4>
                     <div class="amount decimal-format" id="wallet-balance">₱50.000</div>
                     <p>Use for betting only</p>
+                </div>
+                
+                <!-- Wallet Logs Section -->
+                <div class="wallet-logs">
+                    <h4 style="margin: 20px 0 10px 0;">📋 Wallet Logs</h4>
+                    <div id="wallet-logs-list">
+                        <!-- Wallet logs loaded here -->
+                    </div>
                 </div>
                 
                 <div class="deposits">
@@ -1012,6 +1099,17 @@
                 <!-- Bets loaded here -->
                 <p style="text-align: center; color: #999; padding: 40px;">
                     No bets placed yet. Start playing!
+                </p>
+            </div>
+        </div>
+        
+        <!-- MY WINS TAB -->
+        <div id="wins-tab" class="tab-content">
+            <h3 style="color: #667eea; margin-bottom: 20px;">🏆 My Winning Items</h3>
+            <div id="wins-list" class="winner-items-grid">
+                <!-- Winning items loaded here -->
+                <p style="text-align: center; color: #999; padding: 40px;">
+                    No winning items yet. Keep playing!
                 </p>
             </div>
         </div>
@@ -1094,6 +1192,11 @@
                     <!-- Users loaded here -->
                 </div>
                 
+                <h3 style="color: #667eea; margin: 20px 0;">🏆 Winners List</h3>
+                <div id="winners-list" class="winners-list">
+                    <!-- Winners loaded here -->
+                </div>
+                
                 <h3 style="color: #667eea; margin: 20px 0;">🎁 Raffle Items</h3>
                 <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
                     <!-- Items loaded here -->
@@ -1101,9 +1204,6 @@
                 
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
                     <h4 style="color: #667eea;">⚙️ Admin Tools</h4>
-                    <button onclick="runRaffle()" class="btn-secondary" style="margin: 10px 5px;">
-                        Run Raffle Draw
-                    </button>
                     <button onclick="checkExpirations()" class="btn-secondary" style="margin: 10px 5px;">
                         Check Expirations
                     </button>
@@ -1259,6 +1359,33 @@
             
             <div class="bet-numbers-grid" id="bet-details-numbers">
                 <!-- Bet numbers will be displayed here -->
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px;">
+                <button onclick="closeModal()" class="btn-primary">
+                    <i class="fas fa-times"></i> Close
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- WINNER DETAILS MODAL -->
+    <div id="winner-details-modal" class="modal hidden">
+        <div class="modal-content">
+            <button onclick="closeModal()" class="close-btn">&times;</button>
+            <h3 id="winner-details-title" style="color: #667eea; text-align: center;">Winner Details</h3>
+            
+            <div style="text-align: center; margin: 20px 0;">
+                <img id="winner-item-image" src="" alt="Item" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin: 15px 0;">
+                <h4 id="winner-item-name" style="color: #28a745;"></h4>
+                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="winner-item-price" class="decimal-format"></div>
+            </div>
+            
+            <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
+                <h4 style="color: #667eea; margin-bottom: 10px;">Winner Information</h4>
+                <p><strong>Winner:</strong> <span id="winner-username"></span></p>
+                <p><strong>Winning Number:</strong> <span id="winning-number" class="decimal-format"></span></p>
+                <p><strong>Date Won:</strong> <span id="winner-date"></span></p>
             </div>
             
             <div style="text-align: center; margin-top: 20px;">
@@ -1429,6 +1556,7 @@
         let isAutoBetting = false;
         let autoBetInterval = null;
         let autoBetNumbers = [];
+        let manualBetNumbers = [];
         
         // ================ INITIAL DATA ================
         function initializeData() {
@@ -1442,12 +1570,14 @@
                         deposits: [],
                         walletInfo: { shopee: '', lazada: '' },
                         bets: [],
+                        wins: [],
+                        walletLogs: [],
                         serviceFees: 0.000
                     };
                 }
                 demoUsers['admin'] = {
                     username: 'admin',
-                    password: 'admin123',
+                    password: 'secret123',
                     balance: 0.000,
                     deposits: [],
                     walletInfo: { shopee: '', lazada: '' },
@@ -1473,6 +1603,7 @@
                         winnerDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
                         status: "active",
                         bets: [],
+                        winner: null,
                         serviceFeesCollected: 0.000
                     },
                     {
@@ -1488,6 +1619,7 @@
                         winnerDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
                         status: "active",
                         bets: [],
+                        winner: null,
                         serviceFeesCollected: 0.000
                     }
                 ];
@@ -1555,7 +1687,7 @@
         
         function adminLogin() {
             document.getElementById('username').value = 'admin';
-            document.getElementById('password').value = 'admin123';
+            document.getElementById('password').value = 'secret123';
             login();
         }
         
@@ -1604,8 +1736,11 @@
             
             if (tabName === 'wallet') {
                 loadDeposits();
+                loadWalletLogs();
             } else if (tabName === 'bets') {
                 loadUserBets();
+            } else if (tabName === 'wins') {
+                loadUserWins();
             }
         }
         
@@ -1619,6 +1754,10 @@
             document.getElementById('current-user').textContent = currentUser;
             document.getElementById('user-balance').textContent = formatDecimal(user.balance);
             document.getElementById('wallet-balance').textContent = formatDecimal(user.balance);
+            
+            // Update wallet info
+            document.getElementById('shopee-wallet').textContent = user.walletInfo.shopee || 'Not set';
+            document.getElementById('lazada-wallet').textContent = user.walletInfo.lazada || 'Not set';
         }
         
         function loadDeposits() {
@@ -1677,6 +1816,73 @@
             });
             
             depositsList.innerHTML = html;
+        }
+        
+        function loadWalletLogs() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[currentUser];
+            const logsList = document.getElementById('wallet-logs-list');
+            
+            if (!user.walletLogs || user.walletLogs.length === 0) {
+                logsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No wallet activity yet</p>';
+                return;
+            }
+            
+            let html = '';
+            user.walletLogs.slice(-10).reverse().forEach(log => {
+                const logDate = new Date(log.date);
+                let logClass = '';
+                let logIcon = '';
+                
+                if (log.type === 'refund') {
+                    logClass = 'refund';
+                    logIcon = 'fas fa-undo';
+                } else if (log.type === 'win') {
+                    logClass = 'win';
+                    logIcon = 'fas fa-trophy';
+                } else {
+                    logIcon = 'fas fa-exchange-alt';
+                }
+                
+                html += `
+                    <div class="log-item ${logClass}">
+                        <div style="display: flex; justify-content: space-between;">
+                            <div>
+                                <i class="${logIcon}"></i> ${log.description}
+                            </div>
+                            <div class="decimal-format" style="font-weight: bold; color: ${log.amount >= 0 ? '#28a745' : '#dc3545'}">
+                                ${log.amount >= 0 ? '+' : ''}₱${formatDecimal(log.amount)}
+                            </div>
+                        </div>
+                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
+                            ${logDate.toLocaleDateString()} ${logDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            logsList.innerHTML = html;
+        }
+        
+        function addWalletLog(userId, type, description, amount) {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[userId];
+            
+            if (!user) return;
+            
+            if (!user.walletLogs) {
+                user.walletLogs = [];
+            }
+            
+            user.walletLogs.push({
+                date: new Date().toISOString(),
+                type: type,
+                description: description,
+                amount: amount
+            });
+            
+            users[userId] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
         }
         
         function checkDepositExpirations() {
@@ -1943,6 +2149,7 @@
             // Reset betting state
             betNumber = '0.000';
             autoBetNumbers = [];
+            manualBetNumbers = [];
             
             document.getElementById('bet-number').value = betNumber;
             document.getElementById('bet-number').classList.remove('has-value');
@@ -2067,17 +2274,39 @@
                 placeGameBtn.style.opacity = '0.6';
                 placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> GENERATE NUMBERS FIRST';
             } else if (afterAutoBet < 0) {
-                document.getElementById('auto-after-bet').style.color = '#f44336';
-                feeWarning.textContent = 'Auto bets exceed balance! Click "Start Auto Betting" again';
-                placeGameBtn.disabled = true;
-                placeGameBtn.style.opacity = '0.6';
-                placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> EXCEEDS BALANCE';
+                // ADJUSTMENT: Remove random numbers until balance is positive
+                while (afterAutoBet < 0 && autoBetNumbers.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * autoBetNumbers.length);
+                    const removedNumber = autoBetNumbers.splice(randomIndex, 1)[0];
+                    totalAutoBet -= parseFloat(removedNumber);
+                }
+                
+                // Update display after adjustment
+                updateAutoBetNumbersDisplay();
+                updateAutoBetSummary(); // Recursive call to update
             } else {
                 document.getElementById('auto-after-bet').style.color = '#333';
                 feeWarning.textContent = '';
                 placeGameBtn.disabled = false;
                 placeGameBtn.style.opacity = '1';
                 placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+            }
+        }
+        
+        function updateAutoBetNumbersDisplay() {
+            const autoNumbersGrid = document.getElementById('auto-numbers-grid');
+            autoNumbersGrid.innerHTML = '';
+            
+            autoBetNumbers.forEach((num, index) => {
+                const badge = document.createElement('div');
+                badge.className = 'auto-number-badge';
+                badge.textContent = num;
+                badge.title = `Bet #${index + 1}: ${num}`;
+                autoNumbersGrid.appendChild(badge);
+            });
+            
+            if (autoBetNumbers.length > 0) {
+                document.getElementById('auto-numbers-display').style.display = 'block';
             }
         }
         
@@ -2110,8 +2339,7 @@
             
             const bets = JSON.parse(localStorage.getItem('raffle_bets')) || [];
             
-            // For manual betting, we use the bet number itself as the bet number to match
-            // But we need to ensure uniqueness within this raffle
+            // Check if number already exists for this item
             const existingBet = bets.find(bet => 
                 bet.itemId === currentItem.id && bet.number === betAmountValue
             );
@@ -2130,8 +2358,8 @@
                 id: Date.now(),
                 userId: currentUser,
                 itemId: currentItem.id,
-                number: betAmountValue, // The bet number itself
-                amount: betAmountValue, // The amount to deduct
+                number: betAmountValue,
+                amount: betAmountValue,
                 placedAt: new Date().toISOString(),
                 status: 'active',
                 type: 'manual'
@@ -2153,6 +2381,9 @@
             items[itemIndex].bets = items[itemIndex].bets || [];
             items[itemIndex].bets.push(newBet.id);
             localStorage.setItem('raffle_items', JSON.stringify(items));
+            
+            // Add to manual bet tracking
+            manualBetNumbers.push(betAmountValue);
             
             // Show success message
             const statusDiv = document.getElementById('game-status');
@@ -2199,7 +2430,6 @@
             const autoBetBtn = document.getElementById('auto-bet-btn');
             const autoBetStatus = document.getElementById('auto-bet-status');
             const autoNumbersDisplay = document.getElementById('auto-numbers-display');
-            const autoNumbersGrid = document.getElementById('auto-numbers-grid');
             
             if (!isAutoBetting) {
                 // Start auto betting (generate numbers)
@@ -2219,7 +2449,6 @@
                 
                 // Clear previous numbers
                 autoBetNumbers = [];
-                autoNumbersGrid.innerHTML = '';
                 
                 // Generate random numbers within balance
                 let totalAmount = 0;
@@ -2247,14 +2476,7 @@
                 }
                 
                 // Update display
-                autoNumbersGrid.innerHTML = '';
-                autoBetNumbers.forEach((num, index) => {
-                    const badge = document.createElement('div');
-                    badge.className = 'auto-number-badge';
-                    badge.textContent = num;
-                    badge.title = `Bet #${index + 1}: ${num}`;
-                    autoNumbersGrid.appendChild(badge);
-                });
+                updateAutoBetNumbersDisplay();
                 
                 // Show the display
                 autoNumbersDisplay.style.display = 'block';
@@ -2455,6 +2677,72 @@
             document.getElementById('bet-details-modal').classList.remove('hidden');
         }
         
+        // ================ WINNER FUNCTIONS ================
+        function loadUserWins() {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const items = JSON.parse(localStorage.getItem('raffle_items')) || [];
+            const user = users[currentUser];
+            
+            const winsList = document.getElementById('wins-list');
+            
+            if (!user.wins || user.wins.length === 0) {
+                winsList.innerHTML = '<p style="text-align: center; color: #999; padding: 40px;">No winning items yet. Keep playing!</p>';
+                return;
+            }
+            
+            let html = '';
+            user.wins.forEach(win => {
+                const item = items.find(i => i.id === win.itemId);
+                if (item) {
+                    const winDate = new Date(win.winDate);
+                    html += `
+                        <div class="winner-item-card">
+                            <h4 style="color: #28a745;">${item.name}</h4>
+                            <img src="${item.image}" alt="${item.name}">
+                            <div style="margin-top: 10px;">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span>Prize Value:</span>
+                                    <strong class="decimal-format">₱${formatDecimal(item.price)}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
+                                    <span>Winning Number:</span>
+                                    <strong class="decimal-format">${win.winningNumber.toFixed(3)}</strong>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Date Won:</span>
+                                    <span>${winDate.toLocaleDateString()}</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            winsList.innerHTML = html;
+        }
+        
+        function showWinnerDetails(itemId, winnerUserId) {
+            const items = JSON.parse(localStorage.getItem('raffle_items'));
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            
+            const item = items.find(i => i.id === itemId);
+            const winner = users[winnerUserId];
+            
+            if (!item || !item.winner || !winner) return;
+            
+            const winDate = new Date(item.winner.announcedAt || item.winnerDate);
+            
+            document.getElementById('winner-details-title').textContent = 'Winner Details';
+            document.getElementById('winner-item-name').textContent = item.name;
+            document.getElementById('winner-item-price').textContent = formatCurrency(item.price);
+            document.getElementById('winner-item-image').src = item.image;
+            document.getElementById('winner-username').textContent = winnerUserId;
+            document.getElementById('winning-number').textContent = item.winner.winningNumber.toFixed(3);
+            document.getElementById('winner-date').textContent = winDate.toLocaleDateString() + ' ' + winDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            document.getElementById('winner-details-modal').classList.remove('hidden');
+        }
+        
         // ================ CASH IN FUNCTIONS ================
         function showCashIn() {
             selectedAmount = 0;
@@ -2504,12 +2792,16 @@
             
             user.balance = formatDecimal(parseFloat(user.balance) + selectedAmount);
             
+            // Add wallet log
+            addWalletLog(currentUser, 'deposit', 'Cash in deposit', selectedAmount);
+            
             users[currentUser] = user;
             localStorage.setItem('raffle_users', JSON.stringify(users));
             
             closeModal();
             loadUserData();
             loadDeposits();
+            loadWalletLogs();
             
             showNotification(`Successfully cashed in ${formatCurrency(selectedAmount)}! Expires in 5 days.`, 'success');
         }
@@ -2539,12 +2831,17 @@
             users[currentUser].balance = formatDecimal(parseFloat(users[currentUser].balance) - amount);
             users[recipient].balance = formatDecimal(parseFloat(users[recipient].balance) + amount);
             
+            // Add wallet logs
+            addWalletLog(currentUser, 'transfer', `Sent to ${recipient}`, -amount);
+            addWalletLog(recipient, 'transfer', `Received from ${currentUser}`, amount);
+            
             localStorage.setItem('raffle_users', JSON.stringify(users));
             
             document.getElementById('recipient').value = '';
             document.getElementById('send-amount').value = '';
             
             loadUserData();
+            loadWalletLogs();
             
             showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipient}`, 'success');
         }
@@ -2566,6 +2863,9 @@
                 if (!users[username].isAdmin) {
                     totalBalance += parseFloat(users[username].balance);
                     userCount++;
+                    if (users[username].wins && users[username].wins.length > 0) {
+                        totalWinners += users[username].wins.length;
+                    }
                 }
             });
             
@@ -2573,7 +2873,6 @@
             items.forEach(item => {
                 const endDate = new Date(item.endDate);
                 if (now <= endDate) activeRaffles++;
-                if (item.winner) totalWinners++;
             });
             
             document.getElementById('total-users').textContent = userCount;
@@ -2597,7 +2896,7 @@
                             <span class="decimal-format">₱${formatDecimal(user.balance)}</span>
                         </div>
                         <div style="font-size: 12px; color: #666;">
-                            Deposits: ${user.deposits?.length || 0} | Bets: ${user.bets?.length || 0}
+                            Wins: ${user.wins?.length || 0} | Bets: ${user.bets?.length || 0}
                             ${user.serviceFees > 0 ? `| Fees: ₱${formatDecimal(user.serviceFees)}` : ''}
                         </div>
                     </div>
@@ -2605,6 +2904,36 @@
             });
             
             usersList.innerHTML = usersHtml || '<p>No users found</p>';
+            
+            // Load winners list
+            const winnersList = document.getElementById('winners-list');
+            let winnersHtml = '';
+            
+            items.forEach(item => {
+                if (item.winner) {
+                    const winDate = new Date(item.winner.announcedAt || item.winnerDate);
+                    winnersHtml += `
+                        <div class="winner-card" onclick="showWinnerDetails(${item.id}, '${item.winner.userId}')">
+                            <div style="display: flex; justify-content: space-between;">
+                                <div>
+                                    <strong>${item.name}</strong><br>
+                                    <small>Winner: ${item.winner.userId}</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <strong class="decimal-format">${item.winner.winningNumber.toFixed(3)}</strong><br>
+                                    <small>${winDate.toLocaleDateString()}</small>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            
+            if (winnersHtml === '') {
+                winnersList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No winners yet</p>';
+            } else {
+                winnersList.innerHTML = winnersHtml;
+            }
             
             const itemsList = document.getElementById('admin-items-list');
             let itemsHtml = '';
@@ -2623,12 +2952,12 @@
                             </div>
                             <div style="text-align: right;">
                                 <small>Bets: ${item.bets?.length || 0}</small><br>
-                                <small>Ended: ${endDate.toLocaleDateString()}</small>
+                                <small>Ends: ${endDate.toLocaleDateString()}</small>
                             </div>
                         </div>
                         <div style="margin-top: 10px; display: flex; gap: 5px;">
                             <button onclick="runItemRaffle(${item.id})" class="btn-success" style="padding: 5px 10px; font-size: 12px;">
-                                Run Draw
+                                Run Draw Now
                             </button>
                             <button onclick="deleteItem(${item.id})" class="btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #dc3545;">
                                 Delete
@@ -2723,6 +3052,7 @@
                 winnerDate: winnerDate,
                 status: "active",
                 bets: [],
+                winner: null,
                 serviceFeesCollected: 0.000
             };
             
@@ -2745,12 +3075,16 @@
             if (itemIndex === -1) return;
             
             const item = items[itemIndex];
+            
+            // BYPASS DATE CHECK - Always allow admin to run draw
             const now = new Date();
             const endDate = new Date(item.endDate);
             
+            // Even if raffle hasn't ended yet, admin can run it
             if (now < endDate) {
-                showNotification('Raffle has not ended yet', 'warning');
-                return;
+                if (!confirm('Raffle has not ended yet. Are you sure you want to run the draw now?')) {
+                    return;
+                }
             }
             
             const itemBets = bets.filter(bet => bet.itemId === itemId && bet.status === 'active');
@@ -2782,6 +3116,9 @@
                     if (users[bet.userId]) {
                         users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + refundAmount);
                         users[bet.userId].serviceFees = formatDecimal(parseFloat(users[bet.userId].serviceFees || 0) + feeAmount);
+                        
+                        // Add wallet log for refund
+                        addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name}`, refundAmount);
                     }
                     
                     bet.status = 'refunded';
@@ -2817,23 +3154,40 @@
                 items[itemIndex].winner = {
                     userId: winningBet.userId,
                     winningNumber: winningBet.number,
-                    announced: true
+                    announced: true,
+                    announcedAt: new Date().toISOString()
                 };
                 items[itemIndex].status = 'completed';
                 
-                // Give prize to winner
+                // Give prize item to winner (NOT balance)
                 if (users[winningBet.userId]) {
-                    users[winningBet.userId].balance = formatDecimal(parseFloat(users[winningBet.userId].balance) + item.price);
+                    // Add win to user's wins array
+                    users[winningBet.userId].wins = users[winningBet.userId].wins || [];
+                    users[winningBet.userId].wins.push({
+                        itemId: item.id,
+                        winningNumber: winningBet.number,
+                        winDate: new Date().toISOString()
+                    });
+                    
                     winningBet.status = 'won';
                     
+                    // Add wallet log for win
+                    addWalletLog(winningBet.userId, 'win', `Won ${item.name}`, 0);
+                    
                     // Notify winner
-                    showNotification(`Winner declared for ${item.name}: ${winningBet.userId} with number ${winningBet.number}`, 'success');
+                    showNotification(`Winner declared for ${item.name}: ${winningBet.userId} with number ${winningBet.number.toFixed(3)}`, 'success');
                     
                     // Notify other users (simulated)
                     Object.keys(users).forEach(username => {
                         if (!users[username].isAdmin && username !== winningBet.userId) {
-                            // In real app, would send notification
-                            console.log(`Notify ${username}: Someone won ${item.name}!`);
+                            // Add wallet log for refund of losing bets
+                            const userBets = itemBets.filter(bet => bet.userId === username);
+                            userBets.forEach(bet => {
+                                if (bet.id !== winningBet.id) {
+                                    const refundAmount = bet.amount * (1 - refundFeePercent/100);
+                                    addWalletLog(username, 'refund', `Bet refund for ${item.name}`, refundAmount);
+                                }
+                            });
                         }
                     });
                 }
@@ -2847,26 +3201,6 @@
             
             // Update admin view
             loadAdminData();
-        }
-        
-        function runRaffle() {
-            const items = JSON.parse(localStorage.getItem('raffle_items'));
-            const now = new Date();
-            let rafflesRun = 0;
-            
-            items.forEach(item => {
-                const endDate = new Date(item.endDate);
-                if (now >= endDate && item.status === 'active') {
-                    runItemRaffle(item.id);
-                    rafflesRun++;
-                }
-            });
-            
-            if (rafflesRun === 0) {
-                showNotification('No raffles ready for drawing', 'info');
-            } else {
-                showNotification(`Ran raffle for ${rafflesRun} item(s)`, 'success');
-            }
         }
         
         function deleteItem(itemId) {
