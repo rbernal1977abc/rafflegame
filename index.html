@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raffle Number Game - Prototype V8</title>
+    <title>Raffle Number Game - Prototype</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== RESET & BASE STYLES ===== */
@@ -1129,7 +1129,7 @@
         <div class="logo">
             <i class="fas fa-ticket-alt"></i>
             <h1>Raffle Number Game</h1>
-            <p>Prototype V8</p>
+            <p>Prototype v888</p>
         </div>
         
         <div class="login-form">
@@ -2193,6 +2193,22 @@
                     </button>`;
                 }
                 
+                // Add source information if available
+                let sourceInfo = '';
+                if (deposit.source === 'refund') {
+                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
+                        <i class="fas fa-undo"></i> Refund from ${deposit.sourceItem || 'raffle'}
+                    </div>`;
+                } else if (deposit.source === 'transfer') {
+                    sourceInfo = `<div style="font-size: 11px; color: #17a2b8; margin-top: 5px;">
+                        <i class="fas fa-paper-plane"></i> Received from ${deposit.sourceUser || 'another user'}
+                    </div>`;
+                } else if (deposit.source === 'cashin') {
+                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
+                        <i class="fas fa-plus-circle"></i> Cash In deposit
+                    </div>`;
+                }
+                
                 html += `
                     <div class="deposit-item ${statusClass}" id="deposit-${index}">
                         <div style="display: flex; justify-content: space-between;">
@@ -2200,9 +2216,10 @@
                             <span>${daysLeft > 0 ? daysLeft + ' days left' : 'EXPIRED'}</span>
                         </div>
                         <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                            Deposited: ${depositDate.toLocaleDateString()}<br>
+                            Deposited: ${depositDate.toLocaleDateString()} ${depositDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}<br>
                             Expires: ${expiryDate.toLocaleDateString()}
                         </div>
+                        ${sourceInfo}
                         ${statusText}
                         ${actionButton}
                     </div>
@@ -2338,6 +2355,39 @@
             // Keep only last 50 logs
             if (user.walletLogs.length > 50) {
                 user.walletLogs = user.walletLogs.slice(-50);
+            }
+            
+            users[userId] = user;
+            localStorage.setItem('raffle_users', JSON.stringify(users));
+        }
+        
+        function addDeposit(userId, amount, source, sourceItem = '', sourceUser = '') {
+            const users = JSON.parse(localStorage.getItem('raffle_users'));
+            const user = users[userId];
+            
+            if (!user) return;
+            
+            if (!user.deposits) {
+                user.deposits = [];
+            }
+            
+            const deposit = {
+                amount: amount,
+                depositDate: new Date().toISOString(),
+                expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                status: 'active',
+                notificationSent: false,
+                expiredNotified: false,
+                source: source, // 'cashin', 'refund', 'transfer'
+                sourceItem: sourceItem, // For refunds: item name
+                sourceUser: sourceUser // For transfers: sender username
+            };
+            
+            user.deposits.push(deposit);
+            
+            // Keep only last 10 deposits
+            if (user.deposits.length > 10) {
+                user.deposits = user.deposits.slice(-10);
             }
             
             users[userId] = user;
@@ -3147,7 +3197,7 @@
                 return;
             }
             
-            // Calculate total bet amount
+            // Calculate total bet amount for this item
             let totalAmount = 0;
             userBets.forEach(bet => {
                 totalAmount += parseFloat(bet.amount);
@@ -3286,22 +3336,8 @@
             const users = JSON.parse(localStorage.getItem('raffle_users'));
             const user = users[currentUser];
             
-            const deposit = {
-                amount: selectedAmount,
-                depositDate: new Date().toISOString(),
-                expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                status: 'active',
-                notificationSent: false,
-                expiredNotified: false
-            };
-            
-            user.deposits = user.deposits || [];
-            user.deposits.push(deposit);
-            
-            // Keep only last 3 deposits
-            if (user.deposits.length > 3) {
-                user.deposits = user.deposits.slice(-3);
-            }
+            // Add deposit with source information
+            addDeposit(currentUser, selectedAmount, 'cashin');
             
             user.balance = formatDecimal(parseFloat(user.balance) + selectedAmount);
             
@@ -3341,7 +3377,13 @@
                 return;
             }
             
+            // Deduct from sender
             users[currentUser].balance = formatDecimal(parseFloat(users[currentUser].balance) - amount);
+            
+            // Add deposit to recipient with source information
+            addDeposit(recipient, amount, 'transfer', '', currentUser);
+            
+            // Add to recipient's balance
             users[recipient].balance = formatDecimal(parseFloat(users[recipient].balance) + amount);
             
             // Add wallet logs
@@ -3354,6 +3396,7 @@
             document.getElementById('send-amount').value = '';
             
             loadUserData();
+            loadDeposits();
             loadWalletLogs();
             
             showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipient}`, 'success');
@@ -3652,7 +3695,10 @@
                         users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + refundAmount);
                         users[bet.userId].serviceFees = formatDecimal(parseFloat(users[bet.userId].serviceFees || 0) + feeAmount);
                         
-                        // Add wallet log for refund (POSITIVE amount) - FIXED
+                        // Add deposit for the refund
+                        addDeposit(bet.userId, refundAmount, 'refund', item.name);
+                        
+                        // Add wallet log for refund
                         addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (no winner)`, refundAmount);
                     }
                     
@@ -3726,7 +3772,10 @@
                             // FULL REFUND for losing bets
                             users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + bet.amount);
                             
-                            // Add wallet log for full refund (POSITIVE amount) - FIXED
+                            // Add deposit for the full refund
+                            addDeposit(bet.userId, bet.amount, 'refund', item.name);
+                            
+                            // Add wallet log for full refund
                             addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost)`, bet.amount);
                             
                             bet.status = 'refunded';
