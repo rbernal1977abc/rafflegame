@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raffle Number Game - Prototype</title>
+    <title>Raffle Number Game - Prototype V8</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* ===== RESET & BASE STYLES ===== */
@@ -1129,7 +1129,7 @@
         <div class="logo">
             <i class="fas fa-ticket-alt"></i>
             <h1>Raffle Number Game</h1>
-            <p>Prototype v888</p>
+            <p>Prototype V8</p>
         </div>
         
         <div class="login-form">
@@ -2439,7 +2439,7 @@
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
                 // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2464,7 +2464,7 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -2502,7 +2502,7 @@
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
                 // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2527,7 +2527,7 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -3652,7 +3652,7 @@
                         users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + refundAmount);
                         users[bet.userId].serviceFees = formatDecimal(parseFloat(users[bet.userId].serviceFees || 0) + feeAmount);
                         
-                        // Add wallet log for refund (POSITIVE amount)
+                        // Add wallet log for refund (POSITIVE amount) - FIXED
                         addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (no winner)`, refundAmount);
                     }
                     
@@ -3726,7 +3726,7 @@
                             // FULL REFUND for losing bets
                             users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + bet.amount);
                             
-                            // Add wallet log for full refund (POSITIVE amount)
+                            // Add wallet log for full refund (POSITIVE amount) - FIXED
                             addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost)`, bet.amount);
                             
                             bet.status = 'refunded';
