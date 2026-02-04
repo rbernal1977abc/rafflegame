@@ -1057,6 +1057,60 @@
         .view-all-btn:hover {
             background: #5a6268;
         }
+        
+        /* ===== CASH OUT POT ===== */
+        .cashout-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        
+        .cashout-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+        
+        .cashout-btn:active {
+            transform: translateY(0);
+        }
+        
+        .pot-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        
+        /* ===== SCROLLABLE COLLAPSIBLE ===== */
+        .scrollable-content {
+            max-height: 150px;
+            overflow-y: auto;
+            margin: 10px 0;
+            padding-right: 5px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 10px;
+        }
+        
+        .scrollable-content::-webkit-scrollbar-thumb:hover {
+            background: #764ba2;
+        }
     </style>
 </head>
 <body>
@@ -1142,13 +1196,15 @@
             <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Active Raffles</h3>
             <div class="collapsible-header" onclick="toggleCollapsible('active-raffles')">
                 <h4 style="margin: 0; color: #667eea;">
-                    <i class="fas fa-ticket-alt"></i> Active Raffles (Last 3)
+                    <i class="fas fa-ticket-alt"></i> Active Raffles
                 </h4>
                 <i class="fas fa-chevron-down collapsible-icon" id="active-raffles-icon"></i>
             </div>
             <div class="collapsible-content" id="active-raffles-content">
-                <div id="raffle-items" class="items-grid">
-                    <!-- Items loaded by JavaScript -->
+                <div class="scrollable-content">
+                    <div id="raffle-items" class="items-grid">
+                        <!-- Items loaded by JavaScript -->
+                    </div>
                 </div>
             </div>
             <p style="text-align: center; color: #666; margin-top: 20px; font-size: 14px;">
@@ -1171,13 +1227,15 @@
                 <div class="wallet-logs">
                     <div class="collapsible-header" onclick="toggleCollapsible('wallet-logs')">
                         <h4 style="margin: 0; color: #667eea;">
-                            <i class="fas fa-file-alt"></i> Wallet Logs (Last 3)
+                            <i class="fas fa-file-alt"></i> Wallet Logs
                         </h4>
                         <i class="fas fa-chevron-down collapsible-icon" id="wallet-logs-icon"></i>
                     </div>
                     <div class="collapsible-content" id="wallet-logs-content">
-                        <div id="wallet-logs-list">
-                            <!-- Wallet logs loaded here -->
+                        <div class="scrollable-content">
+                            <div id="wallet-logs-list">
+                                <!-- Wallet logs loaded here -->
+                            </div>
                         </div>
                         <button class="view-all-btn" onclick="viewAllLogs()">View All Logs</button>
                     </div>
@@ -1186,13 +1244,15 @@
                 <div class="deposits">
                     <div class="collapsible-header" onclick="toggleCollapsible('deposits')">
                         <h4 style="margin: 0; color: #667eea;">
-                            <i class="fas fa-calendar-alt"></i> Active Deposits (Last 3)
+                            <i class="fas fa-calendar-alt"></i> Active Deposits
                         </h4>
                         <i class="fas fa-chevron-down collapsible-icon" id="deposits-icon"></i>
                     </div>
                     <div class="collapsible-content" id="deposits-content">
-                        <div id="deposits-list">
-                            <!-- Deposits loaded here -->
+                        <div class="scrollable-content">
+                            <div id="deposits-list">
+                                <!-- Deposits loaded here -->
+                            </div>
                         </div>
                         <button class="view-all-btn" onclick="viewAllDeposits()">View All Deposits</button>
                         <p style="color: #666; font-size: 12px; margin-top: 10px;">
@@ -1232,16 +1292,18 @@
             <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Betting History</h3>
             <div class="collapsible-header" onclick="toggleCollapsible('betting-history')">
                 <h4 style="margin: 0; color: #667eea;">
-                    <i class="fas fa-history"></i> My Bets (Last 3)
+                    <i class="fas fa-history"></i> My Bets
                 </h4>
                 <i class="fas fa-chevron-down collapsible-icon" id="betting-history-icon"></i>
             </div>
             <div class="collapsible-content" id="betting-history-content">
-                <div id="bets-list">
-                    <!-- Bets loaded here -->
+                <div class="scrollable-content">
+                    <div id="bets-list">
+                        <!-- Bets loaded here -->
+                    </div>
                 </div>
+                <button class="view-all-btn" onclick="viewAllBets()">View All Bets</button>
             </div>
-            <button class="view-all-btn" onclick="viewAllBets()">View All Bets</button>
         </div>
         
         <!-- MY WINS TAB -->
@@ -1249,16 +1311,18 @@
             <h3 style="color: #667eea; margin-bottom: 20px;">🏆 My Winning Items</h3>
             <div class="collapsible-header" onclick="toggleCollapsible('my-wins')">
                 <h4 style="margin: 0; color: #667eea;">
-                    <i class="fas fa-trophy"></i> My Wins (Last 3)
+                    <i class="fas fa-trophy"></i> My Wins
                 </h4>
                 <i class="fas fa-chevron-down collapsible-icon" id="my-wins-icon"></i>
             </div>
             <div class="collapsible-content" id="my-wins-content">
-                <div id="wins-list" class="winner-items-grid">
-                    <!-- Winning items loaded here -->
+                <div class="scrollable-content">
+                    <div id="wins-list" class="winner-items-grid">
+                        <!-- Winning items loaded here -->
+                    </div>
                 </div>
+                <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
             </div>
-            <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
         </div>
         
         <!-- SEND MONEY TAB -->
@@ -1302,11 +1366,19 @@
         </header>
         
         <div class="admin-content">
-            <div class="admin-stats admin-stats-4">
+            <!-- Total Money Pot with Cash Out Button -->
+            <div class="pot-container">
                 <div class="stat-card pot-money">
-                    <h4>Total Pot Money</h4>
+                    <h4>Total Money Pot</h4>
                     <div id="total-pot-money" class="decimal-format">₱0.000</div>
+                    <small>Winner bets go here</small>
                 </div>
+                <button class="cashout-btn" onclick="cashOutPot()">
+                    <i class="fas fa-money-bill-wave"></i> Cash Out Pot
+                </button>
+            </div>
+            
+            <div class="admin-stats admin-stats-4">
                 <div class="stat-card">
                     <h4>Total Users</h4>
                     <div id="total-users">5</div>
@@ -1341,13 +1413,15 @@
                 <!-- All Users Section -->
                 <div class="collapsible-header" onclick="toggleCollapsible('admin-users')">
                     <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-users"></i> All Users (Last 3)
+                        <i class="fas fa-users"></i> All Users
                     </h4>
                     <i class="fas fa-chevron-down collapsible-icon" id="admin-users-icon"></i>
                 </div>
                 <div class="collapsible-content" id="admin-users-content">
-                    <div id="users-list" style="max-height: 200px; overflow-y: auto;">
-                        <!-- Users loaded here -->
+                    <div class="scrollable-content">
+                        <div id="users-list" style="max-height: 200px; overflow-y: auto;">
+                            <!-- Users loaded here -->
+                        </div>
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllUsers()">View All Users</button>
@@ -1355,13 +1429,15 @@
                 <!-- Winners List Section -->
                 <div class="collapsible-header" onclick="toggleCollapsible('admin-winners')">
                     <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-trophy"></i> Winners List (Last 3)
+                        <i class="fas fa-trophy"></i> Winners List
                     </h4>
                     <i class="fas fa-chevron-down collapsible-icon" id="admin-winners-icon"></i>
                 </div>
                 <div class="collapsible-content" id="admin-winners-content">
-                    <div id="winners-list" class="winners-list">
-                        <!-- Winners loaded here -->
+                    <div class="scrollable-content">
+                        <div id="winners-list" class="winners-list">
+                            <!-- Winners loaded here -->
+                        </div>
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllWinners()">View All Winners</button>
@@ -1369,13 +1445,15 @@
                 <!-- Raffle Items Section -->
                 <div class="collapsible-header" onclick="toggleCollapsible('admin-items')">
                     <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-ticket-alt"></i> Raffle Items (Last 3)
+                        <i class="fas fa-ticket-alt"></i> Raffle Items
                     </h4>
                     <i class="fas fa-chevron-down collapsible-icon" id="admin-items-icon"></i>
                 </div>
                 <div class="collapsible-content" id="admin-items-content">
-                    <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
-                        <!-- Items loaded here -->
+                    <div class="scrollable-content">
+                        <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
+                            <!-- Items loaded here -->
+                        </div>
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllItems()">View All Items</button>
@@ -3576,12 +3654,20 @@
                     // Add wallet log for win (amount 0 since it's an item, not money)
                     addWalletLog(winningBet.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // ADD WINNER'S BET AMOUNT TO TOTAL POT MONEY
-                    systemFees.totalPotMoney = parseFloat(systemFees.totalPotMoney || 0) + parseFloat(winningBet.amount);
+                    // CALCULATE WINNER'S TOTAL BET AMOUNT FOR THIS ITEM
+                    let winnerTotalBet = 0;
+                    itemBets.forEach(bet => {
+                        if (bet.userId === winningBet.userId) {
+                            winnerTotalBet += parseFloat(bet.amount);
+                        }
+                    });
+                    
+                    // ADD WINNER'S TOTAL BET AMOUNT TO TOTAL POT MONEY
+                    systemFees.totalPotMoney = parseFloat(systemFees.totalPotMoney || 0) + winnerTotalBet;
                     
                     // Refund all OTHER users' bets in FULL (100% refund)
                     itemBets.forEach(bet => {
-                        if (bet.id !== winningBet.id && users[bet.userId]) {
+                        if (bet.userId !== winningBet.userId && users[bet.userId]) {
                             // FULL REFUND for losing bets
                             users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + bet.amount);
                             
@@ -3595,7 +3681,7 @@
                     });
                     
                     // Notify winner
-                    showNotification(`Winner declared for ${item.name}: ${winningBet.userId} with number ${winningBet.number.toFixed(3)}`, 'success');
+                    showNotification(`Winner declared for ${item.name}: ${winningBet.userId} with number ${winningBet.number.toFixed(3)}. Winner's bets (₱${formatDecimal(winnerTotalBet)}) added to Total Money Pot.`, 'success');
                 }
             }
             
@@ -3610,6 +3696,29 @@
             
             if (!isAutoDraw) {
                 showNotification(`Raffle draw completed for ${item.name}`, 'success');
+            }
+        }
+        
+        // ================ CASH OUT POT FUNCTION ================
+        function cashOutPot() {
+            const systemFees = JSON.parse(localStorage.getItem('system_fees'));
+            const potAmount = parseFloat(systemFees.totalPotMoney || 0);
+            
+            if (potAmount <= 0) {
+                showNotification('Pot is empty!', 'warning');
+                return;
+            }
+            
+            if (confirm(`Cash out ₱${formatDecimal(potAmount)} from Total Money Pot?`)) {
+                // Reset pot to 0
+                systemFees.totalPotMoney = 0.000;
+                localStorage.setItem('system_fees', JSON.stringify(systemFees));
+                
+                // Update display
+                loadAdminData();
+                
+                // Show success message
+                showNotification(`₱${formatDecimal(potAmount)} transferred successfully! Total Money Pot reset to 0.`, 'success');
             }
         }
         
