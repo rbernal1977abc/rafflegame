@@ -478,12 +478,26 @@
             margin-bottom: 20px;
         }
 
+        .admin-stats-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+
         .stat-card {
             background: #f8f9fa;
             padding: 15px;
             border-radius: 10px;
             text-align: center;
             border: 2px solid #e0e0e0;
+        }
+
+        .stat-card.pot-money {
+            background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+            color: white;
+            border-color: #ff9800;
+        }
+
+        .stat-card.pot-money div {
+            color: white;
         }
 
         .stat-card div {
@@ -502,11 +516,6 @@
             border-left: 5px solid #667eea;
             cursor: pointer;
             transition: all 0.3s;
-        }
-
-        .bet-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
         .bet-item.won {
@@ -577,6 +586,10 @@
             }
             
             .admin-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .admin-stats-4 {
                 grid-template-columns: repeat(2, 1fr);
             }
             
@@ -1107,10 +1120,10 @@
         </header>
         
         <nav class="tabs">
-            <button class="tab active" onclick="showTab('play')">
+            <button class="tab" onclick="showTab('play')">
                 <i class="fas fa-gamepad"></i> Play
             </button>
-            <button class="tab" onclick="showTab('wallet')">
+            <button class="tab active" onclick="showTab('wallet')">
                 <i class="fas fa-wallet"></i> Wallet
             </button>
             <button class="tab" onclick="showTab('bets')">
@@ -1125,10 +1138,18 @@
         </nav>
         
         <!-- PLAY TAB -->
-        <div id="play-tab" class="tab-content active">
+        <div id="play-tab" class="tab-content">
             <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Active Raffles</h3>
-            <div id="raffle-items" class="items-grid">
-                <!-- Items loaded by JavaScript -->
+            <div class="collapsible-header" onclick="toggleCollapsible('active-raffles')">
+                <h4 style="margin: 0; color: #667eea;">
+                    <i class="fas fa-ticket-alt"></i> Active Raffles (Last 3)
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="active-raffles-icon"></i>
+            </div>
+            <div class="collapsible-content" id="active-raffles-content">
+                <div id="raffle-items" class="items-grid">
+                    <!-- Items loaded by JavaScript -->
+                </div>
             </div>
             <p style="text-align: center; color: #666; margin-top: 20px; font-size: 14px;">
                 Tap any item to place your bet
@@ -1136,7 +1157,7 @@
         </div>
         
         <!-- WALLET TAB -->
-        <div id="wallet-tab" class="tab-content">
+        <div id="wallet-tab" class="tab-content active">
             <div class="wallet-info">
                 <h3 style="color: #667eea; margin-bottom: 20px;">💰 My Wallet</h3>
                 
@@ -1150,7 +1171,7 @@
                 <div class="wallet-logs">
                     <div class="collapsible-header" onclick="toggleCollapsible('wallet-logs')">
                         <h4 style="margin: 0; color: #667eea;">
-                            <i class="fas fa-file-alt"></i> Wallet Logs
+                            <i class="fas fa-file-alt"></i> Wallet Logs (Last 3)
                         </h4>
                         <i class="fas fa-chevron-down collapsible-icon" id="wallet-logs-icon"></i>
                     </div>
@@ -1165,7 +1186,7 @@
                 <div class="deposits">
                     <div class="collapsible-header" onclick="toggleCollapsible('deposits')">
                         <h4 style="margin: 0; color: #667eea;">
-                            <i class="fas fa-calendar-alt"></i> Active Deposits
+                            <i class="fas fa-calendar-alt"></i> Active Deposits (Last 3)
                         </h4>
                         <i class="fas fa-chevron-down collapsible-icon" id="deposits-icon"></i>
                     </div>
@@ -1173,6 +1194,7 @@
                         <div id="deposits-list">
                             <!-- Deposits loaded here -->
                         </div>
+                        <button class="view-all-btn" onclick="viewAllDeposits()">View All Deposits</button>
                         <p style="color: #666; font-size: 12px; margin-top: 10px;">
                             ⏰ Deposits expire in 5 days. You'll be notified before expiry.
                         </p>
@@ -1208,23 +1230,35 @@
         <!-- MY BETS TAB -->
         <div id="bets-tab" class="tab-content">
             <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Betting History</h3>
-            <div id="bets-list">
-                <!-- Bets loaded here -->
-                <p style="text-align: center; color: #999; padding: 40px;">
-                    No bets placed yet. Start playing!
-                </p>
+            <div class="collapsible-header" onclick="toggleCollapsible('betting-history')">
+                <h4 style="margin: 0; color: #667eea;">
+                    <i class="fas fa-history"></i> My Bets (Last 3)
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="betting-history-icon"></i>
             </div>
+            <div class="collapsible-content" id="betting-history-content">
+                <div id="bets-list">
+                    <!-- Bets loaded here -->
+                </div>
+            </div>
+            <button class="view-all-btn" onclick="viewAllBets()">View All Bets</button>
         </div>
         
         <!-- MY WINS TAB -->
         <div id="wins-tab" class="tab-content">
             <h3 style="color: #667eea; margin-bottom: 20px;">🏆 My Winning Items</h3>
-            <div id="wins-list" class="winner-items-grid">
-                <!-- Winning items loaded here -->
-                <p style="text-align: center; color: #999; padding: 40px;">
-                    No winning items yet. Keep playing!
-                </p>
+            <div class="collapsible-header" onclick="toggleCollapsible('my-wins')">
+                <h4 style="margin: 0; color: #667eea;">
+                    <i class="fas fa-trophy"></i> My Wins (Last 3)
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="my-wins-icon"></i>
             </div>
+            <div class="collapsible-content" id="my-wins-content">
+                <div id="wins-list" class="winner-items-grid">
+                    <!-- Winning items loaded here -->
+                </div>
+            </div>
+            <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
         </div>
         
         <!-- SEND MONEY TAB -->
@@ -1268,7 +1302,11 @@
         </header>
         
         <div class="admin-content">
-            <div class="admin-stats">
+            <div class="admin-stats admin-stats-4">
+                <div class="stat-card pot-money">
+                    <h4>Total Pot Money</h4>
+                    <div id="total-pot-money" class="decimal-format">₱0.000</div>
+                </div>
                 <div class="stat-card">
                     <h4>Total Users</h4>
                     <div id="total-users">5</div>
@@ -1300,20 +1338,47 @@
                     <i class="fas fa-plus-circle"></i> Add New Raffle Item
                 </button>
                 
-                <h3 style="color: #667eea; margin: 20px 0;">👥 All Users</h3>
-                <div id="users-list" style="max-height: 200px; overflow-y: auto;">
-                    <!-- Users loaded here -->
+                <!-- All Users Section -->
+                <div class="collapsible-header" onclick="toggleCollapsible('admin-users')">
+                    <h4 style="margin: 0; color: #667eea;">
+                        <i class="fas fa-users"></i> All Users (Last 3)
+                    </h4>
+                    <i class="fas fa-chevron-down collapsible-icon" id="admin-users-icon"></i>
                 </div>
+                <div class="collapsible-content" id="admin-users-content">
+                    <div id="users-list" style="max-height: 200px; overflow-y: auto;">
+                        <!-- Users loaded here -->
+                    </div>
+                </div>
+                <button class="view-all-btn" onclick="viewAllUsers()">View All Users</button>
                 
-                <h3 style="color: #667eea; margin: 20px 0;">🏆 Winners List</h3>
-                <div id="winners-list" class="winners-list">
-                    <!-- Winners loaded here -->
+                <!-- Winners List Section -->
+                <div class="collapsible-header" onclick="toggleCollapsible('admin-winners')">
+                    <h4 style="margin: 0; color: #667eea;">
+                        <i class="fas fa-trophy"></i> Winners List (Last 3)
+                    </h4>
+                    <i class="fas fa-chevron-down collapsible-icon" id="admin-winners-icon"></i>
                 </div>
+                <div class="collapsible-content" id="admin-winners-content">
+                    <div id="winners-list" class="winners-list">
+                        <!-- Winners loaded here -->
+                    </div>
+                </div>
+                <button class="view-all-btn" onclick="viewAllWinners()">View All Winners</button>
                 
-                <h3 style="color: #667eea; margin: 20px 0;">🎁 Raffle Items</h3>
-                <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
-                    <!-- Items loaded here -->
+                <!-- Raffle Items Section -->
+                <div class="collapsible-header" onclick="toggleCollapsible('admin-items')">
+                    <h4 style="margin: 0; color: #667eea;">
+                        <i class="fas fa-ticket-alt"></i> Raffle Items (Last 3)
+                    </h4>
+                    <i class="fas fa-chevron-down collapsible-icon" id="admin-items-icon"></i>
                 </div>
+                <div class="collapsible-content" id="admin-items-content">
+                    <div id="admin-items-list" style="max-height: 300px; overflow-y: auto;">
+                        <!-- Items loaded here -->
+                    </div>
+                </div>
+                <button class="view-all-btn" onclick="viewAllItems()">View All Items</button>
                 
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
                     <h4 style="color: #667eea;">⚙️ Admin Tools</h4>
@@ -1677,6 +1742,11 @@
         let drawCheckInterval = null;
         let showAllLogs = false;
         let showAllDeposits = false;
+        let showAllBets = false;
+        let showAllWins = false;
+        let showAllUsers = false;
+        let showAllWinners = false;
+        let showAllItems = false;
         
         // ================ INITIAL DATA ================
         function initializeData() {
@@ -1753,7 +1823,8 @@
             if (!localStorage.getItem('system_fees')) {
                 localStorage.setItem('system_fees', JSON.stringify({
                     totalServiceFees: 0.000,
-                    totalRefundFees: 0.000
+                    totalRefundFees: 0.000,
+                    totalPotMoney: 0.000  // NEW: Track total pot money
                 }));
             }
             
@@ -1851,6 +1922,8 @@
             
             loadUserData();
             loadRaffleItems();
+            loadUserBets();
+            loadUserWins();
         }
         
         function showAdminDashboard() {
@@ -1920,6 +1993,31 @@
             loadDeposits();
         }
         
+        function viewAllBets() {
+            showAllBets = !showAllBets;
+            loadUserBets();
+        }
+        
+        function viewAllWins() {
+            showAllWins = !showAllWins;
+            loadUserWins();
+        }
+        
+        function viewAllUsers() {
+            showAllUsers = !showAllUsers;
+            loadAdminData();
+        }
+        
+        function viewAllWinners() {
+            showAllWinners = !showAllWinners;
+            loadAdminData();
+        }
+        
+        function viewAllItems() {
+            showAllItems = !showAllItems;
+            loadAdminData();
+        }
+        
         // ================ USER DATA FUNCTIONS ================
         function loadUserData() {
             const users = JSON.parse(localStorage.getItem('raffle_users'));
@@ -1946,8 +2044,13 @@
                 return;
             }
             
+            // Sort by date (newest first)
+            const sortedDeposits = [...user.deposits].sort((a, b) => 
+                new Date(b.depositDate) - new Date(a.depositDate)
+            );
+            
             // Show only last 3 deposits by default, or all if showAllDeposits is true
-            const depositsToShow = showAllDeposits ? user.deposits : user.deposits.slice(-3);
+            const depositsToShow = showAllDeposits ? sortedDeposits : sortedDeposits.slice(0, 3);
             
             let html = '';
             depositsToShow.forEach((deposit, index) => {
@@ -1995,6 +2098,12 @@
             });
             
             depositsList.innerHTML = html;
+            
+            // Update View All button text
+            const viewAllBtn = document.querySelector('#deposits-content .view-all-btn');
+            if (viewAllBtn) {
+                viewAllBtn.textContent = showAllDeposits ? 'Show Less' : 'View All Deposits';
+            }
         }
         
         function loadWalletLogs() {
@@ -2007,11 +2116,16 @@
                 return;
             }
             
+            // Sort by date (newest first)
+            const sortedLogs = [...user.walletLogs].sort((a, b) => 
+                new Date(b.date) - new Date(a.date)
+            );
+            
             // Show only last 3 logs by default, or all if showAllLogs is true
-            const logsToShow = showAllLogs ? user.walletLogs : user.walletLogs.slice(-3);
+            const logsToShow = showAllLogs ? sortedLogs : sortedLogs.slice(0, 3);
             
             let html = '';
-            logsToShow.reverse().forEach(log => {
+            logsToShow.forEach(log => {
                 const logDate = new Date(log.date);
                 let logClass = '';
                 let logIcon = '';
@@ -2065,7 +2179,7 @@
             logsList.innerHTML = html;
             
             // Update View All button text
-            const viewAllBtn = document.querySelector('.view-all-btn');
+            const viewAllBtn = document.querySelector('#wallet-logs-content .view-all-btn');
             if (viewAllBtn) {
                 viewAllBtn.textContent = showAllLogs ? 'Show Less' : 'View All Logs';
             }
@@ -2308,8 +2422,17 @@
                 return;
             }
             
+            // Sort by end date (newest first)
+            const sortedItems = [...items].sort((a, b) => 
+                new Date(b.endDate) - new Date(a.endDate)
+            );
+            
+            // Show only last 3 items by default, or all if expanded
+            const content = document.getElementById('active-raffles-content');
+            const itemsToShow = content.classList.contains('expanded') ? sortedItems : sortedItems.slice(0, 3);
+            
             let html = '';
-            items.forEach(item => {
+            itemsToShow.forEach(item => {
                 const startDate = new Date(item.startDate);
                 const endDate = new Date(item.endDate);
                 const raffleDate = new Date(item.raffleDate);
@@ -2933,8 +3056,17 @@
                 return;
             }
             
+            // Sort by date (newest first)
+            const sortedWins = [...user.wins].sort((a, b) => 
+                new Date(b.winDate) - new Date(a.winDate)
+            );
+            
+            // Show only last 3 wins by default, or all if expanded
+            const content = document.getElementById('my-wins-content');
+            const winsToShow = content.classList.contains('expanded') ? sortedWins : sortedWins.slice(0, 3);
+            
             let html = '';
-            user.wins.forEach(win => {
+            winsToShow.forEach(win => {
                 const item = items.find(i => i.id === win.itemId);
                 if (item) {
                     const winDate = new Date(win.winDate);
@@ -3106,6 +3238,7 @@
             let activeRaffles = 0;
             let totalBets = bets.length;
             let totalWinners = 0;
+            let totalPotMoney = parseFloat(systemFees.totalPotMoney || 0);
             
             Object.keys(users).forEach(username => {
                 if (!users[username].isAdmin) {
@@ -3129,14 +3262,20 @@
             document.getElementById('total-bets').textContent = totalBets;
             document.getElementById('total-winners').textContent = totalWinners;
             document.getElementById('total-fees').textContent = formatCurrency(systemFees.totalServiceFees + systemFees.totalRefundFees);
+            document.getElementById('total-pot-money').textContent = formatCurrency(totalPotMoney);
             
+            // Load Users List (last 3 or all)
             const usersList = document.getElementById('users-list');
             let usersHtml = '';
             
-            Object.keys(users).forEach(username => {
-                if (users[username].isAdmin) return;
-                
-                const user = users[username];
+            const userEntries = Object.entries(users).filter(([username]) => !users[username].isAdmin);
+            const sortedUsers = userEntries.sort((a, b) => 
+                parseFloat(b[1].balance) - parseFloat(a[1].balance)
+            );
+            
+            const usersToShow = showAllUsers ? sortedUsers : sortedUsers.slice(0, 3);
+            
+            usersToShow.forEach(([username, user]) => {
                 usersHtml += `
                     <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
                         <div style="display: flex; justify-content: space-between;">
@@ -3153,11 +3292,18 @@
             
             usersList.innerHTML = usersHtml || '<p>No users found</p>';
             
-            // Load winners list
+            // Load Winners List (last 3 or all)
             const winnersList = document.getElementById('winners-list');
             let winnersHtml = '';
             
-            items.forEach(item => {
+            const completedItems = items.filter(item => item.winner);
+            const sortedWinners = completedItems.sort((a, b) => 
+                new Date(b.winner.announcedAt || b.winnerDate) - new Date(a.winner.announcedAt || a.winnerDate)
+            );
+            
+            const winnersToShow = showAllWinners ? sortedWinners : sortedWinners.slice(0, 3);
+            
+            winnersToShow.forEach(item => {
                 if (item.winner) {
                     const winDate = new Date(item.winner.announcedAt || item.winnerDate);
                     winnersHtml += `
@@ -3183,10 +3329,17 @@
                 winnersList.innerHTML = winnersHtml;
             }
             
+            // Load Items List (last 3 or all)
             const itemsList = document.getElementById('admin-items-list');
             let itemsHtml = '';
             
-            items.forEach(item => {
+            const sortedItems = items.sort((a, b) => 
+                new Date(b.endDate) - new Date(a.endDate)
+            );
+            
+            const itemsToShow = showAllItems ? sortedItems : sortedItems.slice(0, 3);
+            
+            itemsToShow.forEach(item => {
                 const endDate = new Date(item.endDate);
                 const now = new Date();
                 const isActive = item.status === 'active' && now <= endDate;
@@ -3366,7 +3519,7 @@
                         users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + refundAmount);
                         users[bet.userId].serviceFees = formatDecimal(parseFloat(users[bet.userId].serviceFees || 0) + feeAmount);
                         
-                        // Add wallet log for refund
+                        // Add wallet log for refund (POSITIVE amount)
                         addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (no winner)`, refundAmount);
                     }
                     
@@ -3423,7 +3576,8 @@
                     // Add wallet log for win (amount 0 since it's an item, not money)
                     addWalletLog(winningBet.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // Winner DOES NOT get bet amount refunded - keep as is
+                    // ADD WINNER'S BET AMOUNT TO TOTAL POT MONEY
+                    systemFees.totalPotMoney = parseFloat(systemFees.totalPotMoney || 0) + parseFloat(winningBet.amount);
                     
                     // Refund all OTHER users' bets in FULL (100% refund)
                     itemBets.forEach(bet => {
@@ -3431,7 +3585,7 @@
                             // FULL REFUND for losing bets
                             users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + bet.amount);
                             
-                            // Add wallet log for full refund
+                            // Add wallet log for full refund (POSITIVE amount)
                             addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost)`, bet.amount);
                             
                             bet.status = 'refunded';
@@ -3542,9 +3696,17 @@
                 betsByItem[bet.itemId].bets.push(bet);
             });
             
+            // Sort by date (newest first)
+            const sortedBets = Object.entries(betsByItem).sort((a, b) => 
+                new Date(b[1].bets[0].placedAt) - new Date(a[1].bets[0].placedAt)
+            );
+            
+            // Show only last 3 bets by default, or all if expanded
+            const content = document.getElementById('betting-history-content');
+            const betsToShow = content.classList.contains('expanded') ? sortedBets : sortedBets.slice(0, 3);
+            
             let html = '';
-            Object.keys(betsByItem).forEach(itemId => {
-                const itemData = betsByItem[itemId];
+            betsToShow.forEach(([itemId, itemData]) => {
                 const item = itemData.item;
                 const itemBets = itemData.bets;
                 
@@ -3624,7 +3786,7 @@
                     icon = 'fas fa-exclamation-circle';
                     break;
                 case 'warning':
-                    backgroundColor = '#ffc107';
+                    backgroundColor = '#ffc107;
                     icon = 'fas fa-exclamation-triangle';
                     break;
                 case 'info':
