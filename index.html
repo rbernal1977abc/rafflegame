@@ -2197,15 +2197,15 @@
                 let sourceInfo = '';
                 if (deposit.source === 'refund') {
                     sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-undo"></i> Refund from ${deposit.sourceItem || 'raffle'}
+                        <i class="fas fa-undo"></i> Refund from ${deposit.sourceItem || 'raffle'} - ₱${formatDecimal(deposit.amount)}
                     </div>`;
                 } else if (deposit.source === 'transfer') {
                     sourceInfo = `<div style="font-size: 11px; color: #17a2b8; margin-top: 5px;">
-                        <i class="fas fa-paper-plane"></i> Received from ${deposit.sourceUser || 'another user'}
+                        <i class="fas fa-paper-plane"></i> Received from ${deposit.sourceUser || 'another user'} - ₱${formatDecimal(deposit.amount)}
                     </div>`;
                 } else if (deposit.source === 'cashin') {
                     sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-plus-circle"></i> Cash In deposit
+                        <i class="fas fa-plus-circle"></i> Cash In deposit - ₱${formatDecimal(deposit.amount)}
                     </div>`;
                 }
                 
@@ -2293,6 +2293,16 @@
                         logClass = '';
                         logIcon = 'fas fa-plus-circle';
                         amountColor = '#28a745'; // Green for deposits (money coming in)
+                        break;
+                    case 'money-sent':
+                        logClass = 'send';
+                        logIcon = 'fas fa-paper-plane';
+                        amountColor = '#dc3545'; // Red for sending money
+                        break;
+                    case 'money-received':
+                        logClass = 'refund';
+                        logIcon = 'fas fa-paper-plane';
+                        amountColor = '#28a745'; // Green for receiving money
                         break;
                     default:
                         logIcon = 'fas fa-exchange-alt';
@@ -2392,6 +2402,15 @@
             
             users[userId] = user;
             localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Log the deposit addition
+            if (source === 'refund') {
+                addWalletLog(userId, 'money-received', `Refund from ${sourceItem}`, amount);
+            } else if (source === 'transfer') {
+                addWalletLog(userId, 'money-received', `Received from ${sourceUser}`, amount);
+            } else if (source === 'cashin') {
+                addWalletLog(userId, 'deposit', 'Cash in deposit', amount);
+            }
         }
         
         function checkDepositExpirations() {
@@ -3387,8 +3406,8 @@
             users[recipient].balance = formatDecimal(parseFloat(users[recipient].balance) + amount);
             
             // Add wallet logs
-            addWalletLog(currentUser, 'send', `Sent to ${recipient}`, -amount);
-            addWalletLog(recipient, 'send', `Received from ${currentUser}`, amount);
+            addWalletLog(currentUser, 'money-sent', `Money sent to ${recipient}`, -amount);
+            addWalletLog(recipient, 'money-received', `Money received from ${currentUser}`, amount);
             
             localStorage.setItem('raffle_users', JSON.stringify(users));
             
