@@ -518,7 +518,7 @@
             transition: all 0.3s;
         }
 
-        .bet-item.won {
+        .bet-item.winner {
             border-left-color: #28a745;
             background: #d4edda;
         }
@@ -951,11 +951,12 @@
         }
         
         .log-item.send {
-            border-left-color: #ffc107;
-            background: #fff3cd;
+            border-left-color: #dc3545;
+            background: #f8d7da;
+            font-weight: bold;
         }
         
-        .log-item.win {
+        .log-item.winner {
             border-left-color: #20c997;
             background: #d1f2eb;
         }
@@ -1034,12 +1035,11 @@
         }
         
         .collapsible-content.expanded {
-            max-height: 800px; /* Increased from 500px for bigger sections */
+            max-height: 800px;
         }
         
-        /* Special bigger sections */
         .collapsible-content.big-section.expanded {
-            max-height: 1200px; /* Even bigger for specific sections */
+            max-height: 1200px;
         }
         
         .collapsible-icon {
@@ -1098,15 +1098,14 @@
         
         /* ===== SCROLLABLE COLLAPSIBLE ===== */
         .scrollable-content {
-            max-height: 250px; /* Increased from 150px for bigger sections */
+            max-height: 250px;
             overflow-y: auto;
             margin: 10px 0;
             padding-right: 5px;
         }
         
-        /* Special bigger scrollable sections */
         .scrollable-content.big-scroll {
-            max-height: 350px; /* Even bigger scrollable area */
+            max-height: 350px;
         }
         
         .scrollable-content::-webkit-scrollbar {
@@ -1292,12 +1291,6 @@
                     </div>
                 </div>
                 
-                <!-- Refund Fee Information -->
-                <div class="refund-fee-info">
-                    <i class="fas fa-info-circle"></i>
-                    <strong>Refund Policy:</strong> When no winner is declared, all bets are refunded with a 2% service fee deducted.
-                </div>
-                
                 <button onclick="showCashIn()" class="btn-primary" style="margin-top: 30px;">
                     <i class="fas fa-plus-circle"></i> Cash In More Money
                 </button>
@@ -1318,7 +1311,6 @@
                 <div style="margin-top: 20px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
                     <h4 style="color: #667eea;">ℹ️ Service Information</h4>
                     <p style="margin: 5px 0; font-size: 14px;">• 2% service fee for wallet transfers</p>
-                    <p style="margin: 5px 0; font-size: 14px;">• 2% service fee on refunded bets (when no winner)</p>
                     <p style="margin: 5px 0; font-size: 14px;">• Deposits expire in 5 days</p>
                 </div>
             </div>
@@ -1634,9 +1626,9 @@
                 </div>
                 
                 <!-- REFUND FEE NOTICE -->
-                <div class="refund-fee-info" style="margin-top: 20px;">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <strong>Important:</strong> If no winner is declared, all bets are refunded with a 2% service fee deducted.
+                <div class="refund-fee-info">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Important:</strong> If there's no winner, all bets are refunded with a 2% service fee deducted.
                 </div>
                 
                 <div class="game-status" id="game-status" style="text-align: center; margin-top: 20px; padding: 10px; border-radius: 10px;">
@@ -1858,7 +1850,7 @@
         let selectedAmount = 0;
         let betNumber = '0.000';
         let currentDepositId = null;
-        let serviceFeePercent = 2; // Changed from $2.00 to 2%
+        let serviceFeePercent = 2; // 2% service fee
         let refundFeePercent = 2; // 2% refund fee
         let isAutoBetting = false;
         let autoBetInterval = null;
@@ -1952,7 +1944,7 @@
                 localStorage.setItem('system_fees', JSON.stringify({
                     totalServiceFees: 0.000,
                     totalRefundFees: 0.000,
-                    totalPotMoney: 0.000  // NEW: Track total pot money
+                    totalPotMoney: 0.000
                 }));
             }
             
@@ -2311,12 +2303,6 @@
                     case 'refund':
                         logClass = 'refund';
                         logIcon = 'fas fa-undo';
-                        // Check if this is a refund with fee
-                        if (log.description && log.description.includes('no winner')) {
-                            logIcon = 'fas fa-undo-alt';
-                            logClass = 'refund-fee';
-                            description = `${log.description} (Net after 2% fee)`;
-                        }
                         amountColor = '#28a745'; // Green for refunds (money coming in)
                         break;
                     case 'transfer-fee':
@@ -2326,12 +2312,16 @@
                         break;
                     case 'send':
                         logClass = 'send';
-                        logIcon = 'fas fa-paper-plane';
-                        // If amount is negative (sending), show red, if positive (receiving), show green
-                        amountColor = log.amount < 0 ? '#dc3545' : '#28a745';
+                        logIcon = 'fas fa-external-link-alt'; // Changed icon for transfers
+                        amountColor = '#dc3545'; // Red for sending money
                         break;
-                    case 'win':
-                        logClass = 'win';
+                    case 'money-received':
+                        logClass = 'refund'; // Use refund style for received money
+                        logIcon = 'fas fa-paper-plane';
+                        amountColor = '#28a745'; // Green for receiving money
+                        break;
+                    case 'winner':
+                        logClass = 'winner';
                         logIcon = 'fas fa-trophy';
                         amountColor = '#20c997'; // Teal for wins
                         break;
@@ -2339,16 +2329,6 @@
                         logClass = '';
                         logIcon = 'fas fa-plus-circle';
                         amountColor = '#28a745'; // Green for deposits (money coming in)
-                        break;
-                    case 'money-sent':
-                        logClass = 'send';
-                        logIcon = 'fas fa-paper-plane';
-                        amountColor = '#dc3545'; // Red for sending money
-                        break;
-                    case 'money-received':
-                        logClass = 'refund';
-                        logIcon = 'fas fa-paper-plane';
-                        amountColor = '#28a745'; // Green for receiving money
                         break;
                     case 'refund-fee':
                         logClass = 'refund-fee';
@@ -2362,26 +2342,36 @@
                 
                 // Format the amount display
                 let amountDisplay = '';
-                if (log.type === 'win') {
-                    amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WON ITEM</span>`;
+                if (log.type === 'winner') {
+                    amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WINNER ITEM</span>`;
                 } else {
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
                         ${displayAmount >= 0 ? '+' : ''}₱${formatDecimal(Math.abs(displayAmount))}
                     </span>`;
                 }
                 
+                // Format date and time
+                const logDateTime = new Date(log.date);
+                const timeString = logDateTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const dateString = logDateTime.toLocaleDateString();
+                
                 html += `
                     <div class="log-item ${logClass}">
-                        <div style="display: flex; justify-content: space-between;">
-                            <div>
-                                <i class="${logIcon}"></i> ${description}
+                        <div style="display: flex; justify-content: space-between; align-items: start;">
+                            <div style="flex: 1;">
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <i class="${logIcon}"></i> 
+                                    <div>
+                                        <div>${description}</div>
+                                        <div style="font-size: 12px; color: #666; margin-top: 3px;">
+                                            <i class="far fa-clock"></i> ${dateString} ${timeString}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
+                            <div style="text-align: right;">
                                 ${amountDisplay}
                             </div>
-                        </div>
-                        <div style="font-size: 12px; color: #666; margin-top: 5px;">
-                            ${logDate.toLocaleDateString()} ${logDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
                         </div>
                     </div>
                 `;
@@ -2406,11 +2396,22 @@
                 user.walletLogs = [];
             }
             
+            const now = new Date();
+            const formattedTime = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const formattedDate = now.toLocaleDateString();
+            
+            // Enhance description with date/time for certain types
+            let enhancedDescription = description;
+            if (type === 'send' || type === 'money-received') {
+                enhancedDescription = `${description} • ${formattedDate} ${formattedTime}`;
+            }
+            
             const logEntry = {
-                date: new Date().toISOString(),
+                date: now.toISOString(),
                 type: type,
-                description: description,
-                amount: amount
+                description: enhancedDescription,
+                amount: amount,
+                timestamp: now.getTime()
             };
             
             user.walletLogs.push(logEntry);
@@ -2423,7 +2424,7 @@
             users[userId] = user;
             localStorage.setItem('raffle_users', JSON.stringify(users));
             
-            // Also update user's wallet logs in real-time if they're viewing them
+            // Immediately refresh wallet logs if user is viewing them
             if (userId === currentUser && document.getElementById('wallet-tab').classList.contains('active')) {
                 loadWalletLogs();
             }
@@ -2468,6 +2469,11 @@
                 addWalletLog(userId, 'money-received', `Received from ${sourceUser}`, amount);
             } else if (source === 'cashin') {
                 addWalletLog(userId, 'deposit', 'Cash in deposit', amount);
+            }
+            
+            // Refresh deposits display if user is viewing them
+            if (userId === currentUser && document.getElementById('wallet-tab').classList.contains('active')) {
+                loadDeposits();
             }
         }
         
@@ -2566,7 +2572,10 @@
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
                 // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+                
+                // Add wallet log for successful transfer to Shopee
+                addWalletLog(currentUser, 'send', `Transferred to Shopee wallet (${user.walletInfo.shopee})`, -balance);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2578,7 +2587,8 @@
                 loadDeposits();
                 loadWalletLogs();
                 
-                showNotification(`Transferred ₱${formatDecimal(balance)} to Shopee wallet. Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+                showNotification(`Transferred ₱${formatDecimal(balance)} to Shopee wallet (${user.walletInfo.shopee}). Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+                closeModal();
                 return;
             }
             
@@ -2591,7 +2601,10 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+            
+            // Add wallet log for successful transfer to Shopee
+            addWalletLog(currentUser, 'send', `Transferred expired deposit to Shopee wallet (${user.walletInfo.shopee})`, -parseFloat(deposit.amount));
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -2604,7 +2617,7 @@
             loadUserData();
             loadWalletLogs();
             
-            showNotification(`Transferred ₱${formatDecimal(deposit.amount)} to Shopee wallet. Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+            showNotification(`Transferred ₱${formatDecimal(deposit.amount)} to Shopee wallet (${user.walletInfo.shopee}). Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
         }
         
         function transferToLazada() {
@@ -2629,7 +2642,10 @@
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
                 // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+                
+                // Add wallet log for successful transfer to Lazada
+                addWalletLog(currentUser, 'send', `Transferred to Lazada wallet (${user.walletInfo.lazada})`, -balance);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2641,7 +2657,8 @@
                 loadDeposits();
                 loadWalletLogs();
                 
-                showNotification(`Transferred ₱${formatDecimal(balance)} to Lazada wallet. Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+                showNotification(`Transferred ₱${formatDecimal(balance)} to Lazada wallet (${user.walletInfo.lazada}). Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+                closeModal();
                 return;
             }
             
@@ -2654,7 +2671,10 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
+            
+            // Add wallet log for successful transfer to Lazada
+            addWalletLog(currentUser, 'send', `Transferred expired deposit to Lazada wallet (${user.walletInfo.lazada})`, -parseFloat(deposit.amount));
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -2667,7 +2687,7 @@
             loadUserData();
             loadWalletLogs();
             
-            showNotification(`Transferred ₱${formatDecimal(deposit.amount)} to Lazada wallet. Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
+            showNotification(`Transferred ₱${formatDecimal(deposit.amount)} to Lazada wallet (${user.walletInfo.lazada}). Net: ₱${formatDecimal(netAmount)} (${formatPercent(serviceFeePercent)} fee)`, 'success');
         }
         
         // ================ RAFFLE ITEMS FUNCTIONS ================
@@ -3454,6 +3474,10 @@
                 return;
             }
             
+            // Get current date and time for consistent logging
+            const now = new Date();
+            const formattedDateTime = now.toLocaleString();
+            
             // Deduct from sender
             users[currentUser].balance = formatDecimal(parseFloat(users[currentUser].balance) - amount);
             
@@ -3463,9 +3487,15 @@
             // Add to recipient's balance
             users[recipient].balance = formatDecimal(parseFloat(users[recipient].balance) + amount);
             
-            // Add wallet logs
-            addWalletLog(currentUser, 'money-sent', `Money sent to ${recipient}`, -amount);
-            addWalletLog(recipient, 'money-received', `Money received from ${currentUser}`, amount);
+            // Add detailed wallet logs for SENDER
+            addWalletLog(currentUser, 'send', 
+                `Money sent to ${recipient}`, 
+                -amount);
+            
+            // Add detailed wallet logs for RECEIVER
+            addWalletLog(recipient, 'money-received', 
+                `Money received from ${currentUser}`, 
+                amount);
             
             localStorage.setItem('raffle_users', JSON.stringify(users));
             
@@ -3476,7 +3506,7 @@
             loadDeposits();
             loadWalletLogs();
             
-            showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipient}`, 'success');
+            showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipient} at ${formattedDateTime}`, 'success');
         }
         
         // ================ ADMIN FUNCTIONS ================
@@ -3769,8 +3799,9 @@
                 
                 itemBets.forEach(bet => {
                     // Calculate refund amount with 2% fee deduction
-                    const refundAmount = bet.amount * (1 - refundFeePercent/100);
-                    const feeAmount = bet.amount * (refundFeePercent/100);
+                    const originalAmount = parseFloat(bet.amount);
+                    const feeAmount = originalAmount * (refundFeePercent / 100);
+                    const refundAmount = originalAmount - feeAmount;
                     
                     if (users[bet.userId]) {
                         // Add refunded amount (after fee) to user's balance
@@ -3782,21 +3813,22 @@
                         // Add deposit for the refund with source information
                         addDeposit(bet.userId, refundAmount, 'refund', item.name);
                         
-                        // Add wallet log for refund with fee information
+                        // Add TWO wallet logs:
+                        // 1. For the refund amount received (after fee)
                         addWalletLog(bet.userId, 'refund', 
-                            `Refund for ${item.name} (no winner) - 2% fee applied`, 
+                            `Refund from ${item.name} (no winner)`, 
                             refundAmount);
                         
-                        // Also log the fee deduction separately
+                        // 2. For the fee deducted (separate log)
                         addWalletLog(bet.userId, 'refund-fee', 
-                            `2% service fee for refund on ${item.name}`, 
+                            `2% refund fee on ${item.name}`, 
                             -feeAmount);
                     }
                     
                     bet.status = 'refunded';
                     bet.refundAmount = refundAmount;
                     bet.feeAmount = feeAmount;
-                    bet.originalAmount = bet.amount;
+                    bet.originalAmount = originalAmount;
                     
                     totalRefunded += refundAmount;
                     totalFees += feeAmount;
@@ -3842,10 +3874,10 @@
                         winDate: new Date().toISOString()
                     });
                     
-                    winningBet.status = 'won';
+                    winningBet.status = 'winner';
                     
                     // Add wallet log for win (amount 0 since it's an item, not money)
-                    addWalletLog(winningBet.userId, 'win', `Won ${item.name}`, 0);
+                    addWalletLog(winningBet.userId, 'winner', `WINNER of ${item.name}`, 0);
                     
                     // CALCULATE WINNER'S TOTAL BET AMOUNT FOR THIS ITEM
                     let winnerTotalBet = 0;
@@ -3868,7 +3900,7 @@
                             addDeposit(bet.userId, bet.amount, 'refund', item.name);
                             
                             // Add wallet log for full refund
-                            addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost)`, bet.amount);
+                            addWalletLog(bet.userId, 'refund', `Refund from ${item.name} (lost)`, bet.amount);
                             
                             bet.status = 'refunded';
                             bet.refundAmount = bet.amount;
@@ -4026,13 +4058,13 @@
                 let statusText = '';
                 
                 // Check if any bet is won
-                const hasWon = itemBets.some(bet => bet.status === 'won');
+                const hasWinner = itemBets.some(bet => bet.status === 'winner');
                 const hasRefunded = itemBets.some(bet => bet.status === 'refunded');
                 const itemEnded = item && item.status === 'completed';
                 
-                if (hasWon) {
-                    statusClass = 'won';
-                    statusText = `<span style="color: #28a745; font-weight: bold;">WON!</span>`;
+                if (hasWinner) {
+                    statusClass = 'winner';
+                    statusText = `<span style="color: #28a745; font-weight: bold;">WINNER!</span>`;
                 } else if (hasRefunded) {
                     statusClass = 'refunded';
                     statusText = `<span style="color: #6c757d;">Refunded</span>`;
