@@ -2259,35 +2259,40 @@
                 let logClass = '';
                 let logIcon = '';
                 let displayAmount = log.amount;
-                let amountColor = '#28a745'; // Green for positive amounts
+                
+                // ALWAYS use green for positive amounts (incoming money)
+                // ALWAYS use red for negative amounts (outgoing money)
+                let amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                 
                 switch(log.type) {
                     case 'bet':
                         logClass = 'bet';
                         logIcon = 'fas fa-dice';
-                        amountColor = '#dc3545'; // Red for bets (money going out)
+                        // Bets are always negative (money going out)
+                        amountColor = '#dc3545';
                         break;
                     case 'refund':
                         logClass = 'refund';
                         logIcon = 'fas fa-undo';
-                        // Refunds are always positive amounts (money coming in)
+                        // Refunds are usually positive (money coming in)
                         amountColor = '#28a745';
                         break;
                     case 'refund-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
-                        amountColor = '#dc3545'; // Red for fees (money going out)
+                        // Fees are always negative (money going out)
+                        amountColor = '#dc3545';
                         break;
                     case 'transfer-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
-                        amountColor = '#dc3545'; // Red for fees (money going out)
+                        // Fees are always negative (money going out)
+                        amountColor = '#dc3545';
                         break;
                     case 'send':
                         logClass = 'send';
                         logIcon = 'fas fa-paper-plane';
-                        // If amount is negative (sending), show red, if positive (receiving), show green
-                        amountColor = log.amount < 0 ? '#dc3545' : '#28a745';
+                        amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                         break;
                     case 'win':
                         logClass = 'win';
@@ -2317,11 +2322,11 @@
                     case 'pot-transfer':
                         logClass = 'send';
                         logIcon = 'fas fa-university';
-                        amountColor = log.amount >= 0 ? '#20c997' : '#dc3545';
+                        amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                         break;
                     default:
                         logIcon = 'fas fa-exchange-alt';
-                        amountColor = log.amount >= 0 ? '#28a745' : '#dc3545';
+                        amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                 }
                 
                 // Format the amount display
@@ -2329,8 +2334,10 @@
                 if (log.type === 'win' && log.amount === 0) {
                     amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WON ITEM</span>`;
                 } else {
+                    // Show + for positive amounts, - for negative amounts
+                    const sign = displayAmount >= 0 ? '+' : '';
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
-                        ${displayAmount >= 0 ? '+' : ''}₱${formatDecimal(Math.abs(displayAmount))}
+                        ${sign}₱${formatDecimal(Math.abs(displayAmount))}
                     </span>`;
                 }
                 
@@ -2384,6 +2391,11 @@
             
             users[userId] = user;
             localStorage.setItem('raffle_users', JSON.stringify(users));
+            
+            // Refresh wallet logs display if current user is viewing their logs
+            if (currentUser === userId && document.getElementById('wallet-tab').classList.contains('active')) {
+                loadWalletLogs();
+            }
         }
         
         function addDeposit(userId, amount, source, sourceItem = '', sourceUser = '') {
@@ -2548,7 +2560,8 @@
             systemFees.totalServiceFees = parseFloat(systemFees.totalServiceFees) + feeAmount;
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
-            // Add wallet log for transfer fee
+            // Add wallet logs for transfer and fee
+            addWalletLog(currentUser, 'send', `Transferred expired deposit to Shopee wallet`, -parseFloat(deposit.amount));
             addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
             
             // Remove deposit
@@ -2612,7 +2625,8 @@
             systemFees.totalServiceFees = parseFloat(systemFees.totalServiceFees) + feeAmount;
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
-            // Add wallet log for transfer fee
+            // Add wallet logs for transfer and fee
+            addWalletLog(currentUser, 'send', `Transferred expired deposit to Lazada wallet`, -parseFloat(deposit.amount));
             addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
             
             // Remove deposit
