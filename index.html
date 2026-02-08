@@ -3785,21 +3785,32 @@
                     // ADD WINNER'S TOTAL BET AMOUNT TO TOTAL POT MONEY
                     systemFees.totalPotMoney = parseFloat(systemFees.totalPotMoney || 0) + winnerTotalBet;
                     
-                    // Refund all OTHER users' bets in FULL (100% refund)
+                    // Refund all OTHER users' bets with 2% service fee deduction
                     itemBets.forEach(bet => {
                         if (bet.userId !== winningBet.userId && users[bet.userId]) {
-                            // FULL REFUND for losing bets
-                            users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + bet.amount);
+                            // Calculate refund with 2% service fee
+                            const refundAmount = bet.amount * (1 - refundFeePercent/100);
+                            const feeAmount = bet.amount * (refundFeePercent/100);
                             
-                            // Add deposit for the full refund
-                            addDeposit(bet.userId, bet.amount, 'refund', item.name);
+                            // Add refund amount to user balance (after 2% fee)
+                            users[bet.userId].balance = formatDecimal(parseFloat(users[bet.userId].balance) + refundAmount);
                             
-                            // Add wallet log for full refund
-                            addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost)`, bet.amount);
+                            // Track user's service fees
+                            users[bet.userId].serviceFees = formatDecimal(parseFloat(users[bet.userId].serviceFees || 0) + feeAmount);
                             
+                            // Add deposit for the refund (after fee)
+                            addDeposit(bet.userId, refundAmount, 'refund', item.name);
+                            
+                            // Add wallet log for refund (with fee info)
+                            addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost - 2% fee)`, refundAmount);
+                            
+                            // Update bet status
                             bet.status = 'refunded';
-                            bet.refundAmount = bet.amount;
-                            bet.feeAmount = 0;
+                            bet.refundAmount = refundAmount;
+                            bet.feeAmount = feeAmount;
+                            
+                            // Add to system fees
+                            systemFees.totalRefundFees = parseFloat(systemFees.totalRefundFees) + feeAmount;
                         }
                     });
                     
