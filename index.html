@@ -2273,6 +2273,11 @@
                         // Refunds are always positive amounts (money coming in)
                         amountColor = '#28a745';
                         break;
+                    case 'refund-fee':
+                        logClass = 'transfer-fee';
+                        logIcon = 'fas fa-percentage';
+                        amountColor = '#dc3545'; // Red for fees (money going out)
+                        break;
                     case 'transfer-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
@@ -2304,6 +2309,16 @@
                         logIcon = 'fas fa-paper-plane';
                         amountColor = '#28a745'; // Green for receiving money
                         break;
+                    case 'pot-money':
+                        logClass = 'win';
+                        logIcon = 'fas fa-money-bill-wave';
+                        amountColor = '#20c997'; // Teal for pot money
+                        break;
+                    case 'pot-transfer':
+                        logClass = 'send';
+                        logIcon = 'fas fa-university';
+                        amountColor = log.amount >= 0 ? '#20c997' : '#dc3545';
+                        break;
                     default:
                         logIcon = 'fas fa-exchange-alt';
                         amountColor = log.amount >= 0 ? '#28a745' : '#dc3545';
@@ -2311,7 +2326,7 @@
                 
                 // Format the amount display
                 let amountDisplay = '';
-                if (log.type === 'win') {
+                if (log.type === 'win' && log.amount === 0) {
                     amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WON ITEM</span>`;
                 } else {
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
@@ -2507,8 +2522,9 @@
                 systemFees.totalServiceFees = parseFloat(systemFees.totalServiceFees) + feeAmount;
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
-                // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+                // Add wallet logs for transfer and fee
+                addWalletLog(currentUser, 'send', `Transferred to Shopee wallet`, -balance);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2533,7 +2549,7 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -2570,8 +2586,9 @@
                 systemFees.totalServiceFees = parseFloat(systemFees.totalServiceFees) + feeAmount;
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
                 
-                // Add wallet log for transfer fee
-                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+                // Add wallet logs for transfer and fee
+                addWalletLog(currentUser, 'send', `Transferred to Lazada wallet`, -balance);
+                addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
                 
                 // Clear balance
                 user.balance = 0.000;
@@ -2596,7 +2613,7 @@
             localStorage.setItem('system_fees', JSON.stringify(systemFees));
             
             // Add wallet log for transfer fee
-            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', feeAmount);
+            addWalletLog(currentUser, 'transfer-fee', 'Wallet transfer service fee', -feeAmount);
             
             // Remove deposit
             user.deposits.splice(currentDepositId, 1);
@@ -3717,8 +3734,9 @@
                         // Add deposit for the refund
                         addDeposit(bet.userId, refundAmount, 'refund', item.name);
                         
-                        // Add wallet log for refund
+                        // Add wallet logs for refund and fee
                         addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (no winner)`, refundAmount);
+                        addWalletLog(bet.userId, 'refund-fee', `2% service fee on refund for ${item.name}`, -feeAmount);
                     }
                     
                     bet.status = 'refunded';
@@ -3785,6 +3803,9 @@
                     // ADD WINNER'S TOTAL BET AMOUNT TO TOTAL POT MONEY
                     systemFees.totalPotMoney = parseFloat(systemFees.totalPotMoney || 0) + winnerTotalBet;
                     
+                    // Add wallet log for winner's bets going to pot
+                    addWalletLog(winningBet.userId, 'pot-transfer', `${item.name} - Winning bets to money pot`, -winnerTotalBet);
+                    
                     // Refund all OTHER users' bets with 2% service fee deduction
                     itemBets.forEach(bet => {
                         if (bet.userId !== winningBet.userId && users[bet.userId]) {
@@ -3801,8 +3822,9 @@
                             // Add deposit for the refund (after fee)
                             addDeposit(bet.userId, refundAmount, 'refund', item.name);
                             
-                            // Add wallet log for refund (with fee info)
+                            // Add wallet logs for refund and fee
                             addWalletLog(bet.userId, 'refund', `Bet refund for ${item.name} (lost - 2% fee)`, refundAmount);
+                            addWalletLog(bet.userId, 'refund-fee', `2% service fee on refund for ${item.name}`, -feeAmount);
                             
                             // Update bet status
                             bet.status = 'refunded';
@@ -3844,6 +3866,9 @@
             }
             
             if (confirm(`Cash out ₱${formatDecimal(potAmount)} from Total Money Pot?`)) {
+                // Add wallet log for pot cash out (admin user)
+                addWalletLog('admin', 'pot-money', 'Cashed out money pot', potAmount);
+                
                 // Reset pot to 0
                 systemFees.totalPotMoney = 0.000;
                 localStorage.setItem('system_fees', JSON.stringify(systemFees));
