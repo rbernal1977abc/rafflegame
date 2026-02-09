@@ -2415,13 +2415,18 @@
             const deposits = currentUserData.deposits || {};
             const depositsList = document.getElementById('deposits-list');
             
-            if (Object.keys(deposits).length === 0) {
-                depositsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No active deposits</p>';
+            // Filter to ONLY show Cash In deposits (not refunds or transfers)
+            const cashInDeposits = Object.values(deposits).filter(deposit => 
+                deposit.source === 'cashin'
+            );
+            
+            if (cashInDeposits.length === 0) {
+                depositsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No active cash deposits</p>';
                 return;
             }
             
             // Sort by date (newest first)
-            const sortedDeposits = Object.values(deposits).sort((a, b) => 
+            const sortedDeposits = cashInDeposits.sort((a, b) => 
                 new Date(b.depositDate) - new Date(a.depositDate)
             );
             
@@ -2439,7 +2444,6 @@
                 
                 let statusClass = '';
                 let statusText = '';
-                let actionButton = '';
                 
                 if (daysLeft <= 1 && daysLeft > 0) {
                     statusClass = 'expiring';
@@ -2454,26 +2458,8 @@
                     </div>`;
                 }
                 
-                // Add source information
-                let sourceInfo = '';
-                if (deposit.source === 'refund') {
-                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-undo"></i> Bid refund from ${deposit.sourceItem || 'raffle'} - ₱${formatDecimal(deposit.amount)}
-                    </div>`;
-                } else if (deposit.source === 'transfer') {
-                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-paper-plane"></i> Received from ${deposit.sourceUser || 'another user'} - ₱${formatDecimal(deposit.amount)}
-                    </div>`;
-                } else if (deposit.source === 'cashin') {
-                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-plus-circle"></i> Cash In deposit - ₱${formatDecimal(deposit.amount)}
-                    </div>`;
-                }
-                
-                const depositKey = Object.keys(currentUserData.deposits)[index];
-                
                 html += `
-                    <div class="deposit-item ${statusClass}" id="deposit-${depositKey}">
+                    <div class="deposit-item ${statusClass}">
                         <div style="display: flex; justify-content: space-between;">
                             <strong class="decimal-format">₱${formatDecimal(deposit.amount)}</strong>
                             <span>${daysLeft > 0 ? daysLeft + ' days left' : 'EXPIRED'}</span>
@@ -2482,9 +2468,10 @@
                             Deposited: ${depositDate.toLocaleDateString()} ${depositDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}<br>
                             Expires: ${expiryDate.toLocaleDateString()}
                         </div>
-                        ${sourceInfo}
+                        <div style="font-size: 11px; color: #28a745; margin-top: 5px;">
+                            <i class="fas fa-plus-circle"></i> Cash In deposit
+                        </div>
                         ${statusText}
-                        ${actionButton}
                     </div>
                 `;
             });
@@ -3200,6 +3187,8 @@
                 // Add wallet log for bids
                 addWalletLog(currentUser.uid, 'bid', `Auto bids placed on ${currentItem.name}`, -totalAutoBid);
                 
+                const newBalance = (currentUserData.balance || 0) - totalAutoBid;
+                
                 const statusDiv = document.getElementById('game-status');
                 statusDiv.innerHTML = `
                     <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
@@ -3214,7 +3203,7 @@
                 document.getElementById('auto-numbers-display').style.display = 'none';
                 document.getElementById('auto-numbers-grid').innerHTML = '';
                 
-                showNotification(`Bid placed successfully!`, 'success');
+                showNotification(`Successfully placed auto bids!`, 'success');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -3515,6 +3504,13 @@
                 return;
             }
             
+            // Validate email format
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(recipientEmail)) {
+                showNotification('Please enter a valid email address', 'error');
+                return;
+            }
+            
             if (!currentUser || !currentUserData || !database) {
                 showNotification('Please login first', 'error');
                 return;
@@ -3525,34 +3521,48 @@
                 return;
             }
             
-            // Find recipient by email
+            // Prevent sending to yourself
+            if (currentUser.email.toLowerCase() === recipientEmail.toLowerCase()) {
+                showNotification('Cannot send money to yourself', 'error');
+                return;
+            }
+            
+            console.log('🔍 Looking for user with email:', recipientEmail);
+            
+            // Find recipient by email - MORE ROBUST SEARCH
             database.ref('users').once('value')
                 .then((snapshot) => {
                     const users = snapshot.val();
+                    console.log('📊 Total users in database:', users ? Object.keys(users).length : 0);
+                    
                     if (!users) {
                         showNotification('No users found in database', 'error');
                         return Promise.reject('No users');
                     }
                     
-                    // Find user by email
+                    // Find user by email - CASE INSENSITIVE
                     let recipientId = null;
                     let recipientData = null;
                     
                     Object.entries(users).forEach(([userId, user]) => {
-                        if (user.email && user.email.toLowerCase() === recipientEmail.toLowerCase()) {
-                            recipientId = userId;
-                            recipientData = user;
+                        if (user.email) {
+                            // Trim and compare emails case-insensitively
+                            const dbEmail = user.email.trim().toLowerCase();
+                            const inputEmail = recipientEmail.trim().toLowerCase();
+                            
+                            console.log('Comparing:', dbEmail, 'with', inputEmail);
+                            
+                            if (dbEmail === inputEmail) {
+                                recipientId = userId;
+                                recipientData = user;
+                                console.log('✅ Found user:', userId, user.email);
+                            }
                         }
                     });
                     
                     if (!recipientId || !recipientData) {
-                        showNotification('User does not exist!', 'error');
+                        showNotification(`User with email "${recipientEmail}" does not exist!`, 'error');
                         return Promise.reject('User not found');
-                    }
-                    
-                    if (recipientId === currentUser.uid) {
-                        showNotification('Cannot send money to yourself', 'error');
-                        return Promise.reject('Self transfer');
                     }
                     
                     const senderNewBalance = currentUserData.balance - amount;
@@ -3575,12 +3585,15 @@
                             document.getElementById('send-amount').value = '';
                             
                             showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
+                            
+                            // Reload user data to update balance
+                            loadUserData();
                         });
                 })
                 .catch((error) => {
                     console.error('Error sending money:', error);
-                    // Don't show error if it's just "User does not exist!"
-                    if (error !== 'User not found' && error !== 'Self transfer' && error !== 'No users') {
+                    // Don't show error if it's just "User not found" - we already showed a message
+                    if (error !== 'User not found' && error !== 'No users') {
                         showNotification('Error sending money: ' + getFirebaseError(error), 'error');
                     }
                 });
@@ -3998,48 +4011,77 @@
                 const uniqueBids = bidArray.filter(bid => numberCounts[bid.number] === 1);
                 
                 if (uniqueBids.length === 0) {
-                    // No winner - refund all bids with 2% fee
+                    // NO WINNER - Refund all users their total bids with 2% fee
                     showNotification('No unique numbers found. Refunding all bids with 2% service fee.', 'info');
                     
+                    // Group bids by user to calculate total per user
+                    const userBids = {};
+                    bidArray.forEach(bid => {
+                        if (!userBids[bid.userId]) {
+                            userBids[bid.userId] = {
+                                username: bid.username,
+                                totalAmount: 0,
+                                bidCount: 0
+                            };
+                        }
+                        userBids[bid.userId].totalAmount += parseFloat(bid.amount);
+                        userBids[bid.userId].bidCount += 1;
+                    });
+                    
+                    const updates = {};
                     let totalRefunded = 0;
                     let totalFees = 0;
                     
-                    const updates = {};
-                    
-                    bidArray.forEach(bid => {
-                        const refundAmount = bid.amount * (1 - refundFeePercent/100);
-                        const feeAmount = bid.amount * (refundFeePercent/100);
+                    // Process refund for each user
+                    Object.entries(userBids).forEach(([userId, userData]) => {
+                        const totalBidAmount = userData.totalAmount;
+                        const feeAmount = totalBidAmount * (refundFeePercent/100);
+                        const refundAmount = totalBidAmount - feeAmount;
                         
-                        // Update user balance
-                        updates['users/' + bid.userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
-                        updates['users/' + bid.userId + '/serviceFees'] = firebase.database.ServerValue.increment(feeAmount);
+                        // Update user balance (add refund)
+                        updates['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
                         
-                        // Add deposit for the refund
-                        addDeposit(bid.userId, refundAmount, 'refund', item.name);
+                        // Add deposit for the refund (single deposit with total amount)
+                        const depositData = {
+                            amount: refundAmount,
+                            depositDate: new Date().toISOString(),
+                            expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'active',
+                            source: 'refund',
+                            sourceItem: item.name,
+                            totalBidded: totalBidAmount,
+                            feeDeducted: feeAmount
+                        };
                         
-                        // Add wallet log for REFUND
-                        addWalletLog(bid.userId, 'refund', `Bid refund for ${item.name} (lost - 2% fee)`, refundAmount);
+                        database.ref('users/' + userId + '/deposits').push(depositData);
                         
-                        // Update bid status
-                        updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
-                        updates['raffles/' + itemId + '/bids/' + bid.id + '/refundAmount'] = refundAmount;
-                        updates['raffles/' + itemId + '/bids/' + bid.id + '/feeAmount'] = feeAmount;
+                        // Add wallet log for REFUND (total amount after fee)
+                        addWalletLog(userId, 'refund', 
+                            `Total bid refund for ${item.name}: ₱${formatDecimal(totalBidAmount)} less 2% fee`, 
+                            refundAmount);
+                        
+                        // Update service fees
+                        updates['raffles/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(feeAmount);
                         
                         totalRefunded += refundAmount;
                         totalFees += feeAmount;
                     });
                     
+                    // Mark all bids as refunded
+                    bidArray.forEach(bid => {
+                        updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
+                    });
+                    
                     // Update raffle status
                     updates['raffles/' + itemId + '/status'] = 'completed';
                     updates['raffles/' + itemId + '/noWinner'] = true;
-                    updates['raffles/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(totalFees);
                     
                     return database.ref().update(updates)
                         .then(() => {
-                            showNotification(`Refunded ₱${formatDecimal(totalRefunded)} to ${bidArray.length} users with 2% service fee (₱${formatDecimal(totalFees)})`, 'success');
+                            showNotification(`Refunded ₱${formatDecimal(totalRefunded)} to users with 2% service fee (₱${formatDecimal(totalFees)})`, 'success');
                         });
                 } else {
-                    // Find winner
+                    // THERE IS A WINNER
                     uniqueBids.sort((a, b) => a.number - b.number);
                     const winningBid = uniqueBids[0];
                     
@@ -4064,7 +4106,6 @@
                         prizeValue: item.price
                     };
                     
-                    // Add to user's wins
                     database.ref('users/' + winningBid.userId + '/wins').once('value').then(snapshot => {
                         const currentWins = snapshot.val() || [];
                         const newWins = [...currentWins, winEntry];
@@ -4077,43 +4118,71 @@
                     // Add wallet log for win
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // Calculate winner's total bid amount for this item
-                    let winnerTotalBid = 0;
+                    // Group losing bids by user
+                    const losingUsers = {};
                     bidArray.forEach(bid => {
-                        if (bid.userId === winningBid.userId) {
-                            winnerTotalBid += parseFloat(bid.amount);
+                        if (bid.userId !== winningBid.userId) {
+                            if (!losingUsers[bid.userId]) {
+                                losingUsers[bid.userId] = {
+                                    username: bid.username,
+                                    totalAmount: 0,
+                                    bidCount: 0
+                                };
+                            }
+                            losingUsers[bid.userId].totalAmount += parseFloat(bid.amount);
+                            losingUsers[bid.userId].bidCount += 1;
                         }
                     });
                     
-                    // Refund all OTHER users' bids with 2% service fee deduction
+                    let totalRefunded = 0;
+                    let totalFees = 0;
+                    
+                    // Refund all OTHER users their total bids with 2% fee
+                    Object.entries(losingUsers).forEach(([userId, userData]) => {
+                        const totalBidAmount = userData.totalAmount;
+                        const feeAmount = totalBidAmount * (refundFeePercent/100);
+                        const refundAmount = totalBidAmount - feeAmount;
+                        
+                        // Update user balance
+                        updates['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
+                        
+                        // Add deposit for the refund
+                        const depositData = {
+                            amount: refundAmount,
+                            depositDate: new Date().toISOString(),
+                            expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'active',
+                            source: 'refund',
+                            sourceItem: item.name,
+                            totalBidded: totalBidAmount,
+                            feeDeducted: feeAmount
+                        };
+                        
+                        database.ref('users/' + userId + '/deposits').push(depositData);
+                        
+                        // Add wallet log for REFUND
+                        addWalletLog(userId, 'refund', 
+                            `Total bid refund for ${item.name}: ₱${formatDecimal(totalBidAmount)} less 2% fee`, 
+                            refundAmount);
+                        
+                        // Update service fees
+                        updates['raffles/' + itemId + '/serviceFeesCollected'] = 
+                            firebase.database.ServerValue.increment(feeAmount);
+                        
+                        totalRefunded += refundAmount;
+                        totalFees += feeAmount;
+                    });
+                    
+                    // Mark losing bids as refunded
                     bidArray.forEach(bid => {
                         if (bid.userId !== winningBid.userId) {
-                            const refundAmount = bid.amount * (1 - refundFeePercent/100);
-                            const feeAmount = bid.amount * (refundFeePercent/100);
-                            
-                            // Update user balance
-                            updates['users/' + bid.userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
-                            updates['users/' + bid.userId + '/serviceFees'] = firebase.database.ServerValue.increment(feeAmount);
-                            
-                            // Add deposit for the refund
-                            addDeposit(bid.userId, refundAmount, 'refund', item.name);
-                            
-                            // Add wallet log for REFUND
-                            addWalletLog(bid.userId, 'refund', `Bid refund for ${item.name} (lost - 2% fee)`, refundAmount);
-                            
-                            // Update bid status
                             updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
-                            updates['raffles/' + itemId + '/bids/' + bid.id + '/refundAmount'] = refundAmount;
-                            updates['raffles/' + itemId + '/bids/' + bid.id + '/feeAmount'] = feeAmount;
-                            
-                            // Update raffle service fees
-                            updates['raffles/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(feeAmount);
                         }
                     });
                     
                     return database.ref().update(updates)
                         .then(() => {
-                            showNotification(`Winner declared for ${item.name}: ${winningBid.username} with number ${winningBid.number.toFixed(3)}. Winner's bids (₱${formatDecimal(winnerTotalBid)}) added to Total Money Pot.`, 'success');
+                            showNotification(`Winner declared for ${item.name}: ${winningBid.username} with number ${winningBid.number.toFixed(3)}. Refunded ₱${formatDecimal(totalRefunded)} to losers with 2% fee (₱${formatDecimal(totalFees)})`, 'success');
                         });
                 }
             })
