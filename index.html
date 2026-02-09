@@ -2570,7 +2570,7 @@
                 // Format the amount display
                 let amountDisplay = '';
                 if (log.type === 'win') {
-                    amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WON ITEM</span>`;
+                    amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WINNER!</span>`;
                 } else {
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
                         ${displayAmount >= 0 ? '+' : ''}₱${formatDecimal(Math.abs(displayAmount))}
@@ -3210,7 +3210,7 @@
                 const statusDiv = document.getElementById('game-status');
                 statusDiv.innerHTML = `
                     <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
-                        <h4><i class="fas fa-check-circle"></i> ${bidsPlaced} Auto Bids Placed Successfully!</h4>
+                        <h4><i class="fas fa-check-circle"></i> Auto Bids Placed Successfully!</h4>
                         <p>Total Bid Amount: <strong class="decimal-format">${formatCurrency(totalAutoBid)}</strong></p>
                         <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(newBalance)}</strong></p>
                     </div>
@@ -3221,7 +3221,7 @@
                 document.getElementById('auto-numbers-display').style.display = 'none';
                 document.getElementById('auto-numbers-grid').innerHTML = '';
                 
-                showNotification(`Successfully placed ${bidsPlaced} auto bids!`, 'success');
+                showNotification(`Successfully placed auto bids!`, 'success');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -3315,7 +3315,7 @@
                     
                     if (hasWon) {
                         statusClass = 'won';
-                        statusText = `<span style="color: #28a745; font-weight: bold;">WON!</span>`;
+                        statusText = `<span style="color: #28a745; font-weight: bold;">WINNER!</span>`;
                     } else if (hasRefunded) {
                         statusClass = 'refunded';
                         statusText = `<span style="color: #6c757d;">Refunded</span>`;
@@ -3572,6 +3572,7 @@
                     showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
                 })
                 .catch((error) => {
+                    console.error('Error sending money:', error);
                     showNotification('Error sending money: ' + getFirebaseError(error), 'error');
                 });
         }
@@ -4098,7 +4099,12 @@
                         prizeValue: item.price
                     };
                     
-                    database.ref('users/' + winningBid.userId + '/wins').push(winEntry);
+                    // Add to user's wins
+                    database.ref('users/' + winningBid.userId + '/wins').once('value').then(snapshot => {
+                        const currentWins = snapshot.val() || [];
+                        const newWins = [...currentWins, winEntry];
+                        return database.ref('users/' + winningBid.userId + '/wins').set(newWins);
+                    });
                     
                     // Update winning bid status
                     updates['raffles/' + itemId + '/bids/' + winningBid.id + '/status'] = 'won';
@@ -4220,9 +4226,8 @@
                 
                 if (drawsRun > 0) {
                     showNotification(`Ran ${drawsRun} automatic draws`, 'success');
-                } else {
-                    showNotification('No raffles ready for automatic draw', 'info');
                 }
+                // Removed the "No raffles ready for automatic draw" message
             });
         }
         
