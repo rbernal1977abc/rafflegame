@@ -1811,7 +1811,7 @@
             <div style="background: #fff3cd; padding: 15px; border-radius: 10px; margin: 20px 0;">
                 <h4 style="color: #856404; margin-bottom: 10px;">Service Fee Information</h4>
                 <p style="margin: 5px 0;"><strong>2% service fee</strong> will be deducted</p>
-                <p style="margin: 5px 0;">Fee amount: <strong id="fee-amount" class="decimal-format">₱0.000</strong></p>
+                    <p style="margin: 5px 0;">Fee amount: <strong id="fee-amount" class="decimal-format">₱0.000</strong></p>
                 <p style="margin: 5px 0;">Net amount after fee: <strong id="net-amount" class="decimal-format">₱0.000</strong></p>
             </div>
             
@@ -2217,7 +2217,7 @@
         function loadUserData() {
             // Don't reload if we're in the middle of a send transaction
             if (isSendingMoney) {
-                isSendingMoney = false;
+                console.log('Preventing profile reload during send transaction');
                 return;
             }
             
@@ -2225,7 +2225,7 @@
             
             console.log('Loading user data for:', currentUser.uid);
             
-            // Temporarily detach the listener to prevent profile switching
+            // Don't attach listeners during send transaction
             if (currentUserData && isSendingMoney) {
                 return;
             }
@@ -2783,44 +2783,58 @@
             let currentNum = bidNumber;
             
             if (num === '.') {
-                if (bidNumber.includes('.')) return;
-                // Add decimal point if not already present
-                bidNumber += '.000';
-            } else {
-                // Remove the decimal part temporarily
-                let parts = currentNum.split('.');
-                let wholePart = parts[0];
-                let decimalPart = parts[1] || '000';
+                // If we already have a decimal point, do nothing
+                if (currentNum.includes('.')) return;
                 
-                if (currentNum.includes('.')) {
-                    // We're adding digits after the decimal point
-                    // Allow exactly 3 digits after decimal
-                    if (decimalPart === '000') {
-                        // First digit after decimal
-                        decimalPart = num + '00';
-                    } else if (decimalPart[1] === '0' && decimalPart[2] === '0') {
-                        // Second digit after decimal
-                        decimalPart = decimalPart[0] + num + '0';
-                    } else if (decimalPart[2] === '0') {
-                        // Third digit after decimal
-                        decimalPart = decimalPart[0] + decimalPart[1] + num;
-                    } else {
-                        // Already have 3 digits, replace the last one
-                        decimalPart = decimalPart[0] + decimalPart[1] + num;
-                    }
+                // If current number is 0, start with "0."
+                if (currentNum === '0.000') {
+                    bidNumber = '0.';
                 } else {
-                    // Adding digits before decimal point - allow infinite digits
-                    if (wholePart === '0' && num !== '.') {
-                        // Replace leading zero
-                        wholePart = num;
-                    } else {
-                        // Add digit to whole part (infinite digits allowed)
-                        wholePart += num;
-                    }
+                    // Add decimal point to existing number
+                    bidNumber = currentNum + '.';
                 }
-                
-                // Reconstruct with exactly 3 decimal places
-                bidNumber = wholePart + '.' + decimalPart;
+            } else {
+                // Handle number input
+                if (currentNum === '0.000') {
+                    // Starting fresh
+                    bidNumber = num;
+                } else if (currentNum.includes('.')) {
+                    // We're entering digits after a decimal point
+                    let parts = currentNum.split('.');
+                    let wholePart = parts[0];
+                    let decimalPart = parts[1] || '';
+                    
+                    // Allow up to 3 digits after decimal
+                    if (decimalPart.length < 3) {
+                        decimalPart += num;
+                        bidNumber = wholePart + '.' + decimalPart;
+                    }
+                    // If we already have 3 digits, do nothing (or you could replace the last digit)
+                } else {
+                    // We're entering digits before decimal point - allow infinite digits
+                    bidNumber = currentNum + num;
+                }
+            }
+            
+            // Ensure we always show 3 decimal places if we have a decimal point
+            if (bidNumber.includes('.') && !bidNumber.endsWith('.')) {
+                let parts = bidNumber.split('.');
+                let decimalPart = parts[1];
+                // Pad with zeros if needed
+                while (decimalPart.length < 3) {
+                    decimalPart += '0';
+                }
+                // Trim to exactly 3 digits if longer
+                if (decimalPart.length > 3) {
+                    decimalPart = decimalPart.substring(0, 3);
+                }
+                bidNumber = parts[0] + '.' + decimalPart;
+            } else if (bidNumber.includes('.') && bidNumber.endsWith('.')) {
+                // If user just pressed decimal, don't add zeros yet
+                // This allows them to see they're entering decimal mode
+            } else {
+                // No decimal point, add .000 for display
+                bidNumber = bidNumber + '.000';
             }
             
             document.getElementById('bid-number').value = bidNumber;
@@ -3540,7 +3554,7 @@
         
         // ================ SEND MONEY FUNCTIONS ================
         function sendMoney() {
-            // Set flag to prevent profile switching
+            // Set flag to prevent profile switching - MOVE THIS TO THE BEGINNING
             isSendingMoney = true;
             
             const recipientEmail = document.getElementById('recipient-email').value.trim();
@@ -3650,7 +3664,7 @@
                             // Reset the flag after transaction is complete
                             setTimeout(() => {
                                 isSendingMoney = false;
-                            }, 1000);
+                            }, 3000); // Changed from 1000 to 3000 ms
                         });
                 })
                 .catch((error) => {
