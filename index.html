@@ -2786,54 +2786,69 @@
         function addNumber(num) {
             let currentNum = bidNumber;
             
-            // Remove trailing .000 if present
+            // Remove trailing .000 if present (for display purposes only)
             if (currentNum.endsWith('.000') && currentNum !== '0.000') {
                 currentNum = currentNum.replace('.000', '');
             }
             
+            // Handle decimal point
             if (num === '.') {
                 // If we already have a decimal point, do nothing
-                if (currentNum.includes('.')) return;
+                if (currentNum.includes('.')) {
+                    return;
+                }
                 
-                // If no decimal point yet, add it and allow user to type the last 3 digits
-                bidNumber = currentNum + '.';
+                // If it's just "0", convert to "0."
+                if (currentNum === '0') {
+                    bidNumber = '0.';
+                } else {
+                    // Add decimal point to existing number
+                    bidNumber = currentNum + '.';
+                }
+                
                 document.getElementById('bid-number').value = bidNumber;
                 document.getElementById('bid-number').classList.add('has-value');
                 updateManualBidSummary();
-                return; // Exit early to let user type the decimal digits
-            } else {
-                // Handle number input
-                if (currentNum === '0.000' || currentNum === '0') {
-                    // Starting fresh - replace 0 with the new number
-                    bidNumber = num;
-                } else if (currentNum.includes('.')) {
-                    // We're entering digits AFTER a decimal point
-                    let parts = currentNum.split('.');
-                    let wholePart = parts[0];
-                    let decimalPart = parts[1] || '';
-                    
-                    // Allow exactly 3 digits after decimal
-                    if (decimalPart.length < 3) {
-                        decimalPart += num;
-                        bidNumber = wholePart + '.' + decimalPart;
-                    }
-                    // If we already have 3 digits, ignore new input
-                } else {
-                    // We're entering digits BEFORE decimal point - allow infinite digits
-                    bidNumber = currentNum + num;
-                }
+                return;
             }
             
-            // Format display: always show 3 decimal places if we have a decimal point
+            // Handle number input (0-9)
+            if (currentNum === '0.000' || currentNum === '0') {
+                // Starting fresh - replace 0 with the new number
+                bidNumber = num;
+            } else if (currentNum.includes('.')) {
+                // We have a decimal point
+                let parts = currentNum.split('.');
+                let wholePart = parts[0];
+                let decimalPart = parts[1] || '';
+                
+                // Allow maximum 3 digits after decimal
+                if (decimalPart.length < 3) {
+                    bidNumber = wholePart + '.' + decimalPart + num;
+                } else {
+                    // Already have 3 decimal digits, ignore new input
+                    return;
+                }
+            } else {
+                // No decimal yet, add to whole number part
+                bidNumber = currentNum + num;
+            }
+            
+            // Format for display
+            formatBidNumberDisplay();
+        }
+        
+        function formatBidNumberDisplay() {
             if (bidNumber.includes('.')) {
                 let parts = bidNumber.split('.');
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Pad decimal part with zeros to exactly 3 digits
+                // Pad decimal part to exactly 3 digits
                 while (decimalPart.length < 3) {
                     decimalPart += '0';
                 }
+                
                 // Ensure exactly 3 decimal digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
@@ -3647,35 +3662,76 @@
                     updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
                     updates['users/' + recipientId + '/balance'] = recipientNewBalance;
                     
-                    return database.ref().update(updates)
-                        .then(() => {
-                            // Add deposit for recipient
-                            addDeposit(recipientId, amount, 'transfer', '', currentUserData.email);
-                            
-                            // Add wallet logs
-                            addWalletLog(currentUser.uid, 'money-sent', `Money sent to ${recipientEmail}`, -amount);
-                            addWalletLog(recipientId, 'money-received', `Money received from ${currentUser.email}`, amount);
-                            
-                            // Clear the form fields
-                            document.getElementById('recipient-email').value = '';
-                            document.getElementById('send-amount').value = '';
-                            
-                            showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
-                            
-                            // IMMEDIATELY update current user balance locally
-                            if (currentUserData) {
-                                currentUserData.balance = senderNewBalance;
-                                updateUI(); // Update the UI with new balance
-                                
-                                // Force refresh wallet logs to show the transaction immediately
-                                loadWalletLogs();
-                            }
-                            
-                            // Reset the flag after transaction is complete
-                            setTimeout(() => {
-                                isSendingMoney = false;
-                            }, 1000);
-                        });
+                    // Create wallet log entries
+                    const senderLog = {
+                        date: new Date().toISOString(),
+                        type: 'money-sent',
+                        description: `Money sent to ${recipientEmail}`,
+                        amount: -amount
+                    };
+                    
+                    const recipientLog = {
+                        date: new Date().toISOString(),
+                        type: 'money-received',
+                        description: `Money received from ${currentUser.email}`,
+                        amount: amount
+                    };
+                    
+                    // Get current logs and add new ones
+                    return Promise.all([
+                        database.ref('users/' + currentUser.uid + '/walletLogs').once('value'),
+                        database.ref('users/' + recipientId + '/walletLogs').once('value')
+                    ]).then(([senderLogsSnapshot, recipientLogsSnapshot]) => {
+                        const senderLogs = senderLogsSnapshot.val() || [];
+                        const recipientLogs = recipientLogsSnapshot.val() || [];
+                        
+                        // Add new logs
+                        senderLogs.push(senderLog);
+                        recipientLogs.push(recipientLog);
+                        
+                        // Keep only last 50 logs
+                        const trimmedSenderLogs = senderLogs.slice(-50);
+                        const trimmedRecipientLogs = recipientLogs.slice(-50);
+                        
+                        updates['users/' + currentUser.uid + '/walletLogs'] = trimmedSenderLogs;
+                        updates['users/' + recipientId + '/walletLogs'] = trimmedRecipientLogs;
+                        
+                        // Add deposit for recipient
+                        const depositData = {
+                            amount: amount,
+                            depositDate: new Date().toISOString(),
+                            expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'active',
+                            source: 'transfer',
+                            sourceItem: '',
+                            sourceUser: currentUserData.email
+                        };
+                        
+                        database.ref('users/' + recipientId + '/deposits').push(depositData);
+                        
+                        return database.ref().update(updates);
+                    });
+                })
+                .then(() => {
+                    // Update local user data immediately
+                    currentUserData.balance -= amount;
+                    
+                    // Clear the form fields
+                    document.getElementById('recipient-email').value = '';
+                    document.getElementById('send-amount').value = '';
+                    
+                    showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
+                    
+                    // IMMEDIATELY update UI
+                    updateUI();
+                    
+                    // Force refresh wallet logs to show the transaction immediately
+                    loadWalletLogs();
+                    
+                    // Reset the flag after transaction is complete
+                    setTimeout(() => {
+                        isSendingMoney = false;
+                    }, 1000);
                 })
                 .catch((error) => {
                     console.error('Error sending money:', error);
