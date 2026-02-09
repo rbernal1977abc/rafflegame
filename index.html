@@ -2306,6 +2306,10 @@
             // Update wallet info
             document.getElementById('shopee-wallet').textContent = currentUserData.walletInfo?.shopee || '';
             document.getElementById('lazada-wallet').textContent = currentUserData.walletInfo?.lazada || '';
+            
+            // Also update manual and auto bid summaries if they're visible
+            updateManualBidSummary();
+            updateAutoBidSummary();
         }
         
         // ================ DASHBOARD FUNCTIONS ================
@@ -2791,8 +2795,12 @@
                 // If we already have a decimal point, do nothing
                 if (currentNum.includes('.')) return;
                 
-                // If no decimal point yet, add it
+                // If no decimal point yet, add it and allow user to type the last 3 digits
                 bidNumber = currentNum + '.';
+                document.getElementById('bid-number').value = bidNumber;
+                document.getElementById('bid-number').classList.add('has-value');
+                updateManualBidSummary();
+                return; // Exit early to let user type the decimal digits
             } else {
                 // Handle number input
                 if (currentNum === '0.000' || currentNum === '0') {
@@ -3554,7 +3562,7 @@
         
         // ================ SEND MONEY FUNCTIONS ================
         function sendMoney() {
-            // Set flag to prevent profile switching - MOVE THIS TO THE BEGINNING
+            // Set flag to prevent profile switching
             isSendingMoney = true;
             
             const recipientEmail = document.getElementById('recipient-email').value.trim();
@@ -3595,7 +3603,7 @@
             
             console.log('🔍 Looking for user with email:', recipientEmail);
             
-            // Find recipient by email - MORE ROBUST SEARCH
+            // Find recipient by email
             database.ref('users').once('value')
                 .then((snapshot) => {
                     const users = snapshot.val();
@@ -3613,7 +3621,6 @@
                     
                     Object.entries(users).forEach(([userId, user]) => {
                         if (user.email) {
-                            // Trim and compare emails case-insensitively
                             const dbEmail = user.email.trim().toLowerCase();
                             const inputEmail = recipientEmail.trim().toLowerCase();
                             
@@ -3655,22 +3662,24 @@
                             
                             showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
                             
-                            // Update current user balance locally without triggering full profile reload
+                            // IMMEDIATELY update current user balance locally
                             if (currentUserData) {
                                 currentUserData.balance = senderNewBalance;
-                                updateUI(); // Just update the UI with new balance
+                                updateUI(); // Update the UI with new balance
+                                
+                                // Force refresh wallet logs to show the transaction immediately
+                                loadWalletLogs();
                             }
                             
                             // Reset the flag after transaction is complete
                             setTimeout(() => {
                                 isSendingMoney = false;
-                            }, 3000); // Changed from 1000 to 3000 ms
+                            }, 1000);
                         });
                 })
                 .catch((error) => {
                     console.error('Error sending money:', error);
                     isSendingMoney = false;
-                    // Don't show error if it's just "User not found" - we already showed a message
                     if (error !== 'User not found' && error !== 'No users') {
                         showNotification('Error sending money: ' + getFirebaseError(error), 'error');
                     }
