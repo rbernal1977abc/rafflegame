@@ -588,8 +588,8 @@
         }
         
         .log-item.bid {
-            border-left-color: #667eea;
-            background: #e0e7ff;
+            border-left-color: #dc3545;
+            background: #f8d7da;
         }
         
         .log-item.transfer-fee {
@@ -598,8 +598,8 @@
         }
         
         .log-item.send {
-            border-left-color: #ffc107;
-            background: #fff3cd;
+            border-left-color: #dc3545;
+            background: #f8d7da;
         }
         
         .log-item.win {
@@ -613,13 +613,13 @@
         }
         
         .log-item.money-received {
-            border-left-color: #17a2b8;
-            background: #d1f2eb;
+            border-left-color: #28a745;
+            background: #d4edda;
         }
         
         .log-item.money-sent {
-            border-left-color: #ffc107;
-            background: #fff3cd;
+            border-left-color: #dc3545;
+            background: #f8d7da;
         }
         
         /* ===== BID LIST ===== */
@@ -1488,9 +1488,7 @@
                     <button onclick="createDemoRaffles()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Create Demo Raffles
                     </button>
-                    <button onclick="initializeAdmin()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
-                        Initialize Admin Account
-                    </button>
+                    <!-- Removed Initialize Admin Account button -->
                     <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Reset Data
                     </button>
@@ -2460,10 +2458,10 @@
                 let sourceInfo = '';
                 if (deposit.source === 'refund') {
                     sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
-                        <i class="fas fa-undo"></i> Refund from ${deposit.sourceItem || 'raffle'} - ₱${formatDecimal(deposit.amount)}
+                        <i class="fas fa-undo"></i> Bid refund from ${deposit.sourceItem || 'raffle'} - ₱${formatDecimal(deposit.amount)}
                     </div>`;
                 } else if (deposit.source === 'transfer') {
-                    sourceInfo = `<div style="font-size: 11px; color: #17a2b8; margin-top: 5px;">
+                    sourceInfo = `<div style="font-size: 11px; color: #28a745; margin-top: 5px;">
                         <i class="fas fa-paper-plane"></i> Received from ${deposit.sourceUser || 'another user'} - ₱${formatDecimal(deposit.amount)}
                     </div>`;
                 } else if (deposit.source === 'cashin') {
@@ -2530,17 +2528,22 @@
                     case 'refund':
                         logClass = 'refund';
                         logIcon = 'fas fa-undo';
-                        amountColor = '#28a745';
+                        amountColor = '#28a745'; // Green for refunds (money coming in)
                         break;
                     case 'transfer-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
                         amountColor = '#dc3545'; // Red for fees (money going out)
                         break;
-                    case 'send':
-                        logClass = 'send';
+                    case 'money-sent':
+                        logClass = 'money-sent';
                         logIcon = 'fas fa-paper-plane';
-                        amountColor = log.amount < 0 ? '#dc3545' : '#28a745';
+                        amountColor = '#dc3545'; // RED for money sent
+                        break;
+                    case 'money-received':
+                        logClass = 'money-received';
+                        logIcon = 'fas fa-paper-plane';
+                        amountColor = '#28a745'; // GREEN for money received
                         break;
                     case 'win':
                         logClass = 'win';
@@ -2550,17 +2553,7 @@
                     case 'deposit':
                         logClass = 'deposit';
                         logIcon = 'fas fa-plus-circle';
-                        amountColor = '#28a745';
-                        break;
-                    case 'money-sent':
-                        logClass = 'send';
-                        logIcon = 'fas fa-paper-plane';
-                        amountColor = '#dc3545';
-                        break;
-                    case 'money-received':
-                        logClass = 'money-received';
-                        logIcon = 'fas fa-paper-plane';
-                        amountColor = '#28a745';
+                        amountColor = '#28a745'; // Green for cash deposits
                         break;
                     default:
                         logIcon = 'fas fa-exchange-alt';
@@ -3202,7 +3195,7 @@
                 // Animate button
                 const placeGameBtn = document.getElementById('auto-place-game-btn');
                 placeGameBtn.classList.add('placed');
-                placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> AUTO BIDS PLACED!';
+                placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
                 
                 // Add wallet log for bids
                 addWalletLog(currentUser.uid, 'bid', `Auto bids placed on ${currentItem.name}`, -totalAutoBid);
@@ -3210,7 +3203,7 @@
                 const statusDiv = document.getElementById('game-status');
                 statusDiv.innerHTML = `
                     <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
-                        <h4><i class="fas fa-check-circle"></i> Auto Bids Placed Successfully!</h4>
+                        <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
                         <p>Total Bid Amount: <strong class="decimal-format">${formatCurrency(totalAutoBid)}</strong></p>
                         <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(newBalance)}</strong></p>
                     </div>
@@ -3221,7 +3214,7 @@
                 document.getElementById('auto-numbers-display').style.display = 'none';
                 document.getElementById('auto-numbers-grid').innerHTML = '';
                 
-                showNotification(`Successfully placed auto bids!`, 'success');
+                showNotification(`Bid placed successfully!`, 'success');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -3236,7 +3229,7 @@
             })
             .catch((error) => {
                 console.error('Auto bid error:', error);
-                showNotification('Error placing auto bids', 'error'); // FIXED: Removed "newBalance is not defined"
+                showNotification('Error placing auto bids: ' + getFirebaseError(error), 'error');
             });
         }
         
@@ -3538,7 +3531,7 @@
                     const users = snapshot.val();
                     if (!users) {
                         showNotification('No users found in database', 'error');
-                        return;
+                        return Promise.reject('No users');
                     }
                     
                     // Find user by email
@@ -3553,13 +3546,13 @@
                     });
                     
                     if (!recipientId || !recipientData) {
-                        showNotification('No user found with this email address', 'error'); // FIXED: Changed error message
-                        return;
+                        showNotification('User does not exist!', 'error');
+                        return Promise.reject('User not found');
                     }
                     
                     if (recipientId === currentUser.uid) {
                         showNotification('Cannot send money to yourself', 'error');
-                        return;
+                        return Promise.reject('Self transfer');
                     }
                     
                     const senderNewBalance = currentUserData.balance - amount;
@@ -3569,24 +3562,27 @@
                     updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
                     updates['users/' + recipientId + '/balance'] = recipientNewBalance;
                     
-                    return database.ref().update(updates);
-                })
-                .then(() => {
-                    // Add deposit for recipient
-                    addDeposit(recipientId, amount, 'transfer', '', currentUserData.email);
-                    
-                    // Add wallet logs
-                    addWalletLog(currentUser.uid, 'money-sent', `Money sent to ${recipientEmail}`, -amount);
-                    addWalletLog(recipientId, 'money-received', `Money received from ${currentUser.email}`, amount);
-                    
-                    document.getElementById('recipient-email').value = '';
-                    document.getElementById('send-amount').value = '';
-                    
-                    showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
+                    return database.ref().update(updates)
+                        .then(() => {
+                            // Add deposit for recipient
+                            addDeposit(recipientId, amount, 'transfer', '', currentUserData.email);
+                            
+                            // Add wallet logs
+                            addWalletLog(currentUser.uid, 'money-sent', `Money sent to ${recipientEmail}`, -amount);
+                            addWalletLog(recipientId, 'money-received', `Money received from ${currentUser.email}`, amount);
+                            
+                            document.getElementById('recipient-email').value = '';
+                            document.getElementById('send-amount').value = '';
+                            
+                            showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
+                        });
                 })
                 .catch((error) => {
                     console.error('Error sending money:', error);
-                    showNotification('Error sending money: email address not recognized', 'error'); // FIXED: Changed error message
+                    // Don't show error if it's just "User does not exist!"
+                    if (error !== 'User not found' && error !== 'Self transfer' && error !== 'No users') {
+                        showNotification('Error sending money: ' + getFirebaseError(error), 'error');
+                    }
                 });
         }
         
@@ -3963,50 +3959,6 @@
                 });
         }
         
-        function initializeAdmin() {
-            const adminEmail = 'admin@raffle.com';
-            const adminPassword = 'admin123';
-            
-            showNotification('Creating admin account...', 'info');
-            
-            if (!auth || !database) {
-                showNotification('Firebase services not available', 'error');
-                return;
-            }
-            
-            auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
-                .then((userCredential) => {
-                    const user = userCredential.user;
-                    
-                    const adminData = {
-                        username: 'Admin',
-                        email: adminEmail,
-                        balance: 1000000.000,
-                        createdAt: new Date().toISOString(),
-                        isAdmin: true,
-                        wins: [],
-                        totalBids: 0,
-                        totalWon: 0,
-                        walletInfo: { shopee: '', lazada: '' },
-                        deposits: {},
-                        walletLogs: [],
-                        serviceFees: 0.000
-                    };
-                    
-                    return database.ref('users/' + user.uid).set(adminData);
-                })
-                .then(() => {
-                    showNotification('✅ Admin account created! Use admin@raffle.com / admin123 to login.', 'success');
-                })
-                .catch((error) => {
-                    if (error.code === 'auth/email-already-in-use') {
-                        showNotification('Admin account already exists. Use admin@raffle.com / admin123 to login.', 'info');
-                    } else {
-                        showNotification('Error: ' + getFirebaseError(error), 'error');
-                    }
-                });
-        }
-        
         function runItemRaffle(itemId) {
             if (!database) {
                 showNotification('Database not available', 'error');
@@ -4055,7 +4007,7 @@
                     const updates = {};
                     
                     bidArray.forEach(bid => {
-                        const refundAmount = bid.amount * (1 - refundFeePercent/100); // FIXED: Deduct 2% not add
+                        const refundAmount = bid.amount * (1 - refundFeePercent/100);
                         const feeAmount = bid.amount * (refundFeePercent/100);
                         
                         // Update user balance
@@ -4065,8 +4017,8 @@
                         // Add deposit for the refund
                         addDeposit(bid.userId, refundAmount, 'refund', item.name);
                         
-                        // Add wallet log for refund
-                        addWalletLog(bid.userId, 'refund', `Bid refund for ${item.name} (no winner)`, refundAmount);
+                        // Add wallet log for REFUND
+                        addWalletLog(bid.userId, 'refund', `Bid refund for ${item.name} (lost - 2% fee)`, refundAmount);
                         
                         // Update bid status
                         updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
@@ -4136,7 +4088,7 @@
                     // Refund all OTHER users' bids with 2% service fee deduction
                     bidArray.forEach(bid => {
                         if (bid.userId !== winningBid.userId) {
-                            const refundAmount = bid.amount * (1 - refundFeePercent/100); // FIXED: Deduct 2% not add
+                            const refundAmount = bid.amount * (1 - refundFeePercent/100);
                             const feeAmount = bid.amount * (refundFeePercent/100);
                             
                             // Update user balance
@@ -4146,7 +4098,7 @@
                             // Add deposit for the refund
                             addDeposit(bid.userId, refundAmount, 'refund', item.name);
                             
-                            // Add wallet log for refund
+                            // Add wallet log for REFUND
                             addWalletLog(bid.userId, 'refund', `Bid refund for ${item.name} (lost - 2% fee)`, refundAmount);
                             
                             // Update bid status
@@ -4203,9 +4155,6 @@
                 .then(() => {
                     showNotification('All data has been reset successfully', 'success');
                     
-                    // Create initial admin account
-                    initializeAdmin();
-                    
                     // Create demo raffles
                     createDemoRaffles();
                 })
@@ -4240,7 +4189,6 @@
                 if (drawsRun > 0) {
                     showNotification(`Ran ${drawsRun} automatic draws`, 'success');
                 }
-                // Removed the "No raffles ready for automatic draw" message
             });
         }
         
