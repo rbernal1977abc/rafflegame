@@ -204,9 +204,6 @@
             margin: 5px 0;
         }
 
-        /* ===== OTHER STYLES (keeping your existing styles) ===== */
-        /* ... (all your existing CSS styles remain here) ... */
-
         /* Add this new style for connection status */
         .connection-status {
             position: fixed;
@@ -230,6 +227,344 @@
         .connection-status.connecting {
             background: #ffc107;
             color: #212529;
+        }
+        
+        /* ===== WALLET STYLES ===== */
+        .balance-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .balance-card .amount {
+            font-size: 40px;
+            font-weight: bold;
+            margin: 10px 0;
+            letter-spacing: 1px;
+        }
+        
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            padding: 10px;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .tab.active {
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        .tab-content {
+            padding: 20px;
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        /* ===== ITEM CARD STYLES ===== */
+        .items-grid {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .item-card {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .item-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .item-card h4 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+        
+        .item-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+        
+        .item-info {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        /* ===== MODAL STYLES ===== */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        /* ===== CALCULATOR STYLES ===== */
+        .calculator {
+            display: grid;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .calc-row {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .calc-btn {
+            flex: 1;
+            padding: 20px;
+            font-size: 24px;
+            border: 2px solid #e0e0e0;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .calc-btn:hover {
+            background: #f8f9fa;
+            border-color: #667eea;
+        }
+        
+        .number-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        #bid-number {
+            font-size: 36px;
+            text-align: center;
+            border: 3px solid #667eea;
+            border-radius: 10px;
+            padding: 15px;
+            width: 100%;
+            background: #f8f9fa;
+            font-weight: bold;
+            letter-spacing: 2px;
+            font-family: monospace;
+            color: #999;
+            transition: all 0.3s;
+        }
+        
+        #bid-number.has-value {
+            color: #28a745;
+            background: #f8fff9;
+            border-color: #28a745;
+        }
+        
+        /* ===== CASHIN OPTIONS ===== */
+        .cashin-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .cashin-option {
+            padding: 25px;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .cashin-option:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+        
+        /* ===== ADMIN STYLES ===== */
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+        
+        .stat-card div {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        
+        /* ===== DECIMAL FORMAT ===== */
+        .decimal-format {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
+        /* ===== FORM STYLES ===== */
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 14px;
+        }
+        
+        .datetime-input {
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            width: 100%;
+            font-size: 14px;
+        }
+        
+        /* ===== BALANCE SUMMARY ===== */
+        .balance-summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+        }
+        
+        .balance-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        
+        .balance-label {
+            color: #666;
+        }
+        
+        .balance-value {
+            font-weight: bold;
+            font-family: monospace;
+        }
+        
+        /* ===== NOTIFICATION ===== */
+        .notification {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            z-index: 1001;
+            animation: slideInRight 0.3s ease;
+        }
+        
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .notification.error {
+            background: #dc3545;
+        }
+        
+        .notification.warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        .notification.info {
+            background: #17a2b8;
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            
+            .auth-form {
+                padding: 20px;
+            }
+            
+            .logo {
+                padding: 30px 20px;
+            }
+            
+            .tab {
+                font-size: 12px;
+                padding: 10px 5px;
+            }
+            
+            #bid-number {
+                font-size: 28px;
+                padding: 12px;
+            }
+            
+            .balance-card .amount {
+                font-size: 32px;
+            }
         }
     </style>
 </head>
@@ -265,7 +600,7 @@
                 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
-                    <input type="text" id="login-email" placeholder="Enter email">
+                    <input type="email" id="login-email" placeholder="Enter email">
                 </div>
                 
                 <div class="input-group">
@@ -284,17 +619,10 @@
                 </div>
                 
                 <div class="admin-login" style="margin-top: 20px;">
-                    <button onclick="adminLogin()" class="btn-secondary">
+                    <button onclick="showAdminLogin()" class="btn-secondary">
                         <i class="fas fa-cog"></i> Admin Login
                     </button>
                 </div>
-                
-                <p style="margin-top: 20px; color: #666; font-size: 14px;">
-                    <strong>Demo Users:</strong><br>
-                    • Email: user1@test.com, Password: 123456<br>
-                    • Email: user2@test.com, Password: 123456<br>
-                    • Email: admin@raffle.com, Password: admin123
-                </p>
             </div>
             
             <!-- REGISTER FORM -->
@@ -336,11 +664,11 @@
     <!-- USER DASHBOARD -->
     <div id="user-dashboard" class="screen hidden">
         <header>
-            <button onclick="logout()" class="btn-icon" title="Logout">
+            <button onclick="logout()" class="btn-icon" title="Logout" style="background: none; border: none; color: white; font-size: 16px; padding: 10px; display: flex; align-items: center; gap: 5px;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
-            <h2>Welcome, <span id="current-user" style="color: #ffeb3b;">User</span></h2>
-            <div class="balance">
+            <h2 style="font-size: 18px; text-align: center; flex: 1;">Welcome, <span id="current-user" style="color: #ffeb3b;">User</span></h2>
+            <div class="balance" style="background: rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 20px; font-weight: bold; font-size: 14px;">
                 <i class="fas fa-wallet"></i>
                 ₱<span id="user-balance" class="decimal-format">50.000</span>
             </div>
@@ -389,7 +717,7 @@
                     </div>
                     <div>
                         <div style="font-size: 12px; color: #666;">Active Games</div>
-                        <div style="font-weight: bold; color: #dc3545;" id="active-games-count">2</div>
+                        <div style="font-weight: bold; color: #dc3545;" id="active-games-count">0</div>
                     </div>
                 </div>
             </div>
@@ -470,29 +798,37 @@
     <!-- ADMIN DASHBOARD -->
     <div id="admin-dashboard" class="screen hidden">
         <header>
-            <button onclick="logout()" class="btn-icon" title="Logout">
+            <button onclick="logout()" class="btn-icon" title="Logout" style="background: none; border: none; color: white; font-size: 16px; padding: 10px; display: flex; align-items: center; gap: 5px;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
-            <h2><i class="fas fa-cog"></i> Admin Control Panel</h2>
+            <h2 style="font-size: 18px; text-align: center; flex: 1;"><i class="fas fa-cog"></i> Admin Control Panel</h2>
         </header>
         
-        <div class="admin-content">
-            <div class="admin-stats admin-stats-4">
+        <div class="admin-content" style="padding: 20px;">
+            <div class="admin-stats">
                 <div class="stat-card">
                     <h4>Online Users</h4>
-                    <div id="admin-online-count">1</div>
+                    <div id="admin-online-count">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Users</h4>
+                    <div id="admin-total-users">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Active Raffles</h4>
+                    <div id="admin-active-raffles">0</div>
+                </div>
+                <div class="stat-card">
+                    <h4>Total Bids</h4>
+                    <div id="admin-total-bids">0</div>
                 </div>
                 <div class="stat-card">
                     <h4>Total Balance</h4>
                     <div id="admin-total-balance" class="decimal-format">₱0.000</div>
                 </div>
                 <div class="stat-card">
-                    <h4>Active Raffles</h4>
-                    <div id="admin-active-raffles">2</div>
-                </div>
-                <div class="stat-card">
-                    <h4>Total Bids</h4>
-                    <div id="admin-total-bids">0</div>
+                    <h4>Money Pot</h4>
+                    <div id="admin-money-pot" class="decimal-format">₱0.000</div>
                 </div>
             </div>
             
@@ -504,11 +840,11 @@
                 
                 <div style="margin-top: 30px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
                     <h4 style="color: #667eea;">⚙️ Admin Tools</h4>
-                    <button onclick="runAllDraws()" class="btn-secondary" style="margin: 10px 5px;">
-                        Run All Draws Now
+                    <button onclick="createDemoRaffles()" class="btn-secondary" style="margin: 10px 5px;">
+                        Create Demo Raffles
                     </button>
-                    <button onclick="resetDemoData()" class="btn-secondary" style="margin: 10px 5px;">
-                        Reset Demo Data
+                    <button onclick="initializeAdmin()" class="btn-secondary" style="margin: 10px 5px;">
+                        Initialize Admin
                     </button>
                 </div>
             </div>
@@ -538,6 +874,10 @@
                 <div class="number-display">
                     <input type="text" id="bid-number" value="0.000" readonly style="font-size: 36px; padding: 15px;" class="decimal-format">
                 </div>
+                
+                <p style="text-align: center; color: #666; margin: 10px 0;">
+                    Enter number (format: X.XXX where X=0-9)
+                </p>
                 
                 <div class="calculator">
                     <div class="calc-row">
@@ -624,7 +964,7 @@
                 
                 <input type="number" id="item-price" placeholder="Price Value (₱)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                 
-                <input type="text" id="item-image-url" placeholder="Image URL" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
+                <input type="text" id="item-image-url" placeholder="Image URL" value="https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                 
                 <!-- END RAFFLE DATE & TIME -->
                 <div>
@@ -648,15 +988,14 @@
     <!-- JAVASCRIPT -->
     <script>
         // ================ FIREBASE CONFIGURATION ================
-        // YOU NEED TO SETUP FIREBASE AND ADD YOUR CONFIG HERE
         const firebaseConfig = {
-  		apiKey: "AIzaSyDCLztneXysYur5WLlsd75nBjkS7j3bGQw",
- 		authDomain: "raffle-game-demo.firebaseapp.com",
-  		projectId: "raffle-game-demo",
-  		storageBucket: "raffle-game-demo.firebasestorage.app",
- 		messagingSenderId: "527324473310",
- 		appId: "1:527324473310:web:b18094975c1380ddd99f4f",
-		measurementId: "G-BKRZMB434G"
+            apiKey: "AIzaSyDCLztneXysYur5WLlsd75nBjkS7j3bGQw",
+            authDomain: "raffle-game-demo.firebaseapp.com",
+            projectId: "raffle-game-demo",
+            storageBucket: "raffle-game-demo.firebasestorage.app",
+            messagingSenderId: "527324473310",
+            appId: "1:527324473310:web:b18094975c1380ddd99f4f",
+            measurementId: "G-BKRZMB434G"
         };
         
         // Initialize Firebase
@@ -681,6 +1020,12 @@
             });
         }
         
+        function showAdminLogin() {
+            document.getElementById('login-email').value = 'admin@raffle.com';
+            document.getElementById('login-password').value = 'admin123';
+            showNotification('Admin credentials filled. Click Login.', 'info');
+        }
+        
         function registerUser() {
             const username = document.getElementById('register-username').value.trim();
             const email = document.getElementById('register-email').value.trim();
@@ -696,6 +1041,8 @@
                 return;
             }
             
+            showNotification('Creating account...', 'info');
+            
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
@@ -706,7 +1053,7 @@
                         email: email,
                         balance: 50.000,
                         createdAt: new Date().toISOString(),
-                        isAdmin: email === 'admin@raffle.com',
+                        isAdmin: false,
                         wins: [],
                         totalBids: 0,
                         totalWon: 0
@@ -715,13 +1062,29 @@
                     return database.ref('users/' + user.uid).set(userData);
                 })
                 .then(() => {
-                    showNotification('Account created successfully!', 'success');
+                    showNotification('Account created successfully! Please login.', 'success');
                     showAuthTab('login');
                     document.getElementById('login-email').value = email;
                     document.getElementById('login-password').value = password;
+                    
+                    // Clear registration form
+                    document.getElementById('register-username').value = '';
+                    document.getElementById('register-email').value = '';
+                    document.getElementById('register-password').value = '';
                 })
                 .catch((error) => {
-                    showNotification(error.message, 'error');
+                    console.error('Registration error:', error);
+                    let errorMessage = error.message;
+                    
+                    if (error.code === 'auth/email-already-in-use') {
+                        errorMessage = 'Email already registered. Please login instead.';
+                    } else if (error.code === 'auth/weak-password') {
+                        errorMessage = 'Password is too weak. Use at least 6 characters.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    }
+                    
+                    showNotification(errorMessage, 'error');
                 });
         }
         
@@ -734,15 +1097,18 @@
                 return;
             }
             
+            showNotification('Logging in...', 'info');
+            
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
-                    loadUserData();
+                    console.log('User logged in:', currentUser.uid);
                     
                     // Set user as online
                     database.ref('online/' + currentUser.uid).set({
                         uid: currentUser.uid,
-                        lastSeen: firebase.database.ServerValue.TIMESTAMP
+                        lastSeen: firebase.database.ServerValue.TIMESTAMP,
+                        email: email
                     });
                     
                     // Remove user from online when they disconnect
@@ -751,15 +1117,19 @@
                     showNotification('Login successful!', 'success');
                 })
                 .catch((error) => {
-                    showNotification(error.message, 'error');
+                    console.error('Login error:', error);
+                    let errorMessage = error.message;
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'User not found. Please register first.';
+                    } else if (error.code === 'auth/wrong-password') {
+                        errorMessage = 'Incorrect password.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    }
+                    
+                    showNotification(errorMessage, 'error');
                 });
-        }
-        
-        function adminLogin() {
-            // Pre-fill admin credentials for demo
-            document.getElementById('login-email').value = 'admin@raffle.com';
-            document.getElementById('login-password').value = 'admin123';
-            showAuthTab('login');
         }
         
         function logout() {
@@ -781,9 +1151,12 @@
         
         // ================ USER DATA FUNCTIONS ================
         function loadUserData() {
+            if (!currentUser) return;
+            
             database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
                 currentUserData = snapshot.val();
                 if (currentUserData) {
+                    console.log('User data loaded:', currentUserData);
                     updateUI();
                     
                     if (currentUserData.isAdmin) {
@@ -791,16 +1164,50 @@
                         loadAdminData();
                     } else {
                         showUserDashboard();
+                        loadRaffleItems();
                     }
                 }
             });
         }
         
         function updateUI() {
-            document.getElementById('current-user').textContent = currentUserData.username;
-            document.getElementById('user-balance').textContent = formatDecimal(currentUserData.balance);
-            document.getElementById('wallet-balance').textContent = formatDecimal(currentUserData.balance);
-            document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance);
+            if (!currentUserData) return;
+            
+            document.getElementById('current-user').textContent = currentUserData.username || currentUserData.email;
+            document.getElementById('user-balance').textContent = formatDecimal(currentUserData.balance || 0);
+            document.getElementById('wallet-balance').textContent = formatDecimal(currentUserData.balance || 0);
+            document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance || 0);
+        }
+        
+        // ================ DASHBOARD FUNCTIONS ================
+        function showUserDashboard() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            
+            // Start listening to online users
+            database.ref('online').on('value', (snapshot) => {
+                const onlineUsers = snapshot.val() || {};
+                document.getElementById('online-count').textContent = Object.keys(onlineUsers).length;
+            });
+        }
+        
+        function showAdminDashboard() {
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('user-dashboard').classList.add('hidden');
+            document.getElementById('admin-dashboard').classList.remove('hidden');
+        }
+        
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
+            document.getElementById(`${tabName}-tab`).classList.add('active');
         }
         
         // ================ GAME FUNCTIONS ================
@@ -812,6 +1219,7 @@
                 
                 let html = '';
                 let activeCount = 0;
+                let totalBids = 0;
                 
                 Object.entries(items).forEach(([itemId, item]) => {
                     const endDate = new Date(item.endDate);
@@ -821,10 +1229,14 @@
                     
                     if (isActive) activeCount++;
                     
+                    const bids = item.bids || {};
+                    const bidCount = Object.keys(bids).length;
+                    totalBids += bidCount;
+                    
                     html += `
                         <div class="item-card ${isEnded ? 'inactive' : ''}" onclick="${isActive ? `openGameModal('${itemId}')` : ''}" style="${!isActive ? 'cursor: not-allowed;' : ''}">
                             <h4>${item.name} ${isEnded ? '(Ended)' : ''}</h4>
-                            <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
+                            <img src="${item.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop'}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
                             <div class="item-info">
                                 <div>
                                     <strong style="color: #28a745;" class="decimal-format">₱${formatDecimal(item.price)}</strong><br>
@@ -832,7 +1244,7 @@
                                 </div>
                                 <div style="text-align: right;">
                                     <strong>${isActive ? daysLeft + ' days left' : 'ENDED'}</strong><br>
-                                    <small>${item.bids ? Object.keys(item.bids).length : '0'} bids</small>
+                                    <small>${bidCount} bids</small>
                                 </div>
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
@@ -846,15 +1258,16 @@
                 
                 container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active raffles</p>';
                 document.getElementById('active-games-count').textContent = activeCount;
+                document.getElementById('total-bids-count').textContent = totalBids;
             });
         }
         
         function openGameModal(itemId) {
             database.ref('raffles/' + itemId).once('value').then((snapshot) => {
                 currentItem = snapshot.val();
-                currentItem.id = itemId;
-                
                 if (!currentItem) return;
+                
+                currentItem.id = itemId;
                 
                 const now = new Date();
                 const endDate = new Date(currentItem.endDate);
@@ -865,7 +1278,7 @@
                 }
                 
                 document.getElementById('item-name').textContent = currentItem.name;
-                document.getElementById('item-image').src = currentItem.image;
+                document.getElementById('item-image').src = currentItem.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
                 
                 // Count bids
                 const bids = currentItem.bids || {};
@@ -888,6 +1301,62 @@
             });
         }
         
+        function addNumber(num) {
+            let currentNum = bidNumber.replace(/\./g, '');
+            
+            if (num === '.') {
+                if (bidNumber.includes('.')) {
+                    return;
+                }
+                bidNumber = currentNum.slice(0, 1) + '.' + currentNum.slice(1, 4).padEnd(3, '0');
+            } else {
+                currentNum += num;
+                if (currentNum.length > 4) {
+                    currentNum = currentNum.slice(1, 5);
+                }
+                
+                if (currentNum.length <= 1) {
+                    bidNumber = '0.' + currentNum.padEnd(3, '0');
+                } else {
+                    bidNumber = currentNum.slice(0, 1) + '.' + currentNum.slice(1, 4).padEnd(3, '0');
+                }
+            }
+            
+            document.getElementById('bid-number').value = bidNumber;
+            
+            if (parseFloat(bidNumber) > 0) {
+                document.getElementById('bid-number').classList.add('has-value');
+            } else {
+                document.getElementById('bid-number').classList.remove('has-value');
+            }
+            
+            updateBidSummary();
+        }
+        
+        function clearNumber() {
+            bidNumber = '0.000';
+            document.getElementById('bid-number').value = bidNumber;
+            document.getElementById('bid-number').classList.remove('has-value');
+            updateBidSummary();
+        }
+        
+        function updateBidSummary() {
+            if (!currentUserData) return;
+            
+            const bidAmountValue = parseFloat(bidNumber) || 0;
+            const balance = currentUserData.balance || 0;
+            const afterBid = balance - bidAmountValue;
+            
+            document.getElementById('manual-bid-amount').textContent = formatCurrency(bidAmountValue);
+            document.getElementById('manual-after-bid').textContent = formatCurrency(afterBid);
+            
+            if (afterBid < 0) {
+                document.getElementById('manual-after-bid').style.color = '#f44336';
+            } else {
+                document.getElementById('manual-after-bid').style.color = '#333';
+            }
+        }
+        
         function placeBid() {
             const bidAmountValue = parseFloat(bidNumber);
             
@@ -907,7 +1376,7 @@
                 return;
             }
             
-            if (currentUserData.balance < bidAmountValue) {
+            if (!currentUserData || currentUserData.balance < bidAmountValue) {
                 showNotification('Insufficient balance! Please cash in.', 'error');
                 return;
             }
@@ -929,7 +1398,7 @@
                 const bidData = {
                     id: bidId,
                     userId: currentUser.uid,
-                    username: currentUserData.username,
+                    username: currentUserData.username || currentUser.email,
                     itemId: currentItem.id,
                     itemName: currentItem.name,
                     number: bidAmountValue,
@@ -939,7 +1408,7 @@
                 };
                 
                 // Update user balance
-                const newBalance = currentUserData.balance - bidAmountValue;
+                const newBalance = (currentUserData.balance || 0) - bidAmountValue;
                 
                 // Run transaction
                 const updates = {};
@@ -963,10 +1432,6 @@
                 // Clear bid number
                 clearNumber();
                 
-                // Update local balance
-                currentUserData.balance -= bidAmountValue;
-                updateUI();
-                
                 // Show notification
                 showNotification(`Bid placed successfully!`, 'success');
                 
@@ -976,8 +1441,228 @@
                 }, 3000);
             })
             .catch((error) => {
+                console.error('Place bid error:', error);
                 showNotification(error.message, 'error');
             });
+        }
+        
+        // ================ CASH IN FUNCTIONS ================
+        function showCashIn() {
+            selectedAmount = 0;
+            document.getElementById('selected-amount').textContent = '0.000';
+            
+            document.getElementById('cashin-modal').classList.remove('hidden');
+        }
+        
+        function selectAmount(amount) {
+            selectedAmount = amount;
+            document.getElementById('selected-amount').textContent = formatDecimal(amount);
+            
+            document.querySelectorAll('.cashin-option').forEach(btn => {
+                btn.style.background = '#f8f9fa';
+                btn.style.color = '#333';
+                btn.style.borderColor = '#dee2e6';
+            });
+            
+            event.target.style.background = '#667eea';
+            event.target.style.color = 'white';
+            event.target.style.borderColor = '#667eea';
+        }
+        
+        function confirmCashIn() {
+            if (selectedAmount <= 0) {
+                showNotification('Please select an amount', 'error');
+                return;
+            }
+            
+            if (!currentUser || !currentUserData) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+            
+            const newBalance = (currentUserData.balance || 0) + selectedAmount;
+            
+            database.ref('users/' + currentUser.uid + '/balance').set(newBalance)
+                .then(() => {
+                    showNotification(`Successfully added ${formatCurrency(selectedAmount)} to your balance!`, 'success');
+                    closeModal();
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                });
+        }
+        
+        // ================ ADMIN FUNCTIONS ================
+        function loadAdminData() {
+            // Load online users count
+            database.ref('online').on('value', (snapshot) => {
+                const onlineUsers = snapshot.val() || {};
+                document.getElementById('admin-online-count').textContent = Object.keys(onlineUsers).length;
+            });
+            
+            // Load total users
+            database.ref('users').once('value').then((snapshot) => {
+                const users = snapshot.val() || {};
+                document.getElementById('admin-total-users').textContent = Object.keys(users).length;
+                
+                // Calculate total balance
+                let totalBalance = 0;
+                Object.values(users).forEach(user => {
+                    totalBalance += parseFloat(user.balance || 0);
+                });
+                document.getElementById('admin-total-balance').textContent = formatCurrency(totalBalance);
+            });
+            
+            // Load raffles data
+            database.ref('raffles').on('value', (snapshot) => {
+                const raffles = snapshot.val() || {};
+                let activeCount = 0;
+                let totalBids = 0;
+                let moneyPot = 0;
+                
+                Object.values(raffles).forEach(raffle => {
+                    const now = new Date();
+                    const endDate = new Date(raffle.endDate);
+                    if (raffle.status === 'active' && now <= endDate) {
+                        activeCount++;
+                    }
+                    
+                    const bids = raffle.bids || {};
+                    totalBids += Object.keys(bids).length;
+                    
+                    // Calculate money pot from ended raffles
+                    if (raffle.status === 'ended' && raffle.winner) {
+                        const winnerBids = Object.values(bids).filter(bid => bid.userId === raffle.winner.userId);
+                        winnerBids.forEach(bid => {
+                            moneyPot += parseFloat(bid.amount || 0);
+                        });
+                    }
+                });
+                
+                document.getElementById('admin-active-raffles').textContent = activeCount;
+                document.getElementById('admin-total-bids').textContent = totalBids;
+                document.getElementById('admin-money-pot').textContent = formatCurrency(moneyPot);
+            });
+        }
+        
+        function showAddItemModal() {
+            const now = new Date();
+            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            
+            const formatDateTime = (date) => {
+                return date.toISOString().slice(0, 16);
+            };
+            
+            document.getElementById('item-name-input').value = '';
+            document.getElementById('item-price').value = '';
+            document.getElementById('item-image-url').value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
+            document.getElementById('end-date').value = formatDateTime(nextWeek);
+            
+            document.getElementById('add-item-modal').classList.remove('hidden');
+        }
+        
+        function addNewItem() {
+            const name = document.getElementById('item-name-input').value.trim();
+            const price = parseFloat(document.getElementById('item-price').value);
+            const image = document.getElementById('item-image-url').value.trim();
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!name || isNaN(price) || !image || !endDate) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            const itemId = database.ref().child('raffles').push().key;
+            
+            const newItem = {
+                id: itemId,
+                name: name,
+                description: `Win this amazing ${name}`,
+                image: image,
+                price: price,
+                startDate: new Date().toISOString(),
+                endDate: endDate,
+                status: "active",
+                bids: {}
+            };
+            
+            database.ref('raffles/' + itemId).set(newItem)
+                .then(() => {
+                    showNotification(`Added new raffle item: ${name}`, 'success');
+                    closeModal();
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                });
+        }
+        
+        function initializeAdmin() {
+            // Create admin account if it doesn't exist
+            const adminEmail = 'admin@raffle.com';
+            const adminPassword = 'admin123';
+            
+            // Try to create admin user
+            auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    
+                    // Create admin data in database
+                    const adminData = {
+                        username: 'Admin',
+                        email: adminEmail,
+                        balance: 1000000.000,
+                        createdAt: new Date().toISOString(),
+                        isAdmin: true,
+                        wins: [],
+                        totalBids: 0,
+                        totalWon: 0
+                    };
+                    
+                    return database.ref('users/' + user.uid).set(adminData);
+                })
+                .then(() => {
+                    showNotification('Admin account created successfully!', 'success');
+                })
+                .catch((error) => {
+                    if (error.code === 'auth/email-already-in-use') {
+                        showNotification('Admin account already exists. You can login with admin@raffle.com / admin123', 'info');
+                    } else {
+                        showNotification(error.message, 'error');
+                    }
+                });
+        }
+        
+        function createDemoRaffles() {
+            const demoRaffles = {
+                raffle1: {
+                    name: "iPhone 15 Pro",
+                    description: "Brand new iPhone 15 Pro 256GB",
+                    image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
+                    price: 69999.000,
+                    startDate: new Date().toISOString(),
+                    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "active",
+                    bids: {}
+                },
+                raffle2: {
+                    name: "Samsung Galaxy S23",
+                    description: "Latest Samsung flagship phone",
+                    image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
+                    price: 45999.000,
+                    startDate: new Date().toISOString(),
+                    endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    status: "active",
+                    bids: {}
+                }
+            };
+            
+            database.ref('raffles').set(demoRaffles)
+                .then(() => {
+                    showNotification('Demo raffles created successfully!', 'success');
+                })
+                .catch((error) => {
+                    showNotification(error.message, 'error');
+                });
         }
         
         // ================ UTILITY FUNCTIONS ================
@@ -1039,6 +1724,8 @@
         
         // ================ INITIALIZATION ================
         window.onload = function() {
+            console.log('App loading...');
+            
             // Monitor connection status
             database.ref('.info/connected').on('value', (snapshot) => {
                 const connected = snapshot.val();
@@ -1046,60 +1733,37 @@
                 
                 if (connected) {
                     statusEl.classList.remove('hidden', 'disconnected', 'connecting');
-                    statusEl.innerHTML = '<i class="fas fa-wifi"></i> <span>Connected</span>';
+                    statusEl.innerHTML = '<i class="fas fa-wifi"></i> <span>Connected to Firebase</span>';
+                    console.log('Connected to Firebase');
                 } else {
                     statusEl.classList.remove('hidden');
-                    statusEl.classList.add('disconnected');
-                    statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i> <span>Disconnected</span>';
+                    statusEl.classList.add('connecting');
+                    statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i> <span>Connecting...</span>';
+                    console.log('Connecting to Firebase...');
                 }
             });
             
             // Check auth state
             auth.onAuthStateChanged((user) => {
+                console.log('Auth state changed:', user ? 'User logged in' : 'No user');
                 if (user) {
                     currentUser = user;
                     loadUserData();
                 } else {
                     // Not logged in
+                    document.getElementById('auth-screen').classList.remove('hidden');
+                    document.getElementById('user-dashboard').classList.add('hidden');
+                    document.getElementById('admin-dashboard').classList.add('hidden');
                 }
             });
             
-            // Initialize demo data if needed
-            initializeDemoData();
+            // Initialize admin button
+            setTimeout(() => {
+                initializeAdmin();
+            }, 2000);
+            
+            showNotification('Welcome to Raffle Game! Register or login to start playing.', 'info');
         };
-        
-        function initializeDemoData() {
-            // Check if demo data exists
-            database.ref('raffles').once('value').then((snapshot) => {
-                if (!snapshot.exists()) {
-                    // Create demo raffles
-                    const demoRaffles = {
-                        raffle1: {
-                            name: "iPhone 15 Pro",
-                            description: "Brand new iPhone 15 Pro 256GB",
-                            image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
-                            price: 69999.000,
-                            startDate: new Date().toISOString(),
-                            endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                            status: "active",
-                            bids: {}
-                        },
-                        raffle2: {
-                            name: "Samsung Galaxy S23",
-                            description: "Latest Samsung flagship phone",
-                            image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
-                            price: 45999.000,
-                            startDate: new Date().toISOString(),
-                            endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                            status: "active",
-                            bids: {}
-                        }
-                    };
-                    
-                    database.ref('raffles').set(demoRaffles);
-                }
-            });
-        }
     </script>
 </body>
 </html>
