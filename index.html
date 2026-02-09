@@ -1042,17 +1042,6 @@
                     <div>🚀 Live Raffle Game! Play with Real Users!</div>
                 </div>
                 
-                <!-- DEMO USERS QUICK LOGIN -->
-                <div class="demo-users" style="margin: 20px 0; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                    <h3>Quick Login (Demo Users):</h3>
-                    <div class="user-badges" style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 10px 0;">
-                        <span onclick="quickLogin('demo1@raffle.com', 'demo123')" style="background: #667eea; color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s;">Demo User 1</span>
-                        <span onclick="quickLogin('demo2@raffle.com', 'demo123')" style="background: #667eea; color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s;">Demo User 2</span>
-                        <span onclick="quickLogin('demo3@raffle.com', 'demo123')" style="background: #667eea; color: white; padding: 8px 15px; border-radius: 20px; cursor: pointer; transition: all 0.3s;">Demo User 3</span>
-                    </div>
-                    <p><small>All demo users start with ₱50.000 play money</small></p>
-                </div>
-                
                 <div class="input-group">
                     <i class="fas fa-user"></i>
                     <input type="email" id="login-email" placeholder="Enter email">
@@ -1228,7 +1217,7 @@
                 <div class="wallet-logs">
                     <div class="collapsible-header" onclick="toggleCollapsible('wallet-logs')">
                         <h4 style="margin: 0; color: #667eea;">
-                            <i class="fas fa-file-alt"></i> Recent Activity & Logs
+                            <i class="fas fa-file-alt"></i> Activity & Logs
                         </h4>
                         <i class="fas fa-chevron-down collapsible-icon" id="wallet-logs-icon"></i>
                     </div>
@@ -1503,7 +1492,7 @@
                         Initialize Admin Account
                     </button>
                     <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
-                        Reset Demo Data
+                        Reset Data
                     </button>
                 </div>
             </div>
@@ -2008,15 +1997,9 @@
             });
         }
         
-        function quickLogin(email, password) {
-            document.getElementById('login-email').value = email;
-            document.getElementById('login-password').value = password;
-            showNotification('Demo credentials filled. Click Login.', 'info');
-        }
-        
         function showAdminLogin() {
             document.getElementById('login-email').value = 'admin@raffle.com';
-            document.getElementById('login-password').value = '';
+            document.getElementById('login-password').value = 'admin123';
             showNotification('Admin credentials filled. Click Login.', 'info');
         }
         
@@ -2527,8 +2510,8 @@
                 new Date(b.date) - new Date(a.date)
             );
             
-            // Show only last 3 logs by default, or all if showAllLogs is true
-            const logsToShow = showAllLogs ? sortedLogs : sortedLogs.slice(0, 3);
+            // Show only last 5 logs by default, or all if showAllLogs is true
+            const logsToShow = showAllLogs ? sortedLogs : sortedLogs.slice(0, 5);
             
             let html = '';
             logsToShow.forEach(log => {
@@ -2630,7 +2613,16 @@
                 amount: amount
             };
             
-            database.ref('users/' + userId + '/walletLogs').push(logEntry);
+            // Get current logs
+            database.ref('users/' + userId + '/walletLogs').once('value').then(snapshot => {
+                const currentLogs = snapshot.val() || [];
+                const newLogs = [...currentLogs, logEntry];
+                
+                // Keep only last 50 logs to prevent database from getting too large
+                const trimmedLogs = newLogs.slice(-50);
+                
+                return database.ref('users/' + userId + '/walletLogs').set(trimmedLogs);
+            });
         }
         
         function addDeposit(userId, amount, source, sourceItem = '', sourceUser = '') {
@@ -3049,9 +3041,7 @@
             
             if (!isAutoBidding) {
                 // Start auto bidding (generate numbers)
-                const users = JSON.parse(localStorage.getItem('raffle_users'));
-                const user = users[currentUser];
-                const balance = parseFloat(user.balance);
+                const balance = currentUserData.balance || 0;
                 
                 if (balance < 0.001) {
                     showNotification('Insufficient balance for auto bidding', 'error');
@@ -3663,6 +3653,9 @@
                 
                 document.getElementById('admin-total-balance').textContent = formatCurrency(totalBalance);
                 document.getElementById('admin-active-deposits').textContent = activeDeposits;
+                
+                // Load users list
+                loadAdminUsersList(users);
             });
             
             // Load raffles and calculate totals
@@ -3704,70 +3697,88 @@
                 
                 // Load admin items list
                 loadAdminItemsList(raffles);
+                
+                // Load winners list with user info
+                loadAdminWinnersList(raffles);
+            });
+        }
+        
+        function loadAdminUsersList(users) {
+            const usersList = document.getElementById('users-list');
+            let usersHtml = '';
+            
+            const userEntries = Object.entries(users).filter(([uid, user]) => !user.isAdmin);
+            const sortedUsers = userEntries.sort((a, b) => 
+                parseFloat(b[1].balance) - parseFloat(a[1].balance)
+            );
+            
+            const usersToShow = showAllUsers ? sortedUsers : sortedUsers.slice(0, 3);
+            
+            usersToShow.forEach(([uid, user]) => {
+                usersHtml += `
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                        <div style="display: flex; justify-content: space-between;">
+                            <strong style="color: #333;">${user.username || user.email}</strong>
+                            <span class="decimal-format" style="color: #333;">₱${formatDecimal(user.balance)}</span>
+                        </div>
+                        <div style="font-size: 12px; color: #666;">
+                            Email: ${user.email}<br>
+                            Wins: ${user.wins?.length || 0} | Bids: ${user.totalBids || 0}
+                            ${user.serviceFees > 0 ? `| Fees: ₱${formatDecimal(user.serviceFees)}` : ''}
+                        </div>
+                    </div>
+                `;
             });
             
-            // Load users list
-            database.ref('users').once('value').then((snapshot) => {
-                const users = snapshot.val() || {};
-                const usersList = document.getElementById('users-list');
-                let usersHtml = '';
+            usersList.innerHTML = usersHtml || '<p>No users found</p>';
+        }
+        
+        function loadAdminWinnersList(raffles) {
+            const winnersList = document.getElementById('winners-list');
+            let winnersHtml = '';
+            
+            const completedItems = Object.values(raffles).filter(item => item.winner);
+            const sortedWinners = completedItems.sort((a, b) => 
+                new Date(b.winner.announcedAt || b.winnerDate) - new Date(a.winner.announcedAt || a.winnerDate)
+            );
+            
+            const winnersToShow = showAllWinners ? sortedWinners : sortedWinners.slice(0, 3);
+            
+            // Get user data for winners
+            const winnerPromises = winnersToShow.map(item => {
+                if (!item.winner) return Promise.resolve(null);
                 
-                const userEntries = Object.entries(users).filter(([uid, user]) => !user.isAdmin);
-                const sortedUsers = userEntries.sort((a, b) => 
-                    parseFloat(b[1].balance) - parseFloat(a[1].balance)
-                );
-                
-                const usersToShow = showAllUsers ? sortedUsers : sortedUsers.slice(0, 3);
-                
-                usersToShow.forEach(([uid, user]) => {
-                    usersHtml += `
-                        <div style="background: #f8f9fa; padding: 10px; border-radius: 8px; margin-bottom: 10px;">
+                return database.ref('users/' + item.winner.userId).once('value')
+                    .then(userSnapshot => {
+                        const user = userSnapshot.val();
+                        return { item, user };
+                    });
+            });
+            
+            Promise.all(winnerPromises).then(results => {
+                results.forEach(result => {
+                    if (!result) return;
+                    
+                    const { item, user } = result;
+                    if (!item.winner || !user) return;
+                    
+                    const winDate = new Date(item.winner.announcedAt || item.winnerDate);
+                    const winnerName = user.username || user.email || item.winner.userId;
+                    
+                    winnersHtml += `
+                        <div class="winner-card" onclick="showWinnerDetails('${item.id}', '${item.winner.userId}')" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0; border-left: 5px solid #28a745; cursor: pointer;">
                             <div style="display: flex; justify-content: space-between;">
-                                <strong style="color: #333;">${user.username || user.email}</strong>
-                                <span class="decimal-format" style="color: #333;">₱${formatDecimal(user.balance)}</span>
-                            </div>
-                            <div style="font-size: 12px; color: #666;">
-                                Wins: ${user.wins?.length || 0} | Bids: ${user.totalBids || 0}
-                                ${user.serviceFees > 0 ? `| Fees: ₱${formatDecimal(user.serviceFees)}` : ''}
+                                <div>
+                                    <strong style="color: #333;">${item.name}</strong><br>
+                                    <small style="color: #666;">Winner: ${winnerName}</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <strong class="decimal-format" style="color: #333;">${item.winner.winningNumber.toFixed(3)}</strong><br>
+                                    <small style="color: #666;">${winDate.toLocaleDateString()}</small>
+                                </div>
                             </div>
                         </div>
                     `;
-                });
-                
-                usersList.innerHTML = usersHtml || '<p>No users found</p>';
-            });
-            
-            // Load winners list
-            database.ref('raffles').once('value').then((snapshot) => {
-                const raffles = snapshot.val() || {};
-                const winnersList = document.getElementById('winners-list');
-                let winnersHtml = '';
-                
-                const completedItems = Object.values(raffles).filter(item => item.winner);
-                const sortedWinners = completedItems.sort((a, b) => 
-                    new Date(b.winner.announcedAt || b.winnerDate) - new Date(a.winner.announcedAt || a.winnerDate)
-                );
-                
-                const winnersToShow = showAllWinners ? sortedWinners : sortedWinners.slice(0, 3);
-                
-                winnersToShow.forEach(item => {
-                    if (item.winner) {
-                        const winDate = new Date(item.winner.announcedAt || item.winnerDate);
-                        winnersHtml += `
-                            <div class="winner-card" onclick="showWinnerDetails('${item.id}', '${item.winner.userId}')" style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 10px 0; border-left: 5px solid #28a745; cursor: pointer;">
-                                <div style="display: flex; justify-content: space-between;">
-                                    <div>
-                                        <strong style="color: #333;">${item.name}</strong><br>
-                                        <small style="color: #666;">Winner: ${item.winner.userId}</small>
-                                    </div>
-                                    <div style="text-align: right;">
-                                        <strong class="decimal-format" style="color: #333;">${item.winner.winningNumber.toFixed(3)}</strong><br>
-                                        <small style="color: #666;">${winDate.toLocaleDateString()}</small>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    }
                 });
                 
                 if (winnersHtml === '') {
@@ -4071,6 +4082,7 @@
                     // Mark winner
                     updates['raffles/' + itemId + '/winner'] = {
                         userId: winningBid.userId,
+                        username: winningBid.username,
                         winningNumber: winningBid.number,
                         announced: true,
                         announcedAt: new Date().toISOString()
@@ -4078,8 +4090,15 @@
                     updates['raffles/' + itemId + '/status'] = 'completed';
                     
                     // Add win to user's wins array
-                    updates['users/' + winningBid.userId + '/wins'] = firebase.database.ServerValue.increment(1);
-                    updates['users/' + winningBid.userId + '/totalWon'] = firebase.database.ServerValue.increment(item.price);
+                    const winEntry = {
+                        itemId: itemId,
+                        itemName: item.name,
+                        winningNumber: winningBid.number,
+                        winDate: new Date().toISOString(),
+                        prizeValue: item.price
+                    };
+                    
+                    database.ref('users/' + winningBid.userId + '/wins').push(winEntry);
                     
                     // Update winning bid status
                     updates['raffles/' + itemId + '/bids/' + winningBid.id + '/status'] = 'won';
@@ -4151,17 +4170,25 @@
         }
         
         function resetAllData() {
-            if (!confirm('This will reset ALL data to initial demo state. Continue?')) return;
+            if (!confirm('WARNING: This will reset ALL data to initial state. This action cannot be undone. Continue?')) return;
             
             if (!database) {
                 showNotification('Database not available', 'error');
                 return;
             }
             
+            showNotification('Resetting all data...', 'info');
+            
             // Clear all data
             database.ref().set(null)
                 .then(() => {
-                    showNotification('All data reset to demo state', 'success');
+                    showNotification('All data has been reset successfully', 'success');
+                    
+                    // Create initial admin account
+                    initializeAdmin();
+                    
+                    // Create demo raffles
+                    createDemoRaffles();
                 })
                 .catch(error => {
                     showNotification('Error resetting data: ' + getFirebaseError(error), 'error');
