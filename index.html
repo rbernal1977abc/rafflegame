@@ -679,7 +679,7 @@
 
     <!-- USER DASHBOARD -->
     <div id="user-dashboard" class="screen hidden">
-        <header>
+        <header style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <button onclick="logout()" class="btn-icon" title="Logout" style="background: none; border: none; color: white; font-size: 16px; padding: 10px; display: flex; align-items: center; gap: 5px;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
@@ -813,7 +813,7 @@
 
     <!-- ADMIN DASHBOARD -->
     <div id="admin-dashboard" class="screen hidden">
-        <header>
+        <header style="display: flex; align-items: center; justify-content: space-between; padding: 15px 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
             <button onclick="logout()" class="btn-icon" title="Logout" style="background: none; border: none; color: white; font-size: 16px; padding: 10px; display: flex; align-items: center; gap: 5px;">
                 <i class="fas fa-sign-out-alt"></i> Logout
             </button>
@@ -1029,25 +1029,30 @@
     <!-- JAVASCRIPT -->
     <script>
         // ================ FIREBASE CONFIGURATION ================
+        // Use test Firebase project or create your own at firebase.google.com
         const firebaseConfig = {
-            apiKey: "AIzaSyDCLztneXysYur5WLlsd75nBjkS7j3bGQw",
-            authDomain: "raffle-game-demo.firebaseapp.com",
-            databaseURL: "https://raffle-game-demo-default-rtdb.firebaseio.com",
-            projectId: "raffle-game-demo",
-            storageBucket: "raffle-game-demo.firebasestorage.app",
-            messagingSenderId: "527324473310",
-            appId: "1:527324473310:web:b18094975c1380ddd99f4f",
-            measurementId: "G-BKRZMB434G"
+            apiKey: "AIzaSyB8V9C6yq6J6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y6Z6Y",
+            authDomain: "test-raffle-game.firebaseapp.com",
+            databaseURL: "https://test-raffle-game-default-rtdb.firebaseio.com",
+            projectId: "test-raffle-game",
+            storageBucket: "test-raffle-game.appspot.com",
+            messagingSenderId: "123456789012",
+            appId: "1:123456789012:web:abcdef1234567890abcdef"
         };
         
         // Initialize Firebase
         console.log('Initializing Firebase...');
         try {
-            firebase.initializeApp(firebaseConfig);
-            console.log('Firebase initialized successfully');
+            // Check if Firebase is already initialized
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+                console.log('Firebase initialized successfully');
+            } else {
+                console.log('Firebase already initialized');
+            }
         } catch (error) {
             console.error('Firebase initialization error:', error);
-            showNotification('Firebase initialization failed: ' + error.message, 'error');
+            showNotification('Firebase initialization failed. Please check your connection.', 'error');
         }
         
         const auth = firebase.auth();
@@ -1096,7 +1101,7 @@
                 })
                 .catch((error) => {
                     console.error('Password reset error:', error);
-                    let errorMessage = error.message;
+                    let errorMessage = 'Error sending reset email.';
                     
                     if (error.code === 'auth/user-not-found') {
                         errorMessage = 'No account found with this email.';
@@ -1157,7 +1162,7 @@
                 })
                 .catch((error) => {
                     console.error('Registration error:', error);
-                    let errorMessage = error.message;
+                    let errorMessage = 'Registration failed.';
                     
                     if (error.code === 'auth/email-already-in-use') {
                         errorMessage = 'Email already registered. Please login instead.';
@@ -1165,6 +1170,8 @@
                         errorMessage = 'Password is too weak. Use at least 6 characters.';
                     } else if (error.code === 'auth/invalid-email') {
                         errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/network-request-failed') {
+                        errorMessage = 'Network error. Please check your internet connection.';
                     }
                     
                     showNotification(errorMessage, 'error');
@@ -1187,11 +1194,6 @@
                     currentUser = userCredential.user;
                     console.log('User logged in:', currentUser.uid, 'Email:', email);
                     
-                    // Check if this is admin
-                    if (email === 'admin@raffle.com') {
-                        console.log('Admin login detected');
-                    }
-                    
                     // Set user as online
                     database.ref('online/' + currentUser.uid).set({
                         uid: currentUser.uid,
@@ -1206,7 +1208,7 @@
                 })
                 .catch((error) => {
                     console.error('Login error:', error);
-                    let errorMessage = error.message;
+                    let errorMessage = 'Login failed.';
                     
                     if (error.code === 'auth/user-not-found') {
                         errorMessage = 'User not found. Please register first.';
@@ -1216,6 +1218,8 @@
                         errorMessage = 'Invalid email address.';
                     } else if (error.code === 'auth/user-disabled') {
                         errorMessage = 'This account has been disabled.';
+                    } else if (error.code === 'auth/network-request-failed') {
+                        errorMessage = 'Network error. Please check your internet connection.';
                     }
                     
                     showNotification(errorMessage, 'error');
@@ -1288,11 +1292,15 @@
                                 showUserDashboard();
                                 loadRaffleItems();
                             }
+                        })
+                        .catch(error => {
+                            console.error('Error creating user data:', error);
+                            showNotification('Error creating user profile. Please try again.', 'error');
                         });
                 }
             }, (error) => {
                 console.error('Error loading user data:', error);
-                showNotification('Error loading user data: ' + error.message, 'error');
+                showNotification('Error loading user data. Please refresh the page.', 'error');
             });
         }
         
@@ -1368,7 +1376,7 @@
                     totalBids += bidCount;
                     
                     html += `
-                        <div class="item-card ${isEnded ? 'inactive' : ''}" onclick="${isActive ? `openGameModal('${itemId}')` : ''}" style="${!isActive ? 'cursor: not-allowed;' : ''}">
+                        <div class="item-card ${isEnded ? 'inactive' : ''}" onclick="${isActive ? `openGameModal('${itemId}')` : ''}" style="${!isActive ? 'cursor: not-allowed; opacity: 0.7;' : ''}">
                             <h4>${item.name} ${isEnded ? '(Ended)' : ''}</h4>
                             <img src="${item.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop'}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
                             <div class="item-info">
@@ -1390,12 +1398,12 @@
                     `;
                 });
                 
-                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active raffles</p>';
+                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active raffles. Check back later!</p>';
                 document.getElementById('active-games-count').textContent = activeCount;
                 document.getElementById('total-bids-count').textContent = totalBids;
             }, (error) => {
                 console.error('Error loading raffle items:', error);
-                showNotification('Error loading raffles: ' + error.message, 'error');
+                showNotification('Error loading raffles. Please refresh.', 'error');
             });
         }
         
@@ -1440,7 +1448,7 @@
                 document.getElementById('game-modal').classList.remove('hidden');
             }).catch(error => {
                 console.error('Error opening game modal:', error);
-                showNotification('Error: ' + error.message, 'error');
+                showNotification('Error loading raffle. Please try again.', 'error');
             });
         }
         
@@ -1585,7 +1593,7 @@
             })
             .catch((error) => {
                 console.error('Place bid error:', error);
-                showNotification('Error: ' + error.message, 'error');
+                showNotification('Error placing bid. Please try again.', 'error');
             });
         }
         
@@ -1631,7 +1639,7 @@
                     closeModal();
                 })
                 .catch((error) => {
-                    showNotification('Error: ' + error.message, 'error');
+                    showNotification('Error adding funds. Please try again.', 'error');
                 });
         }
         
@@ -1737,7 +1745,7 @@
                     closeModal();
                 })
                 .catch((error) => {
-                    showNotification('Error: ' + error.message, 'error');
+                    showNotification('Error adding item. Please try again.', 'error');
                 });
         }
         
@@ -1775,7 +1783,7 @@
                     if (error.code === 'auth/email-already-in-use') {
                         showNotification('Admin account already exists. You can login with admin@raffle.com / admin123', 'info');
                     } else {
-                        showNotification('Error: ' + error.message, 'error');
+                        showNotification('Error creating admin account. Please check your connection.', 'error');
                     }
                 });
         }
@@ -1809,13 +1817,13 @@
                     showNotification('Demo raffles created successfully!', 'success');
                 })
                 .catch((error) => {
-                    showNotification('Error: ' + error.message, 'error');
+                    showNotification('Error creating demo raffles. Please try again.', 'error');
                 });
         }
         
         // ================ UTILITY FUNCTIONS ================
         function formatDecimal(value, decimals = 3) {
-            return parseFloat(value).toFixed(decimals);
+            return parseFloat(value || 0).toFixed(decimals);
         }
         
         function formatCurrency(value) {
@@ -1901,19 +1909,21 @@
                 if (user) {
                     currentUser = user;
                     loadUserData();
+                    updateConnectionStatus(true);
                 } else {
                     // Not logged in
                     document.getElementById('auth-screen').classList.remove('hidden');
                     document.getElementById('user-dashboard').classList.add('hidden');
                     document.getElementById('admin-dashboard').classList.add('hidden');
+                    
+                    // Clear any existing user data
+                    currentUser = null;
+                    currentUserData = null;
                 }
+            }, (error) => {
+                console.error('Auth state change error:', error);
+                showNotification('Authentication error. Please refresh the page.', 'error');
             });
-            
-            // Try to auto-create admin on first load
-            setTimeout(() => {
-                console.log('Attempting to auto-create admin...');
-                initializeAdmin();
-            }, 3000);
             
             showNotification('Welcome to Raffle Game! Register or login to start playing.', 'info');
         };
