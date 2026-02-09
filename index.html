@@ -1522,7 +1522,7 @@
                 </div>
                 
                 <p style="text-align: center; color: #666; margin: 10px 0;">
-                    Enter your unique number (format: X.XXX where X=0-9)
+                    Enter your unique number (format: X.XXX where X=0-9). The number should allow bid to infinite.000 NOT 0.000 "1 digit" only. User should be able to put infinite x amount on the left xx.xxx, xxx.xxx, xxxx.xxx and so on and maintining only .000 3 decimals on the right.
                 </p>
                 
                 <!-- MANUAL BID SECTION -->
@@ -1634,7 +1634,8 @@
                 <div style="margin-top: 20px; text-align: center;">
                     <p style="color: #666; font-size: 14px;">
                         🎯 <strong>Game Rule:</strong> Lowest unique number wins!<br>
-                        No duplicate numbers allowed. Format: X.XXX (e.g., 0.001, 1.111, 123.456)
+                        No duplicate numbers allowed. Format: X.XXX (e.g., 0.001, 1.111, 123.456)<br>
+                        💰 <strong>Maintain .001 Centavo in Wallet:</strong> Ensure you have at least 0.001 in your wallet for transactions.
                     </p>
                 </div>
             </div>
@@ -1931,6 +1932,7 @@
         let showAllWinners = false;
         let showAllItems = false;
         let showAllRaffles = false;
+        let isSendingMoney = false;
         
         // ================ CONNECTION MANAGEMENT ================
         function updateConnectionStatus(connected) {
@@ -2212,6 +2214,12 @@
         
         // ================ USER DATA FUNCTIONS ================
         function loadUserData() {
+            // Don't reload if we're in the middle of a send transaction
+            if (isSendingMoney) {
+                isSendingMoney = false;
+                return;
+            }
+            
             if (!currentUser || !database) return;
             
             console.log('Loading user data for:', currentUser.uid);
@@ -2766,22 +2774,28 @@
         }
         
         function addNumber(num) {
-            let currentNum = bidNumber.replace(/\./g, '');
+            let currentNum = bidNumber;
             
             if (num === '.') {
                 if (bidNumber.includes('.')) return;
-                bidNumber = currentNum.slice(0, 1) + '.' + currentNum.slice(1, 4).padEnd(3, '0');
+                // Add decimal point if not already present
+                bidNumber += '.000';
             } else {
-                currentNum += num;
-                if (currentNum.length > 4) {
-                    currentNum = currentNum.slice(1, 5);
+                // Remove the decimal part temporarily
+                let parts = currentNum.split('.');
+                let wholePart = parts[0];
+                let decimalPart = parts[1] || '000';
+                
+                if (wholePart === '0' && num !== '.') {
+                    // Replace leading zero
+                    wholePart = num;
+                } else {
+                    // Add digit to whole part (infinite digits allowed)
+                    wholePart += num;
                 }
                 
-                if (currentNum.length <= 1) {
-                    bidNumber = '0.' + currentNum.padEnd(3, '0');
-                } else {
-                    bidNumber = currentNum.slice(0, 1) + '.' + currentNum.slice(1, 4).padEnd(3, '0');
-                }
+                // Reconstruct with exactly 3 decimal places
+                bidNumber = wholePart + '.' + decimalPart;
             }
             
             document.getElementById('bid-number').value = bidNumber;
@@ -3496,11 +3510,15 @@
         
         // ================ SEND MONEY FUNCTIONS ================
         function sendMoney() {
+            // Set flag to prevent profile switching
+            isSendingMoney = true;
+            
             const recipientEmail = document.getElementById('recipient-email').value.trim();
             const amount = parseFloat(document.getElementById('send-amount').value);
             
             if (!recipientEmail || isNaN(amount) || amount <= 0) {
                 showNotification('Please enter valid recipient and amount', 'error');
+                isSendingMoney = false;
                 return;
             }
             
@@ -3508,22 +3526,26 @@
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(recipientEmail)) {
                 showNotification('Please enter a valid email address', 'error');
+                isSendingMoney = false;
                 return;
             }
             
             if (!currentUser || !currentUserData || !database) {
                 showNotification('Please login first', 'error');
+                isSendingMoney = false;
                 return;
             }
             
             if (currentUserData.balance < amount) {
                 showNotification('Insufficient balance', 'error');
+                isSendingMoney = false;
                 return;
             }
             
             // Prevent sending to yourself
             if (currentUser.email.toLowerCase() === recipientEmail.toLowerCase()) {
                 showNotification('Cannot send money to yourself', 'error');
+                isSendingMoney = false;
                 return;
             }
             
@@ -3537,6 +3559,7 @@
                     
                     if (!users) {
                         showNotification('No users found in database', 'error');
+                        isSendingMoney = false;
                         return Promise.reject('No users');
                     }
                     
@@ -3562,6 +3585,7 @@
                     
                     if (!recipientId || !recipientData) {
                         showNotification(`User with email "${recipientEmail}" does not exist!`, 'error');
+                        isSendingMoney = false;
                         return Promise.reject('User not found');
                     }
                     
@@ -3581,17 +3605,22 @@
                             addWalletLog(currentUser.uid, 'money-sent', `Money sent to ${recipientEmail}`, -amount);
                             addWalletLog(recipientId, 'money-received', `Money received from ${currentUser.email}`, amount);
                             
+                            // Clear the form fields
                             document.getElementById('recipient-email').value = '';
                             document.getElementById('send-amount').value = '';
                             
                             showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
                             
-                            // Reload user data to update balance
-                            loadUserData();
+                            // Update current user balance locally without triggering full profile reload
+                            if (currentUserData) {
+                                currentUserData.balance = senderNewBalance;
+                                updateUI(); // Just update the UI with new balance
+                            }
                         });
                 })
                 .catch((error) => {
                     console.error('Error sending money:', error);
+                    isSendingMoney = false;
                     // Don't show error if it's just "User not found" - we already showed a message
                     if (error !== 'User not found' && error !== 'No users') {
                         showNotification('Error sending money: ' + getFirebaseError(error), 'error');
