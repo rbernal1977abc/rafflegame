@@ -1521,9 +1521,7 @@
                     <input type="text" id="bid-number" value="0.000" readonly style="font-size: 36px; padding: 15px;" class="decimal-format">
                 </div>
                 
-                <p style="text-align: center; color: #666; margin: 10px 0;">
-                    Enter your unique number (format: X.XXX where X=0-9). The number should allow bid to infinite.000 NOT 0.000 "1 digit" only. User should be able to put infinite x amount on the left xx.xxx, xxx.xxx, xxxx.xxx and so on and maintining only .000 3 decimals on the right.
-                </p>
+                <!-- REMOVED THE INSTRUCTIONAL TEXT MESSAGE HERE -->
                 
                 <!-- MANUAL BID SECTION -->
                 <div class="manual-bid-section">
@@ -1635,7 +1633,7 @@
                     <p style="color: #666; font-size: 14px;">
                         🎯 <strong>Game Rule:</strong> Lowest unique number wins!<br>
                         No duplicate numbers allowed. Format: X.XXX (e.g., 0.001, 1.111, 123.456)<br>
-                        💰 <strong>Maintain .001 Centavo in Wallet:</strong> Ensure you have at least 0.001 in your wallet for transactions.
+                        <!-- REMOVED THE .001 CENTAVO WARNING MESSAGE -->
                     </p>
                 </div>
             </div>
@@ -2156,6 +2154,9 @@
                     setUserOnlineStatus();
                     
                     showNotification('✅ Login successful!', 'success');
+                    
+                    // Load user data immediately
+                    loadUserData();
                 })
                 .catch((error) => {
                     console.error('❌ Login error:', error);
@@ -2198,7 +2199,7 @@
                 
                 if (user) {
                     currentUser = user;
-                    loadUserData();
+                    // Don't call loadUserData here - it's called from loginUser()
                 } else {
                     currentUser = null;
                     currentUserData = null;
@@ -2229,12 +2230,7 @@
                 return;
             }
             
-            database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
-                // Skip if we're in the middle of sending money
-                if (isSendingMoney) {
-                    return;
-                }
-                
+            database.ref('users/' + currentUser.uid).once('value').then((snapshot) => {
                 currentUserData = snapshot.val();
                 console.log('User data loaded:', currentUserData);
                 
@@ -2798,7 +2794,7 @@
                 
                 if (currentNum.includes('.')) {
                     // We're adding digits after the decimal point
-                    // Only allow 3 digits after decimal
+                    // Allow exactly 3 digits after decimal
                     if (decimalPart === '000') {
                         // First digit after decimal
                         decimalPart = num + '00';
@@ -2809,11 +2805,11 @@
                         // Third digit after decimal
                         decimalPart = decimalPart[0] + decimalPart[1] + num;
                     } else {
-                        // Already have 3 digits, can't add more
-                        return;
+                        // Already have 3 digits, replace the last one
+                        decimalPart = decimalPart[0] + decimalPart[1] + num;
                     }
                 } else {
-                    // Adding digits before decimal point
+                    // Adding digits before decimal point - allow infinite digits
                     if (wholePart === '0' && num !== '.') {
                         // Replace leading zero
                         wholePart = num;
@@ -2951,8 +2947,8 @@
                 return;
             }
             
-            if (bidAmountValue < 0.001 || bidAmountValue > 999.999) {
-                showNotification('Bid amount must be between 0.001 and 999.999', 'error');
+            if (bidAmountValue < 0.001) {
+                showNotification('Bid amount must be at least 0.001', 'error');
                 return;
             }
             
@@ -3048,10 +3044,15 @@
         
         // ================ AUTO BID FUNCTIONS ================
         function generateRandomNumber() {
-            // Generate random number between 0.001 and 999.999 with 3 decimal places
-            const wholePart = Math.floor(Math.random() * 1000);
-            const decimalPart = Math.floor(Math.random() * 1000);
-            const randomNum = parseFloat(`${wholePart}.${decimalPart.toString().padStart(3, '0')}`);
+            // Generate random number with infinite digits before decimal and exactly 3 after
+            const wholeDigits = Math.floor(Math.random() * 5) + 1; // 1-5 digits before decimal
+            let wholePart = '';
+            for (let i = 0; i < wholeDigits; i++) {
+                wholePart += Math.floor(Math.random() * 10).toString();
+            }
+            
+            const decimalPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
+            const randomNum = parseFloat(`${wholePart}.${decimalPart}`);
             
             // Ensure it's at least 0.001
             return Math.max(0.001, randomNum).toFixed(3);
@@ -3645,6 +3646,11 @@
                                 currentUserData.balance = senderNewBalance;
                                 updateUI(); // Just update the UI with new balance
                             }
+                            
+                            // Reset the flag after transaction is complete
+                            setTimeout(() => {
+                                isSendingMoney = false;
+                            }, 1000);
                         });
                 })
                 .catch((error) => {
