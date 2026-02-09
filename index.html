@@ -2782,56 +2782,56 @@
         function addNumber(num) {
             let currentNum = bidNumber;
             
+            // Remove trailing .000 if present
+            if (currentNum.endsWith('.000') && currentNum !== '0.000') {
+                currentNum = currentNum.replace('.000', '');
+            }
+            
             if (num === '.') {
                 // If we already have a decimal point, do nothing
                 if (currentNum.includes('.')) return;
                 
-                // If current number is 0, start with "0."
-                if (currentNum === '0.000') {
-                    bidNumber = '0.';
-                } else {
-                    // Add decimal point to existing number
-                    bidNumber = currentNum + '.';
-                }
+                // If no decimal point yet, add it
+                bidNumber = currentNum + '.';
             } else {
                 // Handle number input
-                if (currentNum === '0.000') {
-                    // Starting fresh
+                if (currentNum === '0.000' || currentNum === '0') {
+                    // Starting fresh - replace 0 with the new number
                     bidNumber = num;
                 } else if (currentNum.includes('.')) {
-                    // We're entering digits after a decimal point
+                    // We're entering digits AFTER a decimal point
                     let parts = currentNum.split('.');
                     let wholePart = parts[0];
                     let decimalPart = parts[1] || '';
                     
-                    // Allow up to 3 digits after decimal
+                    // Allow exactly 3 digits after decimal
                     if (decimalPart.length < 3) {
                         decimalPart += num;
                         bidNumber = wholePart + '.' + decimalPart;
                     }
-                    // If we already have 3 digits, do nothing (or you could replace the last digit)
+                    // If we already have 3 digits, ignore new input
                 } else {
-                    // We're entering digits before decimal point - allow infinite digits
+                    // We're entering digits BEFORE decimal point - allow infinite digits
                     bidNumber = currentNum + num;
                 }
             }
             
-            // Ensure we always show 3 decimal places if we have a decimal point
-            if (bidNumber.includes('.') && !bidNumber.endsWith('.')) {
+            // Format display: always show 3 decimal places if we have a decimal point
+            if (bidNumber.includes('.')) {
                 let parts = bidNumber.split('.');
-                let decimalPart = parts[1];
-                // Pad with zeros if needed
+                let wholePart = parts[0];
+                let decimalPart = parts[1] || '';
+                
+                // Pad decimal part with zeros to exactly 3 digits
                 while (decimalPart.length < 3) {
                     decimalPart += '0';
                 }
-                // Trim to exactly 3 digits if longer
+                // Ensure exactly 3 decimal digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
                 }
-                bidNumber = parts[0] + '.' + decimalPart;
-            } else if (bidNumber.includes('.') && bidNumber.endsWith('.')) {
-                // If user just pressed decimal, don't add zeros yet
-                // This allows them to see they're entering decimal mode
+                
+                bidNumber = wholePart + '.' + decimalPart;
             } else {
                 // No decimal point, add .000 for display
                 bidNumber = bidNumber + '.000';
