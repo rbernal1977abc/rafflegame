@@ -2224,7 +2224,17 @@
             
             console.log('Loading user data for:', currentUser.uid);
             
+            // Temporarily detach the listener to prevent profile switching
+            if (currentUserData && isSendingMoney) {
+                return;
+            }
+            
             database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
+                // Skip if we're in the middle of sending money
+                if (isSendingMoney) {
+                    return;
+                }
+                
                 currentUserData = snapshot.val();
                 console.log('User data loaded:', currentUserData);
                 
@@ -2786,12 +2796,31 @@
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '000';
                 
-                if (wholePart === '0' && num !== '.') {
-                    // Replace leading zero
-                    wholePart = num;
+                if (currentNum.includes('.')) {
+                    // We're adding digits after the decimal point
+                    // Only allow 3 digits after decimal
+                    if (decimalPart === '000') {
+                        // First digit after decimal
+                        decimalPart = num + '00';
+                    } else if (decimalPart[1] === '0' && decimalPart[2] === '0') {
+                        // Second digit after decimal
+                        decimalPart = decimalPart[0] + num + '0';
+                    } else if (decimalPart[2] === '0') {
+                        // Third digit after decimal
+                        decimalPart = decimalPart[0] + decimalPart[1] + num;
+                    } else {
+                        // Already have 3 digits, can't add more
+                        return;
+                    }
                 } else {
-                    // Add digit to whole part (infinite digits allowed)
-                    wholePart += num;
+                    // Adding digits before decimal point
+                    if (wholePart === '0' && num !== '.') {
+                        // Replace leading zero
+                        wholePart = num;
+                    } else {
+                        // Add digit to whole part (infinite digits allowed)
+                        wholePart += num;
+                    }
                 }
                 
                 // Reconstruct with exactly 3 decimal places
