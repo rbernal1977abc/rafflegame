@@ -204,7 +204,18 @@
             margin: 5px 0;
         }
 
-        /* Add this new style for connection status */
+        .btn-link {
+            background: none;
+            border: none;
+            color: #667eea;
+            text-decoration: underline;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            padding: 5px;
+        }
+
+        /* Connection Status */
         .connection-status {
             position: fixed;
             top: 10px;
@@ -570,8 +581,8 @@
 </head>
 <body>
     <!-- Connection Status Indicator -->
-    <div id="connection-status" class="connection-status hidden">
-        <i class="fas fa-wifi"></i> <span>Connected</span>
+    <div id="connection-status" class="connection-status">
+        <i class="fas fa-sync fa-spin"></i> <span>Initializing...</span>
     </div>
 
     <!-- LOGIN/REGISTER SCREEN -->
@@ -610,6 +621,11 @@
                 
                 <button onclick="loginUser()" class="btn-primary">
                     <i class="fas fa-sign-in-alt"></i> Login
+                </button>
+                
+                <!-- Forgot Password Link -->
+                <button onclick="showForgotPassword()" class="btn-link">
+                    <i class="fas fa-key"></i> Forgot Password?
                 </button>
                 
                 <!-- ADVERTISEMENT BANNER 2 -->
@@ -844,7 +860,7 @@
                         Create Demo Raffles
                     </button>
                     <button onclick="initializeAdmin()" class="btn-secondary" style="margin: 10px 5px;">
-                        Initialize Admin
+                        Initialize Admin Account
                     </button>
                 </div>
             </div>
@@ -981,6 +997,31 @@
             </button>
         </div>
     </div>
+    
+    <!-- FORGOT PASSWORD MODAL -->
+    <div id="forgot-password-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3 style="color: #667eea; text-align: center;">🔑 Forgot Password</h3>
+            
+            <div style="margin: 20px 0;">
+                <p style="text-align: center; color: #666; margin-bottom: 20px;">
+                    Enter your email address and we'll send you a password reset link.
+                </p>
+                
+                <div class="input-group">
+                    <i class="fas fa-envelope"></i>
+                    <input type="email" id="reset-email" placeholder="Enter your email">
+                </div>
+            </div>
+            
+            <button onclick="sendPasswordReset()" class="btn-primary" style="margin-bottom: 10px;">
+                <i class="fas fa-paper-plane"></i> Send Reset Link
+            </button>
+            <button onclick="closeModal()" class="btn-secondary">
+                <i class="fas fa-times"></i> Cancel
+            </button>
+        </div>
+    </div>
 
     <!-- NOTIFICATION AREA -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
@@ -991,6 +1032,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyDCLztneXysYur5WLlsd75nBjkS7j3bGQw",
             authDomain: "raffle-game-demo.firebaseapp.com",
+            databaseURL: "https://raffle-game-demo-default-rtdb.firebaseio.com",
             projectId: "raffle-game-demo",
             storageBucket: "raffle-game-demo.firebasestorage.app",
             messagingSenderId: "527324473310",
@@ -999,7 +1041,15 @@
         };
         
         // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
+        console.log('Initializing Firebase...');
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+        } catch (error) {
+            console.error('Firebase initialization error:', error);
+            showNotification('Firebase initialization failed: ' + error.message, 'error');
+        }
+        
         const auth = firebase.auth();
         const database = firebase.database();
         
@@ -1026,6 +1076,38 @@
             showNotification('Admin credentials filled. Click Login.', 'info');
         }
         
+        function showForgotPassword() {
+            document.getElementById('forgot-password-modal').classList.remove('hidden');
+        }
+        
+        function sendPasswordReset() {
+            const email = document.getElementById('reset-email').value.trim();
+            
+            if (!email) {
+                showNotification('Please enter your email address', 'error');
+                return;
+            }
+            
+            auth.sendPasswordResetEmail(email)
+                .then(() => {
+                    showNotification('Password reset email sent! Check your inbox.', 'success');
+                    closeModal();
+                    document.getElementById('reset-email').value = '';
+                })
+                .catch((error) => {
+                    console.error('Password reset error:', error);
+                    let errorMessage = error.message;
+                    
+                    if (error.code === 'auth/user-not-found') {
+                        errorMessage = 'No account found with this email.';
+                    } else if (error.code === 'auth/invalid-email') {
+                        errorMessage = 'Invalid email address.';
+                    }
+                    
+                    showNotification(errorMessage, 'error');
+                });
+        }
+        
         function registerUser() {
             const username = document.getElementById('register-username').value.trim();
             const email = document.getElementById('register-email').value.trim();
@@ -1046,6 +1128,7 @@
             auth.createUserWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     const user = userCredential.user;
+                    console.log('User created:', user.uid);
                     
                     // Create user data in database
                     const userData = {
@@ -1102,14 +1185,19 @@
             auth.signInWithEmailAndPassword(email, password)
                 .then((userCredential) => {
                     currentUser = userCredential.user;
-                    console.log('User logged in:', currentUser.uid);
+                    console.log('User logged in:', currentUser.uid, 'Email:', email);
+                    
+                    // Check if this is admin
+                    if (email === 'admin@raffle.com') {
+                        console.log('Admin login detected');
+                    }
                     
                     // Set user as online
                     database.ref('online/' + currentUser.uid).set({
                         uid: currentUser.uid,
                         lastSeen: firebase.database.ServerValue.TIMESTAMP,
                         email: email
-                    });
+                    }).catch(err => console.error('Online status error:', err));
                     
                     // Remove user from online when they disconnect
                     database.ref('online/' + currentUser.uid).onDisconnect().remove();
@@ -1126,6 +1214,8 @@
                         errorMessage = 'Incorrect password.';
                     } else if (error.code === 'auth/invalid-email') {
                         errorMessage = 'Invalid email address.';
+                    } else if (error.code === 'auth/user-disabled') {
+                        errorMessage = 'This account has been disabled.';
                     }
                     
                     showNotification(errorMessage, 'error');
@@ -1153,27 +1243,63 @@
         function loadUserData() {
             if (!currentUser) return;
             
+            console.log('Loading user data for:', currentUser.uid);
+            
             database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
                 currentUserData = snapshot.val();
+                console.log('User data loaded:', currentUserData);
+                
                 if (currentUserData) {
-                    console.log('User data loaded:', currentUserData);
                     updateUI();
                     
-                    if (currentUserData.isAdmin) {
+                    // Check if user is admin
+                    if (currentUserData.isAdmin || currentUser.email === 'admin@raffle.com') {
+                        console.log('User is admin, showing admin dashboard');
                         showAdminDashboard();
                         loadAdminData();
                     } else {
+                        console.log('User is regular user');
                         showUserDashboard();
                         loadRaffleItems();
                     }
+                } else {
+                    // User data doesn't exist in database, create it
+                    console.log('Creating new user data in database');
+                    const userData = {
+                        username: currentUser.email.split('@')[0],
+                        email: currentUser.email,
+                        balance: 50.000,
+                        createdAt: new Date().toISOString(),
+                        isAdmin: currentUser.email === 'admin@raffle.com',
+                        wins: [],
+                        totalBids: 0,
+                        totalWon: 0
+                    };
+                    
+                    database.ref('users/' + currentUser.uid).set(userData)
+                        .then(() => {
+                            currentUserData = userData;
+                            updateUI();
+                            
+                            if (userData.isAdmin) {
+                                showAdminDashboard();
+                                loadAdminData();
+                            } else {
+                                showUserDashboard();
+                                loadRaffleItems();
+                            }
+                        });
                 }
+            }, (error) => {
+                console.error('Error loading user data:', error);
+                showNotification('Error loading user data: ' + error.message, 'error');
             });
         }
         
         function updateUI() {
             if (!currentUserData) return;
             
-            document.getElementById('current-user').textContent = currentUserData.username || currentUserData.email;
+            document.getElementById('current-user').textContent = currentUserData.username || currentUserData.email || 'User';
             document.getElementById('user-balance').textContent = formatDecimal(currentUserData.balance || 0);
             document.getElementById('wallet-balance').textContent = formatDecimal(currentUserData.balance || 0);
             document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance || 0);
@@ -1181,6 +1307,7 @@
         
         // ================ DASHBOARD FUNCTIONS ================
         function showUserDashboard() {
+            console.log('Showing user dashboard');
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('user-dashboard').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
@@ -1193,9 +1320,13 @@
         }
         
         function showAdminDashboard() {
+            console.log('Showing admin dashboard');
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('user-dashboard').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
+            
+            // Update connection status to show connected
+            updateConnectionStatus(true);
         }
         
         function showTab(tabName) {
@@ -1212,10 +1343,13 @@
         
         // ================ GAME FUNCTIONS ================
         function loadRaffleItems() {
+            console.log('Loading raffle items...');
             database.ref('raffles').on('value', (snapshot) => {
                 const items = snapshot.val() || {};
                 const container = document.getElementById('raffle-items');
                 const now = new Date();
+                
+                console.log('Raffle items loaded:', Object.keys(items).length);
                 
                 let html = '';
                 let activeCount = 0;
@@ -1259,13 +1393,19 @@
                 container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active raffles</p>';
                 document.getElementById('active-games-count').textContent = activeCount;
                 document.getElementById('total-bids-count').textContent = totalBids;
+            }, (error) => {
+                console.error('Error loading raffle items:', error);
+                showNotification('Error loading raffles: ' + error.message, 'error');
             });
         }
         
         function openGameModal(itemId) {
             database.ref('raffles/' + itemId).once('value').then((snapshot) => {
                 currentItem = snapshot.val();
-                if (!currentItem) return;
+                if (!currentItem) {
+                    showNotification('Raffle item not found', 'error');
+                    return;
+                }
                 
                 currentItem.id = itemId;
                 
@@ -1298,6 +1438,9 @@
                 updateBidSummary();
                 
                 document.getElementById('game-modal').classList.remove('hidden');
+            }).catch(error => {
+                console.error('Error opening game modal:', error);
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
@@ -1442,7 +1585,7 @@
             })
             .catch((error) => {
                 console.error('Place bid error:', error);
-                showNotification(error.message, 'error');
+                showNotification('Error: ' + error.message, 'error');
             });
         }
         
@@ -1488,12 +1631,14 @@
                     closeModal();
                 })
                 .catch((error) => {
-                    showNotification(error.message, 'error');
+                    showNotification('Error: ' + error.message, 'error');
                 });
         }
         
         // ================ ADMIN FUNCTIONS ================
         function loadAdminData() {
+            console.log('Loading admin data...');
+            
             // Load online users count
             database.ref('online').on('value', (snapshot) => {
                 const onlineUsers = snapshot.val() || {};
@@ -1592,7 +1737,7 @@
                     closeModal();
                 })
                 .catch((error) => {
-                    showNotification(error.message, 'error');
+                    showNotification('Error: ' + error.message, 'error');
                 });
         }
         
@@ -1601,10 +1746,12 @@
             const adminEmail = 'admin@raffle.com';
             const adminPassword = 'admin123';
             
-            // Try to create admin user
+            showNotification('Creating admin account...', 'info');
+            
             auth.createUserWithEmailAndPassword(adminEmail, adminPassword)
                 .then((userCredential) => {
                     const user = userCredential.user;
+                    console.log('Admin user created:', user.uid);
                     
                     // Create admin data in database
                     const adminData = {
@@ -1621,13 +1768,14 @@
                     return database.ref('users/' + user.uid).set(adminData);
                 })
                 .then(() => {
-                    showNotification('Admin account created successfully!', 'success');
+                    showNotification('Admin account created successfully! You can now login.', 'success');
                 })
                 .catch((error) => {
+                    console.error('Admin initialization error:', error);
                     if (error.code === 'auth/email-already-in-use') {
                         showNotification('Admin account already exists. You can login with admin@raffle.com / admin123', 'info');
                     } else {
-                        showNotification(error.message, 'error');
+                        showNotification('Error: ' + error.message, 'error');
                     }
                 });
         }
@@ -1661,7 +1809,7 @@
                     showNotification('Demo raffles created successfully!', 'success');
                 })
                 .catch((error) => {
-                    showNotification(error.message, 'error');
+                    showNotification('Error: ' + error.message, 'error');
                 });
         }
         
@@ -1672,6 +1820,20 @@
         
         function formatCurrency(value) {
             return `₱${formatDecimal(value)}`;
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusEl = document.getElementById('connection-status');
+            if (connected) {
+                statusEl.classList.remove('disconnected', 'connecting');
+                statusEl.innerHTML = '<i class="fas fa-wifi"></i> <span>Connected</span>';
+                statusEl.style.background = '#28a745';
+            } else {
+                statusEl.classList.remove('connecting');
+                statusEl.classList.add('disconnected');
+                statusEl.innerHTML = '<i class="fas fa-wifi-slash"></i> <span>Disconnected</span>';
+                statusEl.style.background = '#dc3545';
+            }
         }
         
         function showNotification(message, type = 'info') {
@@ -1729,23 +1891,13 @@
             // Monitor connection status
             database.ref('.info/connected').on('value', (snapshot) => {
                 const connected = snapshot.val();
-                const statusEl = document.getElementById('connection-status');
-                
-                if (connected) {
-                    statusEl.classList.remove('hidden', 'disconnected', 'connecting');
-                    statusEl.innerHTML = '<i class="fas fa-wifi"></i> <span>Connected to Firebase</span>';
-                    console.log('Connected to Firebase');
-                } else {
-                    statusEl.classList.remove('hidden');
-                    statusEl.classList.add('connecting');
-                    statusEl.innerHTML = '<i class="fas fa-sync fa-spin"></i> <span>Connecting...</span>';
-                    console.log('Connecting to Firebase...');
-                }
+                console.log('Firebase connection:', connected ? 'Connected' : 'Disconnected');
+                updateConnectionStatus(connected);
             });
             
             // Check auth state
             auth.onAuthStateChanged((user) => {
-                console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+                console.log('Auth state changed:', user ? 'User logged in: ' + user.email : 'No user');
                 if (user) {
                     currentUser = user;
                     loadUserData();
@@ -1757,10 +1909,11 @@
                 }
             });
             
-            // Initialize admin button
+            // Try to auto-create admin on first load
             setTimeout(() => {
+                console.log('Attempting to auto-create admin...');
                 initializeAdmin();
-            }, 2000);
+            }, 3000);
             
             showNotification('Welcome to Raffle Game! Register or login to start playing.', 'info');
         };
