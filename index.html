@@ -3040,6 +3040,9 @@
                 return database.ref().update(updates);
             })
             .then(() => {
+                // Update local user data immediately
+                currentUserData.balance = currentUserData.balance - bidAmountValue;
+                
                 // Animate button
                 const placeGameBtn = document.getElementById('manual-place-game-btn');
                 placeGameBtn.classList.add('placed');
@@ -3053,12 +3056,17 @@
                     <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
                         <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
                         <p>Bid Number/Amount: <strong>${formatCurrency(bidAmountValue)}</strong></p>
-                        <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(currentUserData.balance - bidAmountValue)}</strong></p>
+                        <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(currentUserData.balance)}</strong></p>
                     </div>
                 `;
                 
+                // Update ALL UI elements
+                updateUI(); // This updates the main wallet balance
+                updateManualBidSummary(); // This updates the manual bid section
+                updateAutoBidSummary(); // This updates the auto bid section
+                
                 clearNumber();
-                showNotification(`Bid placed successfully!`, 'success');
+                showNotification(`Bid placed successfully! Balance updated.`, 'success');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
@@ -3258,6 +3266,9 @@
                 return database.ref().update(updates);
             })
             .then(() => {
+                // Update local user data immediately
+                currentUserData.balance = currentUserData.balance - totalAutoBid;
+                
                 // Animate button
                 const placeGameBtn = document.getElementById('auto-place-game-btn');
                 placeGameBtn.classList.add('placed');
@@ -3266,7 +3277,7 @@
                 // Add wallet log for bids
                 addWalletLog(currentUser.uid, 'bid', `Auto bids placed on ${currentItem.name}`, -totalAutoBid);
                 
-                const newBalance = (currentUserData.balance || 0) - totalAutoBid;
+                const newBalance = currentUserData.balance;
                 
                 const statusDiv = document.getElementById('game-status');
                 statusDiv.innerHTML = `
@@ -3276,6 +3287,11 @@
                         <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(newBalance)}</strong></p>
                     </div>
                 `;
+                
+                // Update ALL UI elements
+                updateUI(); // This updates the main wallet balance
+                updateManualBidSummary(); // This updates the manual bid section
+                updateAutoBidSummary(); // This updates the auto bid section
                 
                 // Clear auto bid numbers
                 autoBidNumbers = [];
@@ -3559,11 +3575,19 @@
             // Update balance
             database.ref('users/' + currentUser.uid + '/balance').set(newBalance)
                 .then(() => {
+                    // Update local user data
+                    currentUserData.balance = newBalance;
+                    
                     // Add deposit
                     addDeposit(currentUser.uid, selectedAmount, 'cashin');
                     
                     // Add wallet log
                     addWalletLog(currentUser.uid, 'deposit', 'Cash in deposit', selectedAmount);
+                    
+                    // Update UI
+                    updateUI();
+                    updateManualBidSummary();
+                    updateAutoBidSummary();
                     
                     showNotification(`Successfully cashed in ${formatCurrency(selectedAmount)}! Expires in 5 days.`, 'success');
                     closeModal();
@@ -3722,6 +3746,8 @@
                     
                     // IMMEDIATELY update UI
                     updateUI();
+                    updateManualBidSummary();
+                    updateAutoBidSummary();
                     
                     // Force refresh wallet logs to show the transaction immediately
                     loadWalletLogs();
