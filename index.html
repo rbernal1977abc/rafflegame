@@ -3090,9 +3090,8 @@
                 return;
             }
             
-            // NEW: Allow any decimal combination, even all zeros
-            // Remove the regex check that might be too restrictive
-            // Instead, just ensure we have exactly 3 decimal digits
+            // ALLOW ALL 3-digit combinations including 000, 100, 110, etc.
+            // No additional regex validation needed
             
             if (!currentUserData || currentUserData.balance < bidAmountValue) {
                 showNotification('Insufficient balance! Please cash in.', 'error');
@@ -3796,62 +3795,62 @@
                         return Promise.reject('User not found');
                     }
                     
-                    const senderNewBalance = currentUserData.balance - amount;
-                    const recipientNewBalance = (recipientData.balance || 0) + amount;
-                    
-                    const updates = {};
-                    updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
-                    updates['users/' + recipientId + '/balance'] = recipientNewBalance;
-                    
-                    // Create wallet log entries
-                    const senderLog = {
-                        date: new Date().toISOString(),
-                        type: 'money-sent',
-                        description: `Money sent to ${recipientEmail}`,
-                        amount: -amount
-                    };
-                    
-                    const recipientLog = {
-                        date: new Date().toISOString(),
-                        type: 'money-received',
-                        description: `Money received from ${currentUser.email}`,
-                        amount: amount
-                    };
-                    
-                    // Get current logs and add new ones
-                    return Promise.all([
-                        database.ref('users/' + currentUser.uid + '/walletLogs').once('value'),
-                        database.ref('users/' + recipientId + '/walletLogs').once('value')
-                    ]).then(([senderLogsSnapshot, recipientLogsSnapshot]) => {
-                        const senderLogs = senderLogsSnapshot.val() || [];
-                        const recipientLogs = recipientLogsSnapshot.val() || [];
-                        
-                        // Add new logs
-                        senderLogs.push(senderLog);
-                        recipientLogs.push(recipientLog);
-                        
-                        // Keep only last 50 logs
-                        const trimmedSenderLogs = senderLogs.slice(-50);
-                        const trimmedRecipientLogs = recipientLogs.slice(-50);
-                        
-                        updates['users/' + currentUser.uid + '/walletLogs'] = trimmedSenderLogs;
-                        updates['users/' + recipientId + '/walletLogs'] = trimmedRecipientLogs;
-                        
-                        // Add deposit for recipient
-                        const depositData = {
-                            amount: amount,
-                            depositDate: new Date().toISOString(),
-                            expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                            status: 'active',
-                            source: 'transfer',
-                            sourceItem: '',
-                            sourceUser: currentUserData.email
-                        };
-                        
-                        database.ref('users/' + recipientId + '/deposits').push(depositData);
-                        
-                        return database.ref().update(updates);
-                    });
+            const senderNewBalance = currentUserData.balance - amount;
+            const recipientNewBalance = (recipientData.balance || 0) + amount;
+            
+            const updates = {};
+            updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
+            updates['users/' + recipientId + '/balance'] = recipientNewBalance;
+            
+            // Create wallet log entries
+            const senderLog = {
+                date: new Date().toISOString(),
+                type: 'money-sent',
+                description: `Money sent to ${recipientEmail}`,
+                amount: -amount
+            };
+            
+            const recipientLog = {
+                date: new Date().toISOString(),
+                type: 'money-received',
+                description: `Money received from ${currentUser.email}`,
+                amount: amount
+            };
+            
+            // Get current logs and add new ones
+            return Promise.all([
+                database.ref('users/' + currentUser.uid + '/walletLogs').once('value'),
+                database.ref('users/' + recipientId + '/walletLogs').once('value')
+            ]).then(([senderLogsSnapshot, recipientLogsSnapshot]) => {
+                const senderLogs = senderLogsSnapshot.val() || [];
+                const recipientLogs = recipientLogsSnapshot.val() || [];
+                
+                // Add new logs
+                senderLogs.push(senderLog);
+                recipientLogs.push(recipientLog);
+                
+                // Keep only last 50 logs
+                const trimmedSenderLogs = senderLogs.slice(-50);
+                const trimmedRecipientLogs = recipientLogs.slice(-50);
+                
+                updates['users/' + currentUser.uid + '/walletLogs'] = trimmedSenderLogs;
+                updates['users/' + recipientId + '/walletLogs'] = trimmedRecipientLogs;
+                
+                // Add deposit for recipient
+                const depositData = {
+                    amount: amount,
+                    depositDate: new Date().toISOString(),
+                    expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    status: 'active',
+                    source: 'transfer',
+                    sourceItem: '',
+                    sourceUser: currentUserData.email
+                };
+                
+                database.ref('users/' + recipientId + '/deposits').push(depositData);
+                
+                return database.ref().update(updates);
+            });
                 })
                 .then(() => {
                     // Update local user data immediately
@@ -3937,8 +3936,8 @@
                 document.getElementById('admin-online-count').textContent = Object.keys(onlineUsers).length;
             });
             
-            // Load total users and calculate totals
-            database.ref('users').once('value').then((snapshot) => {
+            // FIXED: Use real-time listener for total users and total balance
+            database.ref('users').on('value', (snapshot) => {
                 const users = snapshot.val() || {};
                 document.getElementById('admin-total-users').textContent = Object.keys(users).length;
                 
