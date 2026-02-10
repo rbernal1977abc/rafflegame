@@ -2885,8 +2885,8 @@
                     // Keep as 0.000
                     bidNumber = '0.000';
                 } else {
-                    // Start entering a new number
-                    bidNumber = num; // Allow multi-digit numbers
+                    // Start entering a new number - REMOVE the leading zero
+                    bidNumber = num; // This changes 0.000 to just the entered number
                 }
             } 
             // If we're at "0." (just entered decimal)
@@ -2907,8 +2907,20 @@
             }
             // No decimal point yet (entering whole number)
             else {
-                // Allow whole number entry, then user can add decimal point
-                bidNumber = currentDisplay + num;
+                // If we have leading zeros, remove them
+                if (currentDisplay.startsWith('0') && currentDisplay !== '0') {
+                    // Remove all leading zeros
+                    currentDisplay = currentDisplay.replace(/^0+/, '');
+                    // If after removing zeros we have empty string, use the new number
+                    if (currentDisplay === '') {
+                        bidNumber = num;
+                    } else {
+                        bidNumber = currentDisplay + num;
+                    }
+                } else {
+                    // Just append the number
+                    bidNumber = currentDisplay + num;
+                }
             }
             
             // Format for display
