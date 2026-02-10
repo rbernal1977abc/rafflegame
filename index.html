@@ -2886,17 +2886,9 @@
                     bidNumber = '0.000';
                 } else {
                     // Start entering a new number
-                    bidNumber = '0.' + num;
+                    bidNumber = num; // Allow multi-digit numbers
                 }
             } 
-            // If we're starting from 0 (no decimal point) and we're entering a number
-            else if (currentDisplay === '0') {
-                if (num === '0') {
-                    bidNumber = '0.';
-                } else {
-                    bidNumber = num; // Allow multi-digit numbers before decimal
-                }
-            }
             // If we're at "0." (just entered decimal)
             else if (currentDisplay === '0.') {
                 bidNumber = '0.' + num;
@@ -2937,7 +2929,7 @@
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Pad decimal part to exactly 3 digits
+                // Ensure decimal part has exactly 3 digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
                 } else {
@@ -3094,35 +3086,41 @@
                 return;
             }
             
-            // FIXED VALIDATION: Allow any number with exactly 3 decimal places
+            // FIXED VALIDATION: Allow any number, but ensure it has exactly 3 decimal places when displayed
             // First, get the number as a string
             const numberString = bidNumber.toString();
             
-            // Check if it has a decimal point
-            if (!numberString.includes('.')) {
-                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
-                return;
-            }
-            
+            // Split into whole and decimal parts
             const parts = numberString.split('.');
             
-            // Check if we have exactly 2 parts (whole and decimal)
-            if (parts.length !== 2) {
-                showNotification('Invalid number format', 'error');
-                return;
+            // If no decimal point, it's a whole number - automatically add .000
+            if (parts.length === 1) {
+                // It's a whole number like "10" - treat it as "10.000"
+                bidNumber = bidAmountValue.toFixed(3);
+            } else if (parts.length === 2) {
+                // We have a decimal point
+                const decimalPart = parts[1];
+                
+                // Ensure decimal part has exactly 3 digits
+                if (decimalPart.length !== 3) {
+                    // Pad with zeros or truncate to exactly 3 digits
+                    if (decimalPart.length < 3) {
+                        // Pad with zeros
+                        bidNumber = parts[0] + '.' + decimalPart.padEnd(3, '0');
+                    } else {
+                        // Truncate to 3 digits
+                        bidNumber = parts[0] + '.' + decimalPart.substring(0, 3);
+                    }
+                    
+                    // Update the display
+                    document.getElementById('bid-number').value = bidNumber;
+                }
             }
             
-            // Check if decimal part has exactly 3 digits
-            const decimalPart = parts[1];
-            if (decimalPart.length !== 3) {
-                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
-                return;
-            }
+            // Re-parse the corrected value
+            const correctedBidAmount = parseFloat(bidNumber);
             
-            // ALLOW ANY combination of digits before and after decimal
-            // As long as there are exactly 3 digits after decimal point
-            
-            if (!currentUserData || currentUserData.balance < bidAmountValue) {
+            if (!currentUserData || currentUserData.balance < correctedBidAmount) {
                 showNotification('Insufficient balance! Please cash in.', 'error');
                 return;
             }
@@ -3135,7 +3133,7 @@
             // Check if number already exists
             database.ref('raffles/' + currentItem.id + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
-                const existingBid = Object.values(bids).find(bid => bid.number === bidAmountValue);
+                const existingBid = Object.values(bids).find(bid => bid.number === correctedBidAmount);
                 
                 if (existingBid) {
                     showNotification('This number is already taken! Choose another.', 'error');
@@ -3149,14 +3147,14 @@
                     username: currentUserData.username || currentUser.email,
                     itemId: currentItem.id,
                     itemName: currentItem.name,
-                    number: bidAmountValue,
-                    amount: bidAmountValue,
+                    number: correctedBidAmount,
+                    amount: correctedBidAmount,
                     placedAt: new Date().toISOString(),
                     status: 'active',
                     type: 'manual'
                 };
                 
-                const newBalance = (currentUserData.balance || 0) - bidAmountValue;
+                const newBalance = (currentUserData.balance || 0) - correctedBidAmount;
                 
                 const updates = {};
                 updates['raffles/' + currentItem.id + '/bids/' + bidId] = bidData;
@@ -3164,13 +3162,13 @@
                 updates['users/' + currentUser.uid + '/totalBids'] = (currentUserData.totalBids || 0) + 1;
                 
                 // Add to manual bid tracking
-                manualBidNumbers.push(bidAmountValue);
+                manualBidNumbers.push(correctedBidAmount);
                 
                 return database.ref().update(updates);
             })
             .then(() => {
                 // Update local user data immediately
-                currentUserData.balance = currentUserData.balance - bidAmountValue;
+                currentUserData.balance = currentUserData.balance - correctedBidAmount;
                 
                 // Animate button
                 const placeGameBtn = document.getElementById('manual-place-game-btn');
@@ -3178,13 +3176,13 @@
                 placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
                 
                 // Add wallet log for bid
-                addWalletLog(currentUser.uid, 'bid', `Bid placed on ${currentItem.name}`, -bidAmountValue);
+                addWalletLog(currentUser.uid, 'bid', `Bid placed on ${currentItem.name}`, -correctedBidAmount);
                 
                 const statusDiv = document.getElementById('game-status');
                 statusDiv.innerHTML = `
                     <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
                         <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
-                        <p>Bid Number/Amount: <strong>${formatCurrency(bidAmountValue)}</strong></p>
+                        <p>Bid Number/Amount: <strong>${formatCurrency(correctedBidAmount)}</strong></p>
                         <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(currentUserData.balance)}</strong></p>
                     </div>
                 `;
