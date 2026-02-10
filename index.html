@@ -2237,6 +2237,9 @@
                 if (currentUserData) {
                     updateUI();
                     
+                    // SET UP REAL-TIME LISTENERS
+                    setupRealTimeListeners();
+                    
                     // Check if user is admin
                     if (currentUserData.isAdmin || currentUser.email === 'admin@raffle.com') {
                         showAdminDashboard();
@@ -2271,6 +2274,9 @@
                             currentUserData = userData;
                             updateUI();
                             
+                            // SET UP REAL-TIME LISTENERS
+                            setupRealTimeListeners();
+                            
                             if (userData.isAdmin) {
                                 showAdminDashboard();
                                 loadAdminData();
@@ -2291,6 +2297,40 @@
             }, (error) => {
                 console.error('Error loading user data:', error);
                 showNotification('Error loading user data: ' + getFirebaseError(error), 'error');
+            });
+        }
+        
+        function setupRealTimeListeners() {
+            if (!currentUser || !database) return;
+            
+            // Listen for user data changes (balance, logs, deposits)
+            database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
+                if (!snapshot.exists()) return;
+                
+                const userData = snapshot.val();
+                if (!userData) return;
+                
+                // Update local data
+                currentUserData = userData;
+                
+                // Update UI
+                updateUI();
+                
+                // Refresh wallet logs and deposits if on wallet tab
+                if (document.getElementById('wallet-tab').classList.contains('active')) {
+                    loadWalletLogs();
+                    loadDeposits();
+                }
+                
+                // Refresh bids if on bids tab
+                if (document.getElementById('bids-tab').classList.contains('active')) {
+                    loadUserBids();
+                }
+                
+                // Refresh wins if on wins tab
+                if (document.getElementById('wins-tab').classList.contains('active')) {
+                    loadUserWins();
+                }
             });
         }
         
@@ -2360,9 +2400,11 @@
             document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
             document.getElementById(`${tabName}-tab`).classList.add('active');
             
+            // Force refresh when switching tabs
             if (tabName === 'wallet') {
                 loadDeposits();
                 loadWalletLogs();
+                updateUI(); // Ensure balance is up to date
             } else if (tabName === 'bids') {
                 loadUserBids();
             } else if (tabName === 'wins') {
@@ -2987,8 +3029,22 @@
                 return;
             }
             
-            const decimalPart = bidNumber.split('.')[1];
-            if (!decimalPart || decimalPart.length !== 3) {
+            // FIXED VALIDATION: Allow ANY 3-digit decimal combination (000-999)
+            const numberString = bidNumber.toString();
+            if (!numberString.includes('.')) {
+                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
+                return;
+            }
+            
+            const parts = numberString.split('.');
+            if (parts.length !== 2 || parts[1].length !== 3) {
+                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
+                return;
+            }
+            
+            // Check that it's a valid number with exactly 3 decimal places
+            const decimalRegex = /^\d*\.\d{3}$/;
+            if (!decimalRegex.test(numberString)) {
                 showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
                 return;
             }
@@ -3064,6 +3120,12 @@
                 updateUI(); // This updates the main wallet balance
                 updateManualBidSummary(); // This updates the manual bid section
                 updateAutoBidSummary(); // This updates the auto bid section
+                
+                // FORCE REFRESH WALLET LOGS AND DEPOSITS
+                if (document.getElementById('wallet-tab').classList.contains('active')) {
+                    loadWalletLogs();
+                    loadDeposits();
+                }
                 
                 clearNumber();
                 showNotification(`Bid placed successfully! Balance updated.`, 'success');
@@ -3292,6 +3354,12 @@
                 updateUI(); // This updates the main wallet balance
                 updateManualBidSummary(); // This updates the manual bid section
                 updateAutoBidSummary(); // This updates the auto bid section
+                
+                // FORCE REFRESH WALLET LOGS AND DEPOSITS
+                if (document.getElementById('wallet-tab').classList.contains('active')) {
+                    loadWalletLogs();
+                    loadDeposits();
+                }
                 
                 // Clear auto bid numbers
                 autoBidNumbers = [];
@@ -3589,6 +3657,12 @@
                     updateManualBidSummary();
                     updateAutoBidSummary();
                     
+                    // FORCE REFRESH WALLET LOGS AND DEPOSITS
+                    if (document.getElementById('wallet-tab').classList.contains('active')) {
+                        loadWalletLogs();
+                        loadDeposits();
+                    }
+                    
                     showNotification(`Successfully cashed in ${formatCurrency(selectedAmount)}! Expires in 5 days.`, 'success');
                     closeModal();
                 })
@@ -3750,7 +3824,10 @@
                     updateAutoBidSummary();
                     
                     // Force refresh wallet logs to show the transaction immediately
-                    loadWalletLogs();
+                    if (document.getElementById('wallet-tab').classList.contains('active')) {
+                        loadWalletLogs();
+                        loadDeposits();
+                    }
                     
                     // Reset the flag after transaction is complete
                     setTimeout(() => {
