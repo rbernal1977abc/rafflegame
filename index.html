@@ -364,7 +364,8 @@
         .tab-content {
             padding: 20px;
             display: none;
-            min-height: 500px; /* Fixed: Added minimum height for consistency */
+            min-height: 500px;
+            overflow-y: auto;
         }
         
         .tab-content.active {
@@ -994,10 +995,11 @@
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 500px;
+            height: 400px;
             border: 1px solid #ddd;
             border-radius: 10px;
             overflow: hidden;
+            margin-top: 15px;
         }
         
         .chat-header {
@@ -1075,47 +1077,60 @@
             background: #764ba2;
         }
         
-        /* ===== CHAT ONLINE USERS STYLES ===== */
-        .chat-wrapper {
-            display: flex;
-            gap: 15px;
-            height: 500px;
-        }
-        
-        .online-users-sidebar {
-            width: 200px;
+        /* ===== ONLINE USERS COLLAPSIBLE ===== */
+        .online-users-section {
             background: #f8f9fa;
             border-radius: 10px;
-            padding: 15px;
-            overflow-y: auto;
+            margin-bottom: 15px;
             border: 1px solid #ddd;
         }
-        
-        .online-users-sidebar h4 {
-            color: #667eea;
-            margin-bottom: 15px;
-            text-align: center;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #e0e0e0;
+
+        .online-users-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            cursor: pointer;
+            background: #667eea;
+            color: white;
+            border-radius: 10px 10px 0 0;
         }
-        
+
+        .online-users-header h4 {
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .online-users-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 15px;
+        }
+
+        .online-users-content.expanded {
+            max-height: 200px;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        .online-users-list {
+            display: grid;
+            gap: 8px;
+        }
+
         .online-user-item {
             display: flex;
             align-items: center;
             gap: 10px;
             padding: 10px;
-            margin-bottom: 8px;
             background: white;
             border-radius: 8px;
             border-left: 4px solid #28a745;
-            transition: all 0.2s;
         }
-        
-        .online-user-item:hover {
-            background: #e9ecef;
-            transform: translateX(5px);
-        }
-        
+
         .user-status-indicator {
             width: 10px;
             height: 10px;
@@ -1123,7 +1138,7 @@
             background: #28a745;
             animation: pulse 2s infinite;
         }
-        
+
         .user-username {
             font-weight: 500;
             font-size: 14px;
@@ -1169,19 +1184,21 @@
                 grid-template-columns: repeat(2, 1fr);
             }
             
-            .chat-wrapper {
-                flex-direction: column;
-                height: auto;
-            }
-            
-            .online-users-sidebar {
-                width: 100%;
-                max-height: 150px;
-                order: -1;
-            }
-            
             .chat-container {
-                height: 400px;
+                height: 350px;
+            }
+            
+            .tab-content {
+                min-height: 450px;
+                padding: 15px;
+            }
+            
+            #chat-tab {
+                min-height: 550px;
+            }
+            
+            .online-users-content.expanded {
+                max-height: 150px;
             }
         }
     </style>
@@ -1375,48 +1392,7 @@
         
         <!-- CHAT TAB -->
         <div id="chat-tab" class="tab-content">
-            <h3 style="color: #667eea; margin-bottom: 20px;">💬 Community Chat</h3>
-            
-            <!-- ADVERTISEMENT -->
-            <div class="ad-space banner">
-                <div class="ad-label">Chat Room</div>
-                <div>💬 Chat with other players in real-time!</div>
-            </div>
-            
-            <div class="chat-wrapper">
-                <!-- Online Users Sidebar -->
-                <div class="online-users-sidebar">
-                    <h4><i class="fas fa-users"></i> Online Users</h4>
-                    <div id="online-users-list">
-                        <div style="text-align: center; color: #999; padding: 20px;">
-                            Loading online users...
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Chat Container -->
-                <div class="chat-container" style="flex: 1;">
-                    <div class="chat-header">
-                        <i class="fas fa-comments"></i> Global Chat Room
-                    </div>
-                    <div class="chat-messages" id="chat-messages">
-                        <!-- Chat messages will appear here -->
-                        <div style="text-align: center; color: #999; padding: 20px;">
-                            Loading chat messages...
-                        </div>
-                    </div>
-                    <div class="chat-input-container">
-                        <input type="text" class="chat-input" id="chat-input" placeholder="Type your message here..." maxlength="200">
-                        <button class="chat-send-btn" onclick="sendChatMessage()">
-                            <i class="fas fa-paper-plane"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 12px; color: #666;">
-                <i class="fas fa-info-circle"></i> This is a global chat room. Be respectful to other players.
-            </div>
+            <!-- Chat content will be loaded dynamically -->
         </div>
         
         <!-- WALLET TAB -->
@@ -2425,43 +2401,101 @@
                 });
         }
         
+        // ================ FIXED LOGOUT FUNCTION ================
         function logout() {
+            console.log('Logout initiated...');
+            
             // Clear idle timer
             if (idleTimer) {
                 clearTimeout(idleTimer);
                 idleTimer = null;
             }
             
+            // Remove from online users
             if (currentUser && database) {
-                database.ref('online/' + currentUser.uid).remove();
+                database.ref('online/' + currentUser.uid).remove()
+                    .then(() => {
+                        console.log('Removed from online users');
+                    })
+                    .catch(error => {
+                        console.error('Error removing from online:', error);
+                    });
             }
             
-            // Remove chat listener
+            // Remove listeners
             if (chatListener) {
                 chatListener();
                 chatListener = null;
             }
             
-            // Remove online users listener
             if (onlineUsersListener) {
                 onlineUsersListener();
                 onlineUsersListener = null;
             }
             
+            // Stop auto bidding
+            if (isAutoBidding) {
+                stopAutoBid();
+            }
+            
+            // Sign out from Firebase
             if (auth) {
-                auth.signOut().then(() => {
-                    currentUser = null;
-                    currentUserData = null;
-                    
-                    document.getElementById('auth-screen').classList.remove('hidden');
-                    document.getElementById('user-dashboard').classList.add('hidden');
-                    document.getElementById('admin-dashboard').classList.add('hidden');
-                    
-                    showNotification('Logged out successfully', 'success');
-                }).catch(error => {
-                    console.error('Logout error:', error);
-                    showNotification('Error logging out', 'error');
-                });
+                auth.signOut()
+                    .then(() => {
+                        console.log('✅ User signed out successfully');
+                        
+                        // Reset all user data
+                        currentUser = null;
+                        currentUserData = null;
+                        
+                        // Clear intervals
+                        if (autoBidInterval) {
+                            clearInterval(autoBidInterval);
+                            autoBidInterval = null;
+                        }
+                        
+                        if (drawCheckInterval) {
+                            clearInterval(drawCheckInterval);
+                            drawCheckInterval = null;
+                        }
+                        
+                        if (expirationCheckInterval) {
+                            clearInterval(expirationCheckInterval);
+                            expirationCheckInterval = null;
+                        }
+                        
+                        // Show login screen
+                        document.getElementById('auth-screen').classList.remove('hidden');
+                        document.getElementById('user-dashboard').classList.add('hidden');
+                        document.getElementById('admin-dashboard').classList.add('hidden');
+                        
+                        // Clear any open modals
+                        document.querySelectorAll('.modal').forEach(modal => {
+                            modal.classList.add('hidden');
+                        });
+                        
+                        // Clear input fields
+                        document.getElementById('login-email').value = '';
+                        document.getElementById('login-password').value = '';
+                        
+                        showNotification('Logged out successfully', 'success');
+                        
+                        // Remove event listeners for idle timer
+                        document.removeEventListener('mousemove', resetIdleTimer);
+                        document.removeEventListener('keypress', resetIdleTimer);
+                        document.removeEventListener('click', resetIdleTimer);
+                        document.removeEventListener('scroll', resetIdleTimer);
+                    })
+                    .catch(error => {
+                        console.error('❌ Logout error:', error);
+                        showNotification('Error logging out: ' + error.message, 'error');
+                    });
+            } else {
+                // If auth is not available, just show login screen
+                document.getElementById('auth-screen').classList.remove('hidden');
+                document.getElementById('user-dashboard').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.add('hidden');
+                showNotification('Logged out', 'info');
             }
         }
         
@@ -2694,6 +2728,13 @@
                 tabContent.classList.add('active');
             }
             
+            // Initialize chat page when switching to chat tab
+            if (tabName === 'chat') {
+                setTimeout(() => {
+                    initializeChatPage();
+                }, 100);
+            }
+            
             // Force refresh when switching tabs
             if (tabName === 'wallet') {
                 loadDeposits();
@@ -2705,12 +2746,6 @@
                 loadUserWins();
             } else if (tabName === 'play') {
                 loadGameItems();
-            } else if (tabName === 'chat') {
-                // Chat is handled by real-time listener
-                const chatMessages = document.getElementById('chat-messages');
-                if (chatMessages) {
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                }
             }
         }
         
@@ -4345,6 +4380,82 @@
             showNotification('Lazada transfer functionality coming soon!', 'info');
         }
         
+        // ================ CHAT PAGE FUNCTIONS ================
+        function setupChatPage() {
+            const chatTab = document.getElementById('chat-tab');
+            if (chatTab) {
+                chatTab.innerHTML = `
+                    <h3 style="color: #667eea; margin-bottom: 20px;">💬 Community Chat</h3>
+                    
+                    <!-- ADVERTISEMENT -->
+                    <div class="ad-space banner">
+                        <div class="ad-label">Chat Room</div>
+                        <div>💬 Chat with other players in real-time!</div>
+                    </div>
+                    
+                    <!-- Online Users Section (Collapsible) -->
+                    <div class="online-users-section">
+                        <div class="online-users-header" onclick="toggleOnlineUsers()">
+                            <h4>
+                                <i class="fas fa-users"></i> Online Users 
+                                <span id="online-users-count" style="font-size: 14px; background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 10px;">0</span>
+                            </h4>
+                            <i class="fas fa-chevron-down" id="online-users-icon"></i>
+                        </div>
+                        <div class="online-users-content" id="online-users-content">
+                            <div id="online-users-list">
+                                <div style="text-align: center; color: #999; padding: 20px;">
+                                    Loading online users...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Chat Container -->
+                    <div class="chat-container">
+                        <div class="chat-header">
+                            <i class="fas fa-comments"></i> Global Chat Room
+                        </div>
+                        <div class="chat-messages" id="chat-messages">
+                            <div style="text-align: center; color: #999; padding: 20px;">
+                                Loading chat messages...
+                            </div>
+                        </div>
+                        <div class="chat-input-container">
+                            <input type="text" class="chat-input" id="chat-input" placeholder="Type your message here..." maxlength="200">
+                            <button class="chat-send-btn" onclick="sendChatMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 12px; color: #666;">
+                        <i class="fas fa-info-circle"></i> This is a global chat room. Be respectful to other players.
+                    </div>
+                `;
+            }
+        }
+        
+        function toggleOnlineUsers() {
+            const content = document.getElementById('online-users-content');
+            const icon = document.getElementById('online-users-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            }
+        }
+        
+        function initializeChatPage() {
+            setupChatListener();
+            loadOnlineUsers();
+        }
+        
         // ================ CHAT FUNCTIONS ================
         function setupChatListener() {
             if (!currentUser || !database) return;
@@ -4398,8 +4509,14 @@
             onlineUsersListener = database.ref('online').on('value', (snapshot) => {
                 const onlineUsers = snapshot.val() || {};
                 const onlineUsersList = document.getElementById('online-users-list');
+                const onlineUsersCount = document.getElementById('online-users-count');
                 
                 if (!onlineUsersList) return;
+                
+                // Update count
+                if (onlineUsersCount) {
+                    onlineUsersCount.textContent = Object.keys(onlineUsers).length;
+                }
                 
                 if (Object.keys(onlineUsers).length === 0) {
                     onlineUsersList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No online users</div>';
@@ -4408,7 +4525,7 @@
                 
                 // Convert to array and sort by username
                 const usersArray = Object.values(onlineUsers)
-                    .filter(user => user.uid !== currentUser.uid) // Exclude current user
+                    .filter(user => user.uid !== currentUser?.uid) // Exclude current user if logged in
                     .sort((a, b) => (a.username || a.email).localeCompare(b.username || b.email));
                 
                 let html = '';
@@ -5192,6 +5309,9 @@
         // ================ INITIALIZATION ================
         window.onload = function() {
             console.log('App loading...');
+            
+            // Initialize chat page structure
+            setupChatPage();
             
             // Start connection monitoring
             setTimeout(() => {
