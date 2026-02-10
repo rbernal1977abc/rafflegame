@@ -2571,40 +2571,53 @@
                         logClass = 'bid';
                         logIcon = 'fas fa-dice';
                         amountColor = '#dc3545'; // Red for bids (money going out)
+                        // Ensure bid amount shows as negative
+                        displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'refund':
                         logClass = 'refund';
                         logIcon = 'fas fa-undo';
                         amountColor = '#28a745'; // Green for refunds (money coming in)
+                        // Refunds are positive
+                        displayAmount = Math.abs(displayAmount);
                         break;
                     case 'transfer-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
                         amountColor = '#dc3545'; // Red for fees (money going out)
+                        // Fees are negative
+                        displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'money-sent':
                         logClass = 'money-sent';
                         logIcon = 'fas fa-paper-plane';
                         amountColor = '#dc3545'; // RED for money sent
+                        // Money sent is negative
+                        displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'money-received':
                         logClass = 'money-received';
                         logIcon = 'fas fa-paper-plane';
                         amountColor = '#28a745'; // GREEN for money received
+                        // Money received is positive
+                        displayAmount = Math.abs(displayAmount);
                         break;
                     case 'win':
                         logClass = 'win';
                         logIcon = 'fas fa-trophy';
                         amountColor = '#20c997'; // Teal for wins
+                        // Wins show as text, not amount
                         break;
                     case 'deposit':
                         logClass = 'deposit';
                         logIcon = 'fas fa-plus-circle';
                         amountColor = '#28a745'; // Green for cash deposits
+                        // Deposits are positive
+                        displayAmount = Math.abs(displayAmount);
                         break;
                     default:
                         logIcon = 'fas fa-exchange-alt';
-                        amountColor = log.amount >= 0 ? '#28a745' : '#dc3545';
+                        amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                 }
                 
                 // Format the amount display
@@ -2612,8 +2625,10 @@
                 if (log.type === 'win') {
                     amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WINNER!</span>`;
                 } else {
+                    // Show + for positive, - for negative
+                    const sign = displayAmount >= 0 ? '+' : '-';
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
-                        ${displayAmount >= 0 ? '+' : ''}₱${formatDecimal(Math.abs(displayAmount))}
+                        ${sign}₱${formatDecimal(Math.abs(displayAmount))}
                     </span>`;
                 }
                 
@@ -2646,11 +2661,23 @@
         function addWalletLog(userId, type, description, amount) {
             if (!database) return;
             
+            // Ensure amount has the correct sign based on type
+            let logAmount = amount;
+            
+            // For certain types, ensure negative sign if needed
+            if (type === 'bid' || type === 'transfer-fee' || type === 'money-sent') {
+                // These should be negative amounts (money going out)
+                logAmount = -Math.abs(amount);
+            } else if (type === 'refund' || type === 'money-received' || type === 'deposit') {
+                // These should be positive amounts (money coming in)
+                logAmount = Math.abs(amount);
+            }
+            
             const logEntry = {
                 date: new Date().toISOString(),
                 type: type,
                 description: description,
-                amount: amount
+                amount: logAmount  // Use the adjusted amount
             };
             
             // Get current logs
@@ -2831,7 +2858,7 @@
                 // If we don't have a decimal point yet, add it
                 if (!bidNumber.includes('.')) {
                     // If it's "0.000" or "0", change to "0."
-                    if (bidNumber === '0.000' || bidNumber === '0') {
+                    if (bidNumber === '0.000' || bidNumber === '0' || bidNumber === '0.') {
                         bidNumber = '0.';
                     } else {
                         // Add decimal to existing number
@@ -2851,17 +2878,28 @@
                 currentDisplay = bidNumber.replace('.000', '');
             }
             
+            // Also handle if it ends with . and zeros
+            if (bidNumber.includes('.') && /\.0+$/.test(bidNumber)) {
+                currentDisplay = bidNumber;
+            }
+            
             if (currentDisplay === '0' || currentDisplay === '0.000') {
                 // Starting with 0 - replace it with the new number
-                bidNumber = num;
+                if (currentDisplay === '0.000') {
+                    // If we have 0.000, start entering decimal part
+                    bidNumber = '0.' + num;
+                } else {
+                    bidNumber = num;
+                }
             } else if (currentDisplay.includes('.')) {
                 // We have a decimal point in the display
                 const parts = currentDisplay.split('.');
-                const decimalPart = parts[1];
+                const wholePart = parts[0];
+                let decimalPart = parts[1] || '';
                 
                 // Check if we already have 3 decimal digits
                 if (decimalPart.length < 3) {
-                    bidNumber = parts[0] + '.' + decimalPart + num;
+                    bidNumber = wholePart + '.' + decimalPart + num;
                 }
                 // If already 3 digits, do nothing (don't add more)
             } else {
@@ -2891,10 +2929,20 @@
                     }
                 }
                 
+                // Handle edge case where decimal part might be empty
+                if (decimalPart === '') {
+                    decimalPart = '000';
+                }
+                
                 displayValue = wholePart + '.' + decimalPart;
             } else {
                 // No decimal point, add .000 for display
                 displayValue = displayValue + '.000';
+            }
+            
+            // Special case: if displayValue is something like ".123", convert to "0.123"
+            if (displayValue.startsWith('.')) {
+                displayValue = '0' + displayValue;
             }
             
             // Update the display
@@ -3042,12 +3090,9 @@
                 return;
             }
             
-            // Check that it's a valid number with exactly 3 decimal places
-            const decimalRegex = /^\d*\.\d{3}$/;
-            if (!decimalRegex.test(numberString)) {
-                showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
-                return;
-            }
+            // NEW: Allow any decimal combination, even all zeros
+            // Remove the regex check that might be too restrictive
+            // Instead, just ensure we have exactly 3 decimal digits
             
             if (!currentUserData || currentUserData.balance < bidAmountValue) {
                 showNotification('Insufficient balance! Please cash in.', 'error');
