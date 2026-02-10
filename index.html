@@ -2872,22 +2872,14 @@
             }
             
             // Handle number input (0-9)
-            // Remove .000 display formatting if present
             let currentDisplay = bidNumber;
             
-            // Check if current display has decimal point with zeros padding
-            if (currentDisplay.includes('.')) {
-                const parts = currentDisplay.split('.');
-                const wholePart = parts[0];
-                let decimalPart = parts[1] || '';
-                
-                // If decimal part is all zeros (like .000), start fresh
-                if (/^0+$/.test(decimalPart)) {
-                    currentDisplay = wholePart + '.';
-                }
+            // Remove .000 display formatting if present
+            if (currentDisplay.includes('.000') && currentDisplay !== '0.000') {
+                currentDisplay = currentDisplay.replace('.000', '');
             }
             
-            // If current display is '0.000' and we're entering a number, start fresh
+            // If current display is '0.000' and we're entering a number
             if (currentDisplay === '0.000') {
                 if (num === '0') {
                     // Keep as 0.000
@@ -2897,12 +2889,12 @@
                     bidNumber = '0.' + num;
                 }
             } 
-            // If we're starting from 0 (no decimal point)
+            // If we're starting from 0 (no decimal point) and we're entering a number
             else if (currentDisplay === '0') {
                 if (num === '0') {
                     bidNumber = '0.';
                 } else {
-                    bidNumber = '0.' + num;
+                    bidNumber = num; // Allow multi-digit numbers before decimal
                 }
             }
             // If we're at "0." (just entered decimal)
@@ -2934,13 +2926,18 @@
         function formatBidNumberDisplay() {
             let displayValue = bidNumber;
             
+            // If it's empty or just a decimal point, set to 0.
+            if (displayValue === '' || displayValue === '.') {
+                displayValue = '0.';
+            }
+            
             // Ensure proper formatting
             if (displayValue.includes('.')) {
                 const parts = displayValue.split('.');
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Pad or truncate decimal part to exactly 3 digits
+                // Pad decimal part to exactly 3 digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
                 } else {
@@ -2960,7 +2957,7 @@
                 displayValue = displayValue + '.000';
             }
             
-            // Special case: if displayValue is something like ".123", convert to "0.123"
+            // Special case: if displayValue starts with ".", add "0" prefix
             if (displayValue.startsWith('.')) {
                 displayValue = '0' + displayValue;
             }
@@ -3097,21 +3094,33 @@
                 return;
             }
             
-            // FIXED VALIDATION: Allow ANY 3-digit decimal combination (000-999)
+            // FIXED VALIDATION: Allow any number with exactly 3 decimal places
+            // First, get the number as a string
             const numberString = bidNumber.toString();
+            
+            // Check if it has a decimal point
             if (!numberString.includes('.')) {
                 showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
                 return;
             }
             
             const parts = numberString.split('.');
-            if (parts.length !== 2 || parts[1].length !== 3) {
+            
+            // Check if we have exactly 2 parts (whole and decimal)
+            if (parts.length !== 2) {
+                showNotification('Invalid number format', 'error');
+                return;
+            }
+            
+            // Check if decimal part has exactly 3 digits
+            const decimalPart = parts[1];
+            if (decimalPart.length !== 3) {
                 showNotification('Number must have exactly 3 decimal places (e.g., 0.123)', 'error');
                 return;
             }
             
-            // ALLOW ALL 3-digit combinations including 000, 100, 110, etc.
-            // No additional regex validation needed
+            // ALLOW ANY combination of digits before and after decimal
+            // As long as there are exactly 3 digits after decimal point
             
             if (!currentUserData || currentUserData.balance < bidAmountValue) {
                 showNotification('Insufficient balance! Please cash in.', 'error');
