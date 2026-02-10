@@ -2874,36 +2874,56 @@
             // Handle number input (0-9)
             // Remove .000 display formatting if present
             let currentDisplay = bidNumber;
-            if (bidNumber.endsWith('.000') && bidNumber !== '0.000') {
-                currentDisplay = bidNumber.replace('.000', '');
-            }
             
-            // Also handle if it ends with . and zeros
-            if (bidNumber.includes('.') && /\.0+$/.test(bidNumber)) {
-                currentDisplay = bidNumber;
-            }
-            
-            if (currentDisplay === '0' || currentDisplay === '0.000') {
-                // Starting with 0 - replace it with the new number
-                if (currentDisplay === '0.000') {
-                    // If we have 0.000, start entering decimal part
-                    bidNumber = '0.' + num;
-                } else {
-                    bidNumber = num;
-                }
-            } else if (currentDisplay.includes('.')) {
-                // We have a decimal point in the display
+            // Check if current display has decimal point with zeros padding
+            if (currentDisplay.includes('.')) {
                 const parts = currentDisplay.split('.');
                 const wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Check if we already have 3 decimal digits
+                // If decimal part is all zeros (like .000), start fresh
+                if (/^0+$/.test(decimalPart)) {
+                    currentDisplay = wholePart + '.';
+                }
+            }
+            
+            // If current display is '0.000' and we're entering a number, start fresh
+            if (currentDisplay === '0.000') {
+                if (num === '0') {
+                    // Keep as 0.000
+                    bidNumber = '0.000';
+                } else {
+                    // Start entering a new number
+                    bidNumber = '0.' + num;
+                }
+            } 
+            // If we're starting from 0 (no decimal point)
+            else if (currentDisplay === '0') {
+                if (num === '0') {
+                    bidNumber = '0.';
+                } else {
+                    bidNumber = '0.' + num;
+                }
+            }
+            // If we're at "0." (just entered decimal)
+            else if (currentDisplay === '0.') {
+                bidNumber = '0.' + num;
+            }
+            // If we have a decimal point already
+            else if (currentDisplay.includes('.')) {
+                const parts = currentDisplay.split('.');
+                const wholePart = parts[0];
+                let decimalPart = parts[1] || '';
+                
+                // Allow up to 3 decimal digits
                 if (decimalPart.length < 3) {
                     bidNumber = wholePart + '.' + decimalPart + num;
                 }
                 // If already 3 digits, do nothing (don't add more)
-            } else {
-                // No decimal point yet, add to whole number
+            }
+            // No decimal point yet (entering whole number)
+            else {
+                // Allow whole number entry, then user can add decimal point
                 bidNumber = currentDisplay + num;
             }
             
