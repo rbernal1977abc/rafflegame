@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Raffle Number Game - Live Centralized</title>
+    <title>Centavo - Number Game</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -24,6 +24,18 @@
             min-height: 100vh;
             padding: 20px;
             color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== FOOTER STYLES ===== */
+        .footer {
+            text-align: center;
+            color: white;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 14px;
+            opacity: 0.8;
         }
 
         /* ===== ADVERTISEMENT STYLES ===== */
@@ -96,6 +108,7 @@
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             overflow: hidden;
             animation: slideUp 0.5s ease;
+            flex: 1;
         }
 
         @keyframes slideUp {
@@ -325,15 +338,17 @@
             display: flex;
             background: #f8f9fa;
             padding: 10px;
+            flex-wrap: wrap;
         }
         
         .tab {
             flex: 1;
-            padding: 15px;
+            min-width: 70px;
+            padding: 12px 5px;
             border: none;
             background: none;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             color: #666;
             display: flex;
             flex-direction: column;
@@ -974,6 +989,91 @@
             border-left: 5px solid #667eea;
         }
         
+        /* ===== CHAT STYLES ===== */
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 500px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            background: #f8f9fa;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+        
+        .message.sent {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+            border-bottom-right-radius: 2px;
+        }
+        
+        .message.received {
+            background: #e9ecef;
+            margin-right: auto;
+            border-bottom-left-radius: 2px;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 3px;
+        }
+        
+        .message-time {
+            font-size: 10px;
+            opacity: 0.7;
+            text-align: right;
+            margin-top: 5px;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            border-top: 1px solid #ddd;
+            background: white;
+        }
+        
+        .chat-input {
+            flex: 1;
+            border: none;
+            padding: 15px;
+            font-size: 14px;
+            outline: none;
+        }
+        
+        .chat-send-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        
+        .chat-send-btn:hover {
+            background: #764ba2;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             body {
@@ -989,8 +1089,8 @@
             }
             
             .tab {
-                font-size: 12px;
-                padding: 10px 5px;
+                font-size: 11px;
+                padding: 10px 3px;
             }
             
             #bid-number {
@@ -1022,7 +1122,7 @@
     <div id="auth-screen" class="screen">
         <div class="logo">
             <i class="fas fa-ticket-alt"></i>
-            <h1>Raffle Number Game</h1>
+            <h1>Centavo - Number Game</h1>
             <p>Live Centralized Demo</p>
         </div>
         
@@ -1039,7 +1139,7 @@
                 <!-- ADVERTISEMENT BANNER 1 -->
                 <div class="ad-space banner">
                     <div class="ad-label">Ad Space</div>
-                    <div>🚀 Live Raffle Game! Play with Real Users!</div>
+                    <div>🚀 Live Number Game! Play with Real Users!</div>
                 </div>
                 
                 <div class="input-group">
@@ -1133,6 +1233,9 @@
             <button class="tab" onclick="showTab('play')">
                 <i class="fas fa-gamepad"></i> Play
             </button>
+            <button class="tab" onclick="showTab('chat')">
+                <i class="fas fa-comments"></i> Chat
+            </button>
             <button class="tab active" onclick="showTab('wallet')">
                 <i class="fas fa-wallet"></i> Wallet
             </button>
@@ -1149,21 +1252,21 @@
         
         <!-- PLAY TAB -->
         <div id="play-tab" class="tab-content">
-            <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Live Raffles</h3>
+            <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Live Games</h3>
             
             <!-- ADVERTISEMENT -->
             <div class="ad-space medium">
-                <div class="ad-label">Featured Raffle</div>
+                <div class="ad-label">Featured Game</div>
                 <div>📱 Win iPhone 15 - Join Now!</div>
             </div>
             
-            <div class="collapsible-header" onclick="toggleCollapsible('active-raffles')">
+            <div class="collapsible-header" onclick="toggleCollapsible('active-games')">
                 <h4 style="margin: 0; color: #667eea;">
-                    <i class="fas fa-ticket-alt"></i> Active Raffles
+                    <i class="fas fa-ticket-alt"></i> Active Games
                 </h4>
-                <i class="fas fa-chevron-down collapsible-icon" id="active-raffles-icon"></i>
+                <i class="fas fa-chevron-down collapsible-icon" id="active-games-icon"></i>
             </div>
-            <div class="collapsible-content expanded" id="active-raffles-content">
+            <div class="collapsible-content expanded" id="active-games-content">
                 <div class="scrollable-content">
                     <div id="live-stats" style="background: #f8f9fa; padding: 10px; border-radius: 10px; margin-bottom: 15px; text-align: center;">
                         <div style="display: flex; justify-content: space-around;">
@@ -1182,17 +1285,50 @@
                         </div>
                     </div>
                     
-                    <div id="raffle-items" class="items-grid">
+                    <div id="game-items" class="items-grid">
                         <!-- Items loaded from Firebase -->
                     </div>
                 </div>
-                <button class="view-all-btn" onclick="viewAllRaffles()">View All Raffles</button>
+                <button class="view-all-btn" onclick="viewAllGames()">View All Games</button>
             </div>
             
             <!-- BOTTOM ADVERTISEMENT -->
             <div class="ad-space banner">
                 <div class="ad-label">Sponsored</div>
                 <div>🎯 Increase your winning chances!</div>
+            </div>
+        </div>
+        
+        <!-- CHAT TAB -->
+        <div id="chat-tab" class="tab-content">
+            <h3 style="color: #667eea; margin-bottom: 20px;">💬 Community Chat</h3>
+            
+            <!-- ADVERTISEMENT -->
+            <div class="ad-space banner">
+                <div class="ad-label">Chat Room</div>
+                <div>💬 Chat with other players in real-time!</div>
+            </div>
+            
+            <div class="chat-container">
+                <div class="chat-header">
+                    <i class="fas fa-comments"></i> Global Chat Room
+                </div>
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Chat messages will appear here -->
+                    <div style="text-align: center; color: #999; padding: 20px;">
+                        Loading chat messages...
+                    </div>
+                </div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message here..." maxlength="200">
+                    <button class="chat-send-btn" onclick="sendChatMessage()">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; background: #f8f9fa; padding: 10px; border-radius: 8px; font-size: 12px; color: #666;">
+                <i class="fas fa-info-circle"></i> This is a global chat room. Be respectful to other players.
             </div>
         </div>
         
@@ -1409,8 +1545,8 @@
                     <div id="admin-total-users">0</div>
                 </div>
                 <div class="stat-card">
-                    <h4>Active Raffles</h4>
-                    <div id="admin-active-raffles">0</div>
+                    <h4>Active Games</h4>
+                    <div id="admin-active-games">0</div>
                 </div>
                 <div class="stat-card">
                     <h4>Total Bids</h4>
@@ -1429,7 +1565,7 @@
             <!-- ADMIN ACTIONS -->
             <div class="admin-actions" style="margin-top: 30px;">
                 <button onclick="showAddItemModal()" class="btn-primary" style="margin-bottom: 20px;">
-                    <i class="fas fa-plus-circle"></i> Add New Raffle Item
+                    <i class="fas fa-plus-circle"></i> Add New Game Item
                 </button>
                 
                 <!-- All Users Section -->
@@ -1464,10 +1600,10 @@
                 </div>
                 <button class="view-all-btn" onclick="viewAllWinners()">View All Winners</button>
                 
-                <!-- Raffle Items Section -->
+                <!-- Game Items Section -->
                 <div class="collapsible-header" onclick="toggleCollapsible('admin-items')">
                     <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-ticket-alt"></i> Raffle Items
+                        <i class="fas fa-ticket-alt"></i> Game Items
                     </h4>
                     <i class="fas fa-chevron-down collapsible-icon" id="admin-items-icon"></i>
                 </div>
@@ -1485,8 +1621,8 @@
                     <button onclick="checkAutoDraws()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Check Auto Draws
                     </button>
-                    <button onclick="createDemoRaffles()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
-                        Create Demo Raffles
+                    <button onclick="createDemoGames()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
+                        Create Demo Games
                     </button>
                     <!-- Removed Initialize Admin Account button -->
                     <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
@@ -1520,8 +1656,6 @@
                 <div class="number-display">
                     <input type="text" id="bid-number" value="0.000" readonly style="font-size: 36px; padding: 15px;" class="decimal-format">
                 </div>
-                
-                <!-- REMOVED THE INSTRUCTIONAL TEXT MESSAGE HERE -->
                 
                 <!-- MANUAL BID SECTION -->
                 <div class="manual-bid-section">
@@ -1633,7 +1767,6 @@
                     <p style="color: #666; font-size: 14px;">
                         🎯 <strong>Game Rule:</strong> Lowest unique number wins!<br>
                         No duplicate numbers allowed. Format: X.XXX (e.g., 0.001, 1.111, 123.456)<br>
-                        <!-- REMOVED THE .001 CENTAVO WARNING MESSAGE -->
                     </p>
                 </div>
             </div>
@@ -1723,7 +1856,7 @@
     <!-- ADD ITEM MODAL (ADMIN) -->
     <div id="add-item-modal" class="modal hidden">
         <div class="modal-content">
-            <h3 style="color: #667eea; text-align: center;">➕ Add Raffle Item</h3>
+            <h3 style="color: #667eea; text-align: center;">➕ Add Game Item</h3>
             
             <div style="display: grid; gap: 15px; margin: 20px 0;">
                 <input type="text" id="item-name-input" placeholder="Item Name (e.g., iPhone 15)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
@@ -1732,22 +1865,22 @@
                 
                 <input type="text" id="item-image-url" placeholder="Image URL" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                 
-                <!-- START RAFFLE DATE & TIME -->
+                <!-- START GAME DATE & TIME -->
                 <div>
-                    <label class="form-label">Start Raffle Date & Time:</label>
+                    <label class="form-label">Start Game Date & Time:</label>
                     <input type="datetime-local" id="start-date" class="datetime-input">
                 </div>
                 
-                <!-- END RAFFLE DATE & TIME -->
+                <!-- END GAME DATE & TIME -->
                 <div>
-                    <label class="form-label">End Raffle Date & Time:</label>
+                    <label class="form-label">End Game Date & Time:</label>
                     <input type="datetime-local" id="end-date" class="datetime-input">
                 </div>
                 
-                <!-- RAFFLE DAY DATE & TIME -->
+                <!-- GAME DRAW DATE & TIME -->
                 <div>
-                    <label class="form-label">Raffle Day Date & Time:</label>
-                    <input type="datetime-local" id="raffle-date" class="datetime-input">
+                    <label class="form-label">Game Draw Date & Time:</label>
+                    <input type="datetime-local" id="draw-date" class="datetime-input">
                 </div>
                 
                 <!-- WINNER DATE & TIME -->
@@ -1862,6 +1995,11 @@
     <!-- NOTIFICATION AREA -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
 
+    <!-- FOOTER -->
+    <div class="footer">
+        Developed and Patented by RP8 and Dimax
+    </div>
+
     <!-- JAVASCRIPT -->
     <script>
         // ================ FIREBASE CONFIGURATION ================
@@ -1929,8 +2067,9 @@
         let showAllUsers = false;
         let showAllWinners = false;
         let showAllItems = false;
-        let showAllRaffles = false;
+        let showAllGames = false;
         let isSendingMoney = false;
+        let chatListener = null;
         
         // ================ CONNECTION MANAGEMENT ================
         function updateConnectionStatus(connected) {
@@ -2170,6 +2309,12 @@
                 database.ref('online/' + currentUser.uid).remove();
             }
             
+            // Remove chat listener
+            if (chatListener) {
+                chatListener();
+                chatListener = null;
+            }
+            
             if (auth) {
                 auth.signOut().then(() => {
                     currentUser = null;
@@ -2246,11 +2391,12 @@
                         loadAdminData();
                     } else {
                         showUserDashboard();
-                        loadRaffleItems();
+                        loadGameItems();
                         loadDeposits();
                         loadWalletLogs();
                         loadUserBids();
                         loadUserWins();
+                        setupChatListener();
                     }
                 } else {
                     // Create user data if it doesn't exist
@@ -2282,11 +2428,12 @@
                                 loadAdminData();
                             } else {
                                 showUserDashboard();
-                                loadRaffleItems();
+                                loadGameItems();
                                 loadDeposits();
                                 loadWalletLogs();
                                 loadUserBids();
                                 loadUserWins();
+                                setupChatListener();
                             }
                         })
                         .catch(error => {
@@ -2360,6 +2507,9 @@
             
             // Initialize all collapsible sections as expanded
             initializeCollapsibleSections();
+            
+            // Show wallet tab by default
+            showTab('wallet');
         }
         
         function showAdminDashboard() {
@@ -2374,7 +2524,7 @@
         function initializeCollapsibleSections() {
             // Set all collapsible sections to expanded by default
             const sections = [
-                'active-raffles', 'wallet-logs', 'deposits', 'bidding-history', 
+                'active-games', 'wallet-logs', 'deposits', 'bidding-history', 
                 'my-wins', 'admin-users', 'admin-winners', 'admin-items'
             ];
             
@@ -2410,7 +2560,11 @@
             } else if (tabName === 'wins') {
                 loadUserWins();
             } else if (tabName === 'play') {
-                loadRaffleItems();
+                loadGameItems();
+            } else if (tabName === 'chat') {
+                // Chat is handled by real-time listener
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
         
@@ -2463,9 +2617,9 @@
             loadAdminData();
         }
         
-        function viewAllRaffles() {
-            showAllRaffles = !showAllRaffles;
-            loadRaffleItems();
+        function viewAllGames() {
+            showAllGames = !showAllGames;
+            loadGameItems();
         }
         
         // ================ WALLET LOGS & DEPOSITS ================
@@ -2708,15 +2862,15 @@
             database.ref('users/' + userId + '/deposits').push(deposit);
         }
         
-        // ================ RAFFLE ITEMS FUNCTIONS ================
-        function loadRaffleItems() {
+        // ================ GAME ITEMS FUNCTIONS ================
+        function loadGameItems() {
             if (!database) return;
             
-            console.log('Loading raffle items...');
+            console.log('Loading game items...');
             
-            database.ref('raffles').on('value', (snapshot) => {
+            database.ref('games').on('value', (snapshot) => {
                 const items = snapshot.val() || {};
-                const container = document.getElementById('raffle-items');
+                const container = document.getElementById('game-items');
                 const now = new Date();
                 
                 let html = '';
@@ -2729,15 +2883,15 @@
                     new Date(b.endDate) - new Date(a.endDate)
                 );
                 
-                // Show only last 3 items by default, or all if expanded or showAllRaffles is true
-                const content = document.getElementById('active-raffles-content');
+                // Show only last 3 items by default, or all if expanded or showAllGames is true
+                const content = document.getElementById('active-games-content');
                 const isExpanded = content.classList.contains('expanded');
-                const itemsToShow = (showAllRaffles || isExpanded) ? sortedItems : sortedItems.slice(0, 3);
+                const itemsToShow = (showAllGames || isExpanded) ? sortedItems : sortedItems.slice(0, 3);
                 
                 itemsToShow.forEach(item => {
                     const endDate = new Date(item.endDate);
                     const startDate = new Date(item.startDate);
-                    const raffleDate = new Date(item.raffleDate);
+                    const drawDate = new Date(item.drawDate);
                     const winnerDate = new Date(item.winnerDate);
                     const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
                     const isActive = item.status === 'active' && now >= startDate && now <= endDate;
@@ -2775,7 +2929,7 @@
                                 </div>
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
                                     <span>Draw:</span>
-                                    <span>${raffleDate.toLocaleDateString()} ${raffleDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                    <span>${drawDate.toLocaleDateString()} ${drawDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
                                 <div style="display: flex; justify-content: space-between;">
                                     <span>Winner:</span>
@@ -2784,14 +2938,14 @@
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
                                 <button class="${isActive ? 'btn-primary' : 'btn-secondary'}" style="padding: 10px 20px; font-size: 14px; width: 100%;" ${!isActive ? 'disabled' : ''}>
-                                    <i class="fas fa-play"></i> ${isActive ? 'Play Now' : 'Raffle Ended'}
+                                    <i class="fas fa-play"></i> ${isActive ? 'Play Now' : 'Game Ended'}
                                 </button>
                             </div>
                         </div>
                     `;
                 });
                 
-                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active raffles. Check back later!</p>';
+                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active games. Check back later!</p>';
                 document.getElementById('active-games-count').textContent = activeCount;
                 document.getElementById('total-bids-count').textContent = totalBids;
                 
@@ -2801,8 +2955,8 @@
                     document.getElementById('online-count').textContent = Object.keys(onlineUsers).length;
                 });
             }, (error) => {
-                console.error('Error loading raffle items:', error);
-                showNotification('Error loading raffles', 'error');
+                console.error('Error loading game items:', error);
+                showNotification('Error loading games', 'error');
             });
         }
         
@@ -2810,10 +2964,10 @@
         function openGameModal(itemId) {
             if (!database) return;
             
-            database.ref('raffles/' + itemId).once('value').then((snapshot) => {
+            database.ref('games/' + itemId).once('value').then((snapshot) => {
                 currentItem = snapshot.val();
                 if (!currentItem) {
-                    showNotification('Raffle item not found', 'error');
+                    showNotification('Game item not found', 'error');
                     return;
                 }
                 
@@ -2823,7 +2977,7 @@
                 const endDate = new Date(currentItem.endDate);
                 
                 if (now > endDate || currentItem.status === 'completed') {
-                    showNotification('This raffle has ended', 'error');
+                    showNotification('This game has ended', 'error');
                     return;
                 }
                 
@@ -2848,7 +3002,7 @@
                 document.getElementById('game-modal').classList.remove('hidden');
             }).catch(error => {
                 console.error('Error opening game modal:', error);
-                showNotification('Error loading raffle', 'error');
+                showNotification('Error loading game', 'error');
             });
         }
         
@@ -3093,12 +3247,8 @@
                 return;
             }
             
-            if (bidAmountValue < 0.001) {
-                showNotification('Bid amount must be at least 0.001', 'error');
-                return;
-            }
-            
-            // FIXED VALIDATION: Allow any number, but ensure it has exactly 3 decimal places when displayed
+            // FIXED: Allow any amount, just ensure it has 3 decimal places
+            // No minimum amount restriction
             // First, get the number as a string
             const numberString = bidNumber.toString();
             
@@ -3143,7 +3293,7 @@
             }
             
             // Check if number already exists
-            database.ref('raffles/' + currentItem.id + '/bids').once('value').then((snapshot) => {
+            database.ref('games/' + currentItem.id + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
                 const existingBid = Object.values(bids).find(bid => bid.number === correctedBidAmount);
                 
@@ -3169,7 +3319,7 @@
                 const newBalance = (currentUserData.balance || 0) - correctedBidAmount;
                 
                 const updates = {};
-                updates['raffles/' + currentItem.id + '/bids/' + bidId] = bidData;
+                updates['games/' + currentItem.id + '/bids/' + bidId] = bidData;
                 updates['users/' + currentUser.uid + '/balance'] = newBalance;
                 updates['users/' + currentUser.uid + '/totalBids'] = (currentUserData.totalBids || 0) + 1;
                 
@@ -3242,8 +3392,8 @@
             const decimalPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
             const randomNum = parseFloat(`${wholePart}.${decimalPart}`);
             
-            // Ensure it's at least 0.001
-            return Math.max(0.001, randomNum).toFixed(3);
+            // No minimum amount restriction
+            return randomNum.toFixed(3);
         }
         
         function toggleAutoBid() {
@@ -3356,7 +3506,7 @@
             }
             
             // Check existing bids for this item
-            database.ref('raffles/' + currentItem.id + '/bids').once('value').then((snapshot) => {
+            database.ref('games/' + currentItem.id + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
                 const existingNumbers = Object.values(bids).map(bid => bid.number);
                 
@@ -3403,7 +3553,7 @@
                 // Prepare updates
                 const updates = {};
                 newBids.forEach(bid => {
-                    updates['raffles/' + currentItem.id + '/bids/' + bid.key] = bid.data;
+                    updates['games/' + currentItem.id + '/bids/' + bid.key] = bid.data;
                 });
                 updates['users/' + currentUser.uid + '/balance'] = newBalance;
                 updates['users/' + currentUser.uid + '/totalBids'] = (currentUserData.totalBids || 0) + bidsPlaced;
@@ -3472,23 +3622,23 @@
         function loadUserBids() {
             if (!currentUser || !database) return;
             
-            database.ref('raffles').once('value').then((snapshot) => {
-                const raffles = snapshot.val() || {};
+            database.ref('games').once('value').then((snapshot) => {
+                const games = snapshot.val() || {};
                 const bidsList = document.getElementById('bids-list');
                 
                 let allUserBids = [];
                 
-                // Collect all bids from all raffles for this user
-                Object.entries(raffles).forEach(([raffleId, raffle]) => {
-                    const bids = raffle.bids || {};
+                // Collect all bids from all games for this user
+                Object.entries(games).forEach(([gameId, game]) => {
+                    const bids = game.bids || {};
                     Object.entries(bids).forEach(([bidId, bid]) => {
                         if (bid.userId === currentUser.uid) {
                             allUserBids.push({
                                 ...bid,
-                                raffleId: raffleId,
-                                raffleName: raffle.name,
-                                raffleStatus: raffle.status,
-                                endDate: raffle.endDate
+                                gameId: gameId,
+                                gameName: game.name,
+                                gameStatus: game.status,
+                                endDate: game.endDate
                             });
                         }
                     });
@@ -3505,13 +3655,13 @@
                 // Group bids by item
                 const bidsByItem = {};
                 allUserBids.forEach(bid => {
-                    if (!bidsByItem[bid.raffleId]) {
-                        bidsByItem[bid.raffleId] = {
-                            raffle: { name: bid.raffleName, status: bid.raffleStatus, endDate: bid.endDate },
+                    if (!bidsByItem[bid.gameId]) {
+                        bidsByItem[bid.gameId] = {
+                            game: { name: bid.gameName, status: bid.gameStatus, endDate: bid.endDate },
                             bids: []
                         };
                     }
-                    bidsByItem[bid.raffleId].bids.push(bid);
+                    bidsByItem[bid.gameId].bids.push(bid);
                 });
                 
                 // Show only last 3 items by default, or all if expanded
@@ -3520,8 +3670,8 @@
                 const itemsToShow = showAllBids || isExpanded ? Object.entries(bidsByItem) : Object.entries(bidsByItem).slice(0, 3);
                 
                 let html = '';
-                itemsToShow.forEach(([raffleId, itemData]) => {
-                    const item = itemData.raffle;
+                itemsToShow.forEach(([gameId, itemData]) => {
+                    const item = itemData.game;
                     const itemBids = itemData.bids;
                     
                     // Calculate total bid amount for this item
@@ -3549,13 +3699,13 @@
                         statusText = `<span style="color: #6c757d;">Refunded</span>`;
                     } else if (itemEnded) {
                         statusClass = 'inactive';
-                        statusText = `<span style="color: #6c757d;">Inactive (Raffle Ended)</span>`;
+                        statusText = `<span style="color: #6c757d;">Inactive (Game Ended)</span>`;
                     } else {
                         statusText = `<span style="color: #667eea;">Active</span>`;
                     }
                     
                     html += `
-                        <div class="bid-item ${statusClass}" onclick="showBidDetails('${raffleId}', '${item.name}')">
+                        <div class="bid-item ${statusClass}" onclick="showBidDetails('${gameId}', '${item.name}')">
                             <div style="display: flex; justify-content: space-between;">
                                 <strong>${item.name} ${itemEnded ? '(Ended)' : ''}</strong>
                                 <span style="color: #667eea;" class="decimal-format">₱${formatDecimal(totalBidAmount)}</span>
@@ -3583,10 +3733,10 @@
             });
         }
         
-        function showBidDetails(raffleId, raffleName) {
+        function showBidDetails(gameId, gameName) {
             if (!database) return;
             
-            database.ref('raffles/' + raffleId + '/bids').once('value').then((snapshot) => {
+            database.ref('games/' + gameId + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
                 const userBids = Object.values(bids).filter(bid => bid.userId === currentUser.uid);
                 
@@ -3602,7 +3752,7 @@
                 });
                 
                 // Update modal title
-                document.getElementById('bid-details-title').textContent = `Bid Details: ${raffleName}`;
+                document.getElementById('bid-details-title').textContent = `Bid Details: ${gameName}`;
                 document.getElementById('bid-details-total').innerHTML = `Total Bid: <span class="decimal-format">${formatCurrency(totalAmount)}</span>`;
                 
                 // Display bid numbers
@@ -3638,9 +3788,9 @@
                 return;
             }
             
-            // Get all raffles to match with wins
-            database.ref('raffles').once('value').then((snapshot) => {
-                const raffles = snapshot.val() || {};
+            // Get all games to match with wins
+            database.ref('games').once('value').then((snapshot) => {
+                const games = snapshot.val() || {};
                 
                 // Sort by date (newest first)
                 const sortedWins = [...userWins].sort((a, b) => 
@@ -3654,17 +3804,17 @@
                 
                 let html = '';
                 winsToShow.forEach(win => {
-                    const raffle = raffles[win.itemId];
-                    if (raffle) {
+                    const game = games[win.itemId];
+                    if (game) {
                         const winDate = new Date(win.winDate);
                         html += `
                             <div class="winner-item-card">
-                                <h4 style="color: #28a745;">${raffle.name}</h4>
-                                <img src="${raffle.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop'}" alt="${raffle.name}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin: 10px 0;">
+                                <h4 style="color: #28a745;">${game.name}</h4>
+                                <img src="${game.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop'}" alt="${game.name}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 8px; margin: 10px 0;">
                                 <div style="margin-top: 10px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Prize Value:</span>
-                                        <strong class="decimal-format">₱${formatDecimal(raffle.price)}</strong>
+                                        <strong class="decimal-format">₱${formatDecimal(game.price)}</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Winning Number:</span>
@@ -3754,7 +3904,7 @@
                 });
         }
         
-        // ================ SEND MONEY FUNCTIONS ================
+        // ================ SEND MONEY FUNCTIONS - FIXED ================
         function sendMoney() {
             // Set flag to prevent profile switching
             isSendingMoney = true;
@@ -3901,8 +4051,13 @@
                     
                     showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
                     
-                    // IMMEDIATELY update UI
-                    updateUI();
+                    // IMMEDIATELY update UI WITHOUT reloading user data
+                    document.getElementById('user-balance').textContent = formatDecimal(currentUserData.balance);
+                    document.getElementById('wallet-balance').textContent = formatDecimal(currentUserData.balance);
+                    document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance);
+                    document.getElementById('auto-balance').textContent = formatCurrency(currentUserData.balance);
+                    
+                    // Update bid summaries
                     updateManualBidSummary();
                     updateAutoBidSummary();
                     
@@ -3965,6 +4120,77 @@
             showNotification('Lazada transfer functionality coming soon!', 'info');
         }
         
+        // ================ CHAT FUNCTIONS ================
+        function setupChatListener() {
+            if (!currentUser || !database) return;
+            
+            // Remove existing listener if any
+            if (chatListener) {
+                chatListener();
+            }
+            
+            // Listen for chat messages
+            chatListener = database.ref('chat/messages').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
+                const messages = snapshot.val() || {};
+                const chatMessages = document.getElementById('chat-messages');
+                
+                // Convert to array and sort by timestamp
+                const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
+                
+                let html = '';
+                messagesArray.forEach(message => {
+                    const messageTime = new Date(message.timestamp);
+                    const isOwnMessage = message.userId === currentUser.uid;
+                    
+                    html += `
+                        <div class="message ${isOwnMessage ? 'sent' : 'received'}">
+                            <div class="message-sender">${message.username}</div>
+                            <div>${message.text}</div>
+                            <div class="message-time">${messageTime.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                        </div>
+                    `;
+                });
+                
+                chatMessages.innerHTML = html || '<div style="text-align: center; color: #999; padding: 20px;">No messages yet. Start the conversation!</div>';
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+        
+        function sendChatMessage() {
+            if (!currentUser || !currentUserData || !database) return;
+            
+            const chatInput = document.getElementById('chat-input');
+            const messageText = chatInput.value.trim();
+            
+            if (!messageText) {
+                showNotification('Please enter a message', 'error');
+                return;
+            }
+            
+            if (messageText.length > 200) {
+                showNotification('Message too long (max 200 characters)', 'error');
+                return;
+            }
+            
+            const messageData = {
+                userId: currentUser.uid,
+                username: currentUserData.username || currentUser.email.split('@')[0],
+                text: messageText,
+                timestamp: Date.now()
+            };
+            
+            database.ref('chat/messages').push(messageData)
+                .then(() => {
+                    chatInput.value = '';
+                    chatInput.focus();
+                })
+                .catch((error) => {
+                    showNotification('Error sending message: ' + getFirebaseError(error), 'error');
+                });
+        }
+        
         // ================ ADMIN FUNCTIONS ================
         function loadAdminData() {
             if (!database) return;
@@ -4008,48 +4234,48 @@
                 loadAdminUsersList(users);
             });
             
-            // Load raffles and calculate totals
-            database.ref('raffles').on('value', (snapshot) => {
-                const raffles = snapshot.val() || {};
+            // Load games and calculate totals
+            database.ref('games').on('value', (snapshot) => {
+                const games = snapshot.val() || {};
                 let activeCount = 0;
                 let totalBids = 0;
                 let moneyPot = 0;
                 let serviceFees = 0;
                 
-                Object.values(raffles).forEach(raffle => {
+                Object.values(games).forEach(game => {
                     const now = new Date();
-                    const endDate = new Date(raffle.endDate);
-                    if (raffle.status === 'active' && now <= endDate) {
+                    const endDate = new Date(game.endDate);
+                    if (game.status === 'active' && now <= endDate) {
                         activeCount++;
                     }
                     
-                    const bids = raffle.bids || {};
+                    const bids = game.bids || {};
                     totalBids += Object.keys(bids).length;
                     
-                    if (raffle.status === 'completed') {
+                    if (game.status === 'completed') {
                         // Calculate money pot from winner's bids
-                        if (raffle.winner) {
-                            const winnerBids = Object.values(bids).filter(bid => bid.userId === raffle.winner.userId);
+                        if (game.winner) {
+                            const winnerBids = Object.values(bids).filter(bid => bid.userId === game.winner.userId);
                             winnerBids.forEach(bid => {
                                 moneyPot += parseFloat(bid.amount || 0);
                             });
                         }
                         
                         // Calculate service fees collected
-                        serviceFees += parseFloat(raffle.serviceFeesCollected || 0);
+                        serviceFees += parseFloat(game.serviceFeesCollected || 0);
                     }
                 });
                 
-                document.getElementById('admin-active-raffles').textContent = activeCount;
+                document.getElementById('admin-active-games').textContent = activeCount;
                 document.getElementById('admin-total-bids').textContent = totalBids;
                 document.getElementById('total-pot-money').textContent = formatCurrency(moneyPot);
                 document.getElementById('total-fees').textContent = formatCurrency(serviceFees);
                 
                 // Load admin items list
-                loadAdminItemsList(raffles);
+                loadAdminItemsList(games);
                 
                 // Load winners list with user info
-                loadAdminWinnersList(raffles);
+                loadAdminWinnersList(games);
             });
         }
         
@@ -4083,11 +4309,11 @@
             usersList.innerHTML = usersHtml || '<p>No users found</p>';
         }
         
-        function loadAdminWinnersList(raffles) {
+        function loadAdminWinnersList(games) {
             const winnersList = document.getElementById('winners-list');
             let winnersHtml = '';
             
-            const completedItems = Object.values(raffles).filter(item => item.winner);
+            const completedItems = Object.values(games).filter(item => item.winner);
             const sortedWinners = completedItems.sort((a, b) => 
                 new Date(b.winner.announcedAt || b.winnerDate) - new Date(a.winner.announcedAt || a.winnerDate)
             );
@@ -4139,11 +4365,11 @@
             });
         }
         
-        function loadAdminItemsList(raffles) {
+        function loadAdminItemsList(games) {
             const itemsList = document.getElementById('admin-items-list');
             let itemsHtml = '';
             
-            const itemsArray = Object.entries(raffles).map(([id, item]) => ({ id, ...item }));
+            const itemsArray = Object.entries(games).map(([id, item]) => ({ id, ...item }));
             const sortedItems = itemsArray.sort((a, b) => 
                 new Date(b.endDate) - new Date(a.endDate)
             );
@@ -4172,7 +4398,7 @@
                             </div>
                         </div>
                         <div style="margin-top: 10px; display: flex; gap: 5px;">
-                            <button onclick="runItemRaffle('${item.id}')" class="${isEnded ? 'btn-disabled' : 'btn-success'}" style="padding: 5px 10px; font-size: 12px; background: ${isEnded ? '#6c757d' : '#28a745'}; color: white; border: none; border-radius: 5px; cursor: ${isEnded ? 'not-allowed' : 'pointer'};" ${isEnded ? 'disabled' : ''}>
+                            <button onclick="runItemDraw('${item.id}')" class="${isEnded ? 'btn-disabled' : 'btn-success'}" style="padding: 5px 10px; font-size: 12px; background: ${isEnded ? '#6c757d' : '#28a745'}; color: white; border: none; border-radius: 5px; cursor: ${isEnded ? 'not-allowed' : 'pointer'};" ${isEnded ? 'disabled' : ''}>
                                 ${isEnded ? 'Ended' : 'Run Draw Now'}
                             </button>
                             <button onclick="deleteItem('${item.id}')" class="btn-secondary" style="padding: 5px 10px; font-size: 12px; background: #dc3545; color: white; border: none; border-radius: 5px; cursor: pointer;">
@@ -4183,7 +4409,7 @@
                 `;
             });
             
-            itemsList.innerHTML = itemsHtml || '<p>No raffle items</p>';
+            itemsList.innerHTML = itemsHtml || '<p>No game items</p>';
         }
         
         function showAddItemModal() {
@@ -4200,7 +4426,7 @@
             document.getElementById('item-image-url').value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
             document.getElementById('start-date').value = formatDateTime(now);
             document.getElementById('end-date').value = formatDateTime(nextWeek);
-            document.getElementById('raffle-date').value = formatDateTime(nextWeek);
+            document.getElementById('draw-date').value = formatDateTime(nextWeek);
             document.getElementById('winner-date-input').value = formatDateTime(weekAfter);
             
             document.getElementById('add-item-modal').classList.remove('hidden');
@@ -4212,10 +4438,10 @@
             const image = document.getElementById('item-image-url').value.trim();
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
-            const raffleDate = document.getElementById('raffle-date').value;
+            const drawDate = document.getElementById('draw-date').value;
             const winnerDate = document.getElementById('winner-date-input').value;
             
-            if (!name || isNaN(price) || !image || !startDate || !endDate || !raffleDate || !winnerDate) {
+            if (!name || isNaN(price) || !image || !startDate || !endDate || !drawDate || !winnerDate) {
                 showNotification('Please fill all fields', 'error');
                 return;
             }
@@ -4225,7 +4451,7 @@
                 return;
             }
             
-            const itemId = database.ref().child('raffles').push().key;
+            const itemId = database.ref().child('games').push().key;
             
             const newItem = {
                 id: itemId,
@@ -4235,7 +4461,7 @@
                 price: price,
                 startDate: startDate,
                 endDate: endDate,
-                raffleDate: raffleDate,
+                drawDate: drawDate,
                 winnerDate: winnerDate,
                 status: "active",
                 bids: {},
@@ -4243,9 +4469,9 @@
                 serviceFeesCollected: 0.000
             };
             
-            database.ref('raffles/' + itemId).set(newItem)
+            database.ref('games/' + itemId).set(newItem)
                 .then(() => {
-                    showNotification(`Added new raffle item: ${name}`, 'success');
+                    showNotification(`Added new game item: ${name}`, 'success');
                     closeModal();
                 })
                 .catch((error) => {
@@ -4253,35 +4479,35 @@
                 });
         }
         
-        function createDemoRaffles() {
+        function createDemoGames() {
             if (!database) {
                 showNotification('Database not available', 'error');
                 return;
             }
             
-            const demoRaffles = {
-                raffle1: {
+            const demoGames = {
+                game1: {
                     name: "iPhone 15 Pro",
                     description: "Brand new iPhone 15 Pro 256GB",
                     image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
                     price: 69999.000,
                     startDate: new Date().toISOString(),
                     endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    raffleDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
                     winnerDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
                     status: "active",
                     bids: {},
                     winner: null,
                     serviceFeesCollected: 0.000
                 },
-                raffle2: {
+                game2: {
                     name: "Samsung Galaxy S23",
                     description: "Latest Samsung flagship phone",
                     image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
                     price: 45999.000,
                     startDate: new Date().toISOString(),
                     endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    raffleDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    drawDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
                     winnerDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
                     status: "active",
                     bids: {},
@@ -4290,25 +4516,25 @@
                 }
             };
             
-            database.ref('raffles').set(demoRaffles)
+            database.ref('games').set(demoGames)
                 .then(() => {
-                    showNotification('Demo raffles created successfully!', 'success');
+                    showNotification('Demo games created successfully!', 'success');
                 })
                 .catch((error) => {
-                    showNotification('Error creating demo raffles: ' + getFirebaseError(error), 'error');
+                    showNotification('Error creating demo games: ' + getFirebaseError(error), 'error');
                 });
         }
         
-        function runItemRaffle(itemId) {
+        function runItemDraw(itemId) {
             if (!database) {
                 showNotification('Database not available', 'error');
                 return;
             }
             
-            database.ref('raffles/' + itemId).once('value').then((snapshot) => {
+            database.ref('games/' + itemId).once('value').then((snapshot) => {
                 const item = snapshot.val();
                 if (!item) {
-                    showNotification('Raffle item not found', 'error');
+                    showNotification('Game item not found', 'error');
                     return;
                 }
                 
@@ -4316,7 +4542,7 @@
                 const endDate = new Date(item.endDate);
                 
                 if (now < endDate) {
-                    if (!confirm('Raffle has not ended yet. Are you sure you want to run the draw now?')) {
+                    if (!confirm('Game has not ended yet. Are you sure you want to run the draw now?')) {
                         return;
                     }
                 }
@@ -4388,7 +4614,7 @@
                             refundAmount);
                         
                         // Update service fees
-                        updates['raffles/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(feeAmount);
+                        updates['games/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(feeAmount);
                         
                         totalRefunded += refundAmount;
                         totalFees += feeAmount;
@@ -4396,12 +4622,12 @@
                     
                     // Mark all bids as refunded
                     bidArray.forEach(bid => {
-                        updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
+                        updates['games/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
                     });
                     
-                    // Update raffle status
-                    updates['raffles/' + itemId + '/status'] = 'completed';
-                    updates['raffles/' + itemId + '/noWinner'] = true;
+                    // Update game status
+                    updates['games/' + itemId + '/status'] = 'completed';
+                    updates['games/' + itemId + '/noWinner'] = true;
                     
                     return database.ref().update(updates)
                         .then(() => {
@@ -4415,14 +4641,14 @@
                     const updates = {};
                     
                     // Mark winner
-                    updates['raffles/' + itemId + '/winner'] = {
+                    updates['games/' + itemId + '/winner'] = {
                         userId: winningBid.userId,
                         username: winningBid.username,
                         winningNumber: winningBid.number,
                         announced: true,
                         announcedAt: new Date().toISOString()
                     };
-                    updates['raffles/' + itemId + '/status'] = 'completed';
+                    updates['games/' + itemId + '/status'] = 'completed';
                     
                     // Add win to user's wins array
                     const winEntry = {
@@ -4440,7 +4666,7 @@
                     });
                     
                     // Update winning bid status
-                    updates['raffles/' + itemId + '/bids/' + winningBid.id + '/status'] = 'won';
+                    updates['games/' + itemId + '/bids/' + winningBid.id + '/status'] = 'won';
                     
                     // Add wallet log for win
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
@@ -4493,7 +4719,7 @@
                             refundAmount);
                         
                         // Update service fees
-                        updates['raffles/' + itemId + '/serviceFeesCollected'] = 
+                        updates['games/' + itemId + '/serviceFeesCollected'] = 
                             firebase.database.ServerValue.increment(feeAmount);
                         
                         totalRefunded += refundAmount;
@@ -4503,7 +4729,7 @@
                     // Mark losing bids as refunded
                     bidArray.forEach(bid => {
                         if (bid.userId !== winningBid.userId) {
-                            updates['raffles/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
+                            updates['games/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
                         }
                     });
                     
@@ -4514,20 +4740,20 @@
                 }
             })
             .catch(error => {
-                console.error('Error running raffle:', error);
-                showNotification('Error running raffle: ' + getFirebaseError(error), 'error');
+                console.error('Error running game draw:', error);
+                showNotification('Error running game draw: ' + getFirebaseError(error), 'error');
             });
         }
         
         function deleteItem(itemId) {
-            if (!confirm('Are you sure you want to delete this raffle item?')) return;
+            if (!confirm('Are you sure you want to delete this game item?')) return;
             
             if (!database) {
                 showNotification('Database not available', 'error');
                 return;
             }
             
-            database.ref('raffles/' + itemId).remove()
+            database.ref('games/' + itemId).remove()
                 .then(() => {
                     showNotification('Item deleted successfully', 'success');
                 })
@@ -4551,8 +4777,8 @@
                 .then(() => {
                     showNotification('All data has been reset successfully', 'success');
                     
-                    // Create demo raffles
-                    createDemoRaffles();
+                    // Create demo games
+                    createDemoGames();
                 })
                 .catch(error => {
                     showNotification('Error resetting data: ' + getFirebaseError(error), 'error');
@@ -4565,18 +4791,18 @@
                 return;
             }
             
-            database.ref('raffles').once('value').then((snapshot) => {
-                const raffles = snapshot.val() || {};
+            database.ref('games').once('value').then((snapshot) => {
+                const games = snapshot.val() || {};
                 const now = new Date();
                 let drawsRun = 0;
                 
-                Object.entries(raffles).forEach(([itemId, item]) => {
+                Object.entries(games).forEach(([itemId, item]) => {
                     if (item.status === 'active') {
-                        const raffleDate = new Date(item.raffleDate);
+                        const drawDate = new Date(item.drawDate);
                         
-                        // Check if raffle date/time has passed
-                        if (now >= raffleDate) {
-                            runItemRaffle(itemId);
+                        // Check if draw date/time has passed
+                        if (now >= drawDate) {
+                            runItemDraw(itemId);
                             drawsRun++;
                         }
                     }
@@ -4602,7 +4828,7 @@
             if (!database) return;
             
             Promise.all([
-                database.ref('raffles/' + itemId).once('value'),
+                database.ref('games/' + itemId).once('value'),
                 database.ref('users/' + winnerUserId).once('value')
             ])
             .then(([itemSnapshot, userSnapshot]) => {
@@ -4676,7 +4902,7 @@
                 setupAuthListener();
             }, 1500);
             
-            showNotification('Welcome to Raffle Game! Register or login to start playing.', 'info');
+            showNotification('Welcome to Centavo Number Game! Register or login to start playing.', 'info');
             
             // Start auto draw checker
             setInterval(() => {
