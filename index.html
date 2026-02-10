@@ -2784,54 +2784,47 @@
         }
         
         function addNumber(num) {
-            let currentNum = bidNumber;
-            
-            // Remove trailing .000 if present (for display purposes only)
-            if (currentNum.endsWith('.000') && currentNum !== '0.000') {
-                currentNum = currentNum.replace('.000', '');
-            }
-            
-            // Handle decimal point
+            // Handle decimal point separately
             if (num === '.') {
-                // If we already have a decimal point, do nothing
-                if (currentNum.includes('.')) {
-                    return;
+                // If we don't have a decimal point yet, add it
+                if (!bidNumber.includes('.')) {
+                    // If it's "0.000" or "0", change to "0."
+                    if (bidNumber === '0.000' || bidNumber === '0') {
+                        bidNumber = '0.';
+                    } else {
+                        // Add decimal to existing number
+                        bidNumber = bidNumber.replace('.000', '') + '.';
+                    }
+                    document.getElementById('bid-number').value = bidNumber;
+                    document.getElementById('bid-number').classList.add('has-value');
+                    updateManualBidSummary();
                 }
-                
-                // If it's just "0", convert to "0."
-                if (currentNum === '0') {
-                    bidNumber = '0.';
-                } else {
-                    // Add decimal point to existing number
-                    bidNumber = currentNum + '.';
-                }
-                
-                document.getElementById('bid-number').value = bidNumber;
-                document.getElementById('bid-number').classList.add('has-value');
-                updateManualBidSummary();
                 return;
             }
             
             // Handle number input (0-9)
-            if (currentNum === '0.000' || currentNum === '0') {
-                // Starting fresh - replace 0 with the new number
+            // Remove .000 display formatting if present
+            let currentDisplay = bidNumber;
+            if (bidNumber.endsWith('.000') && bidNumber !== '0.000') {
+                currentDisplay = bidNumber.replace('.000', '');
+            }
+            
+            if (currentDisplay === '0' || currentDisplay === '0.000') {
+                // Starting with 0 - replace it with the new number
                 bidNumber = num;
-            } else if (currentNum.includes('.')) {
-                // We have a decimal point
-                let parts = currentNum.split('.');
-                let wholePart = parts[0];
-                let decimalPart = parts[1] || '';
+            } else if (currentDisplay.includes('.')) {
+                // We have a decimal point in the display
+                const parts = currentDisplay.split('.');
+                const decimalPart = parts[1];
                 
-                // Allow maximum 3 digits after decimal
+                // Check if we already have 3 decimal digits
                 if (decimalPart.length < 3) {
-                    bidNumber = wholePart + '.' + decimalPart + num;
-                } else {
-                    // Already have 3 decimal digits, ignore new input
-                    return;
+                    bidNumber = parts[0] + '.' + decimalPart + num;
                 }
+                // If already 3 digits, do nothing (don't add more)
             } else {
-                // No decimal yet, add to whole number part
-                bidNumber = currentNum + num;
+                // No decimal point yet, add to whole number
+                bidNumber = currentDisplay + num;
             }
             
             // Format for display
@@ -2839,30 +2832,35 @@
         }
         
         function formatBidNumberDisplay() {
-            if (bidNumber.includes('.')) {
-                let parts = bidNumber.split('.');
+            let displayValue = bidNumber;
+            
+            // Ensure proper formatting
+            if (displayValue.includes('.')) {
+                const parts = displayValue.split('.');
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Pad decimal part to exactly 3 digits
-                while (decimalPart.length < 3) {
-                    decimalPart += '0';
-                }
-                
-                // Ensure exactly 3 decimal digits
+                // Pad or truncate decimal part to exactly 3 digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
+                } else {
+                    while (decimalPart.length < 3) {
+                        decimalPart += '0';
+                    }
                 }
                 
-                bidNumber = wholePart + '.' + decimalPart;
+                displayValue = wholePart + '.' + decimalPart;
             } else {
                 // No decimal point, add .000 for display
-                bidNumber = bidNumber + '.000';
+                displayValue = displayValue + '.000';
             }
             
-            document.getElementById('bid-number').value = bidNumber;
+            // Update the display
+            document.getElementById('bid-number').value = displayValue;
             
-            if (parseFloat(bidNumber) > 0) {
+            // Check if valid number
+            const numValue = parseFloat(displayValue);
+            if (numValue > 0) {
                 document.getElementById('bid-number').classList.add('has-value');
             } else {
                 document.getElementById('bid-number').classList.remove('has-value');
@@ -2872,8 +2870,8 @@
         }
         
         function clearNumber() {
-            bidNumber = '0.000';
-            document.getElementById('bid-number').value = bidNumber;
+            bidNumber = '0';
+            document.getElementById('bid-number').value = '0.000';
             document.getElementById('bid-number').classList.remove('has-value');
             updateManualBidSummary();
         }
