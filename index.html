@@ -364,6 +364,7 @@
         .tab-content {
             padding: 20px;
             display: none;
+            min-height: 500px; /* Fixed: Added minimum height for consistency */
         }
         
         .tab-content.active {
@@ -1074,6 +1075,64 @@
             background: #764ba2;
         }
         
+        /* ===== CHAT ONLINE USERS STYLES ===== */
+        .chat-wrapper {
+            display: flex;
+            gap: 15px;
+            height: 500px;
+        }
+        
+        .online-users-sidebar {
+            width: 200px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        
+        .online-users-sidebar h4 {
+            color: #667eea;
+            margin-bottom: 15px;
+            text-align: center;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .online-user-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            margin-bottom: 8px;
+            background: white;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+            transition: all 0.2s;
+        }
+        
+        .online-user-item:hover {
+            background: #e9ecef;
+            transform: translateX(5px);
+        }
+        
+        .user-status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+            animation: pulse 2s infinite;
+        }
+        
+        .user-username {
+            font-weight: 500;
+            font-size: 14px;
+            color: #333;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             body {
@@ -1108,6 +1167,21 @@
             
             .admin-stats-4 {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .chat-wrapper {
+                flex-direction: column;
+                height: auto;
+            }
+            
+            .online-users-sidebar {
+                width: 100%;
+                max-height: 150px;
+                order: -1;
+            }
+            
+            .chat-container {
+                height: 400px;
             }
         }
     </style>
@@ -1309,21 +1383,34 @@
                 <div>💬 Chat with other players in real-time!</div>
             </div>
             
-            <div class="chat-container">
-                <div class="chat-header">
-                    <i class="fas fa-comments"></i> Global Chat Room
-                </div>
-                <div class="chat-messages" id="chat-messages">
-                    <!-- Chat messages will appear here -->
-                    <div style="text-align: center; color: #999; padding: 20px;">
-                        Loading chat messages...
+            <div class="chat-wrapper">
+                <!-- Online Users Sidebar -->
+                <div class="online-users-sidebar">
+                    <h4><i class="fas fa-users"></i> Online Users</h4>
+                    <div id="online-users-list">
+                        <div style="text-align: center; color: #999; padding: 20px;">
+                            Loading online users...
+                        </div>
                     </div>
                 </div>
-                <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="chat-input" placeholder="Type your message here..." maxlength="200">
-                    <button class="chat-send-btn" onclick="sendChatMessage()">
-                        <i class="fas fa-paper-plane"></i>
-                    </button>
+                
+                <!-- Chat Container -->
+                <div class="chat-container" style="flex: 1;">
+                    <div class="chat-header">
+                        <i class="fas fa-comments"></i> Global Chat Room
+                    </div>
+                    <div class="chat-messages" id="chat-messages">
+                        <!-- Chat messages will appear here -->
+                        <div style="text-align: center; color: #999; padding: 20px;">
+                            Loading chat messages...
+                        </div>
+                    </div>
+                    <div class="chat-input-container">
+                        <input type="text" class="chat-input" id="chat-input" placeholder="Type your message here..." maxlength="200">
+                        <button class="chat-send-btn" onclick="sendChatMessage()">
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -2070,6 +2157,36 @@
         let showAllGames = false;
         let isSendingMoney = false;
         let chatListener = null;
+        let onlineUsersListener = null;
+        let idleTimer = null;
+        const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+        
+        // ================ IDLE LOGOUT SYSTEM ================
+        function resetIdleTimer() {
+            if (idleTimer) {
+                clearTimeout(idleTimer);
+            }
+            
+            // Set idle timer for 5 minutes
+            idleTimer = setTimeout(() => {
+                if (currentUser) {
+                    console.log('🕒 User idle for 5 minutes, logging out...');
+                    logout();
+                    showNotification('You have been logged out due to inactivity. Please login again.', 'warning');
+                }
+            }, IDLE_TIMEOUT);
+        }
+        
+        function setupIdleListener() {
+            // Reset timer on user activity
+            document.addEventListener('mousemove', resetIdleTimer);
+            document.addEventListener('keypress', resetIdleTimer);
+            document.addEventListener('click', resetIdleTimer);
+            document.addEventListener('scroll', resetIdleTimer);
+            
+            // Start the timer
+            resetIdleTimer();
+        }
         
         // ================ CONNECTION MANAGEMENT ================
         function updateConnectionStatus(connected) {
@@ -2114,6 +2231,7 @@
             userStatusRef.set({
                 uid: currentUser.uid,
                 email: currentUser.email,
+                username: currentUserData?.username || currentUser.email.split('@')[0],
                 lastSeen: firebase.database.ServerValue.TIMESTAMP,
                 status: 'online'
             }).catch(err => {
@@ -2292,6 +2410,9 @@
                     // Set user as online
                     setUserOnlineStatus();
                     
+                    // Setup idle logout timer
+                    setupIdleListener();
+                    
                     showNotification('✅ Login successful!', 'success');
                     
                     // Load user data immediately
@@ -2305,6 +2426,12 @@
         }
         
         function logout() {
+            // Clear idle timer
+            if (idleTimer) {
+                clearTimeout(idleTimer);
+                idleTimer = null;
+            }
+            
             if (currentUser && database) {
                 database.ref('online/' + currentUser.uid).remove();
             }
@@ -2313,6 +2440,12 @@
             if (chatListener) {
                 chatListener();
                 chatListener = null;
+            }
+            
+            // Remove online users listener
+            if (onlineUsersListener) {
+                onlineUsersListener();
+                onlineUsersListener = null;
             }
             
             if (auth) {
@@ -2397,6 +2530,7 @@
                         loadUserBids();
                         loadUserWins();
                         setupChatListener();
+                        loadOnlineUsers();
                     }
                 } else {
                     // Create user data if it doesn't exist
@@ -2434,6 +2568,7 @@
                                 loadUserBids();
                                 loadUserWins();
                                 setupChatListener();
+                                loadOnlineUsers();
                             }
                         })
                         .catch(error => {
@@ -2508,8 +2643,10 @@
             // Initialize all collapsible sections as expanded
             initializeCollapsibleSections();
             
-            // Show wallet tab by default
-            showTab('wallet');
+            // Show wallet tab by default (FIXED: Issue #3)
+            setTimeout(() => {
+                showTab('wallet');
+            }, 100);
         }
         
         function showAdminDashboard() {
@@ -2547,8 +2684,15 @@
                 content.classList.remove('active');
             });
             
-            document.querySelector(`[onclick="showTab('${tabName}')"]`).classList.add('active');
-            document.getElementById(`${tabName}-tab`).classList.add('active');
+            const tabButton = document.querySelector(`[onclick="showTab('${tabName}')"]`);
+            if (tabButton) {
+                tabButton.classList.add('active');
+            }
+            
+            const tabContent = document.getElementById(`${tabName}-tab`);
+            if (tabContent) {
+                tabContent.classList.add('active');
+            }
             
             // Force refresh when switching tabs
             if (tabName === 'wallet') {
@@ -2564,7 +2708,9 @@
             } else if (tabName === 'chat') {
                 // Chat is handled by real-time listener
                 const chatMessages = document.getElementById('chat-messages');
-                chatMessages.scrollTop = chatMessages.scrollHeight;
+                if (chatMessages) {
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
             }
         }
         
@@ -2628,6 +2774,8 @@
             
             const deposits = currentUserData.deposits || {};
             const depositsList = document.getElementById('deposits-list');
+            
+            if (!depositsList) return;
             
             // Filter to ONLY show Cash In deposits (not refunds or transfers)
             const cashInDeposits = Object.values(deposits).filter(deposit => 
@@ -2698,6 +2846,8 @@
             
             const logs = currentUserData.walletLogs || [];
             const logsList = document.getElementById('wallet-logs-list');
+            
+            if (!logsList) return;
             
             if (logs.length === 0) {
                 logsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No wallet activity yet</p>';
@@ -2873,6 +3023,8 @@
                 const container = document.getElementById('game-items');
                 const now = new Date();
                 
+                if (!container) return;
+                
                 let html = '';
                 let activeCount = 0;
                 let totalBids = 0;
@@ -2885,7 +3037,7 @@
                 
                 // Show only last 3 items by default, or all if expanded or showAllGames is true
                 const content = document.getElementById('active-games-content');
-                const isExpanded = content.classList.contains('expanded');
+                const isExpanded = content ? content.classList.contains('expanded') : false;
                 const itemsToShow = (showAllGames || isExpanded) ? sortedItems : sortedItems.slice(0, 3);
                 
                 itemsToShow.forEach(item => {
@@ -2946,13 +3098,18 @@
                 });
                 
                 container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No active games. Check back later!</p>';
-                document.getElementById('active-games-count').textContent = activeCount;
-                document.getElementById('total-bids-count').textContent = totalBids;
+                
+                const activeGamesCount = document.getElementById('active-games-count');
+                const totalBidsCount = document.getElementById('total-bids-count');
+                
+                if (activeGamesCount) activeGamesCount.textContent = activeCount;
+                if (totalBidsCount) totalBidsCount.textContent = totalBids;
                 
                 // Update online users count
                 database.ref('online').once('value').then(snapshot => {
                     const onlineUsers = snapshot.val() || {};
-                    document.getElementById('online-count').textContent = Object.keys(onlineUsers).length;
+                    const onlineCount = document.getElementById('online-count');
+                    if (onlineCount) onlineCount.textContent = Object.keys(onlineUsers).length;
                 });
             }, (error) => {
                 console.error('Error loading game items:', error);
@@ -3148,30 +3305,39 @@
             const balance = currentUserData.balance || 0;
             const afterBid = balance - bidAmountValue;
             
-            document.getElementById('manual-bid-amount').textContent = formatCurrency(bidAmountValue);
-            document.getElementById('manual-after-bid').textContent = formatCurrency(afterBid);
+            const manualBidAmount = document.getElementById('manual-bid-amount');
+            const manualAfterBid = document.getElementById('manual-after-bid');
+            
+            if (manualBidAmount) manualBidAmount.textContent = formatCurrency(bidAmountValue);
+            if (manualAfterBid) manualAfterBid.textContent = formatCurrency(afterBid);
             
             const feeWarning = document.getElementById('manual-fee-warning');
             const placeGameBtn = document.getElementById('manual-place-game-btn');
             
             if (afterBid < 0) {
-                document.getElementById('manual-after-bid').style.color = '#f44336';
-                feeWarning.textContent = 'Insufficient balance!';
-                placeGameBtn.disabled = true;
-                placeGameBtn.style.opacity = '0.6';
-                placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> INSUFFICIENT BALANCE';
+                if (manualAfterBid) manualAfterBid.style.color = '#f44336';
+                if (feeWarning) feeWarning.textContent = 'Insufficient balance!';
+                if (placeGameBtn) {
+                    placeGameBtn.disabled = true;
+                    placeGameBtn.style.opacity = '0.6';
+                    placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> INSUFFICIENT BALANCE';
+                }
             } else if (bidAmountValue <= 0) {
-                document.getElementById('manual-after-bid').style.color = '#333';
-                feeWarning.textContent = 'Enter a valid bid amount';
-                placeGameBtn.disabled = true;
-                placeGameBtn.style.opacity = '0.6';
-                placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> ENTER BID AMOUNT';
+                if (manualAfterBid) manualAfterBid.style.color = '#333';
+                if (feeWarning) feeWarning.textContent = 'Enter a valid bid amount';
+                if (placeGameBtn) {
+                    placeGameBtn.disabled = true;
+                    placeGameBtn.style.opacity = '0.6';
+                    placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> ENTER BID AMOUNT';
+                }
             } else {
-                document.getElementById('manual-after-bid').style.color = '#333';
-                feeWarning.textContent = '';
-                placeGameBtn.disabled = false;
-                placeGameBtn.style.opacity = '1';
-                placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
+                if (manualAfterBid) manualAfterBid.style.color = '#333';
+                if (feeWarning) feeWarning.textContent = '';
+                if (placeGameBtn) {
+                    placeGameBtn.disabled = false;
+                    placeGameBtn.style.opacity = '1';
+                    placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
+                }
             }
         }
         
@@ -3180,7 +3346,8 @@
             
             const balance = currentUserData.balance || 0;
             
-            document.getElementById('auto-balance').textContent = formatCurrency(balance);
+            const autoBalance = document.getElementById('auto-balance');
+            if (autoBalance) autoBalance.textContent = formatCurrency(balance);
             
             // Calculate total auto bid amount
             let totalAutoBid = 0;
@@ -3190,18 +3357,23 @@
             
             const afterAutoBid = balance - totalAutoBid;
             
-            document.getElementById('auto-total-bid').textContent = formatCurrency(totalAutoBid);
-            document.getElementById('auto-after-bid').textContent = formatCurrency(afterAutoBid);
+            const autoTotalBid = document.getElementById('auto-total-bid');
+            const autoAfterBid = document.getElementById('auto-after-bid');
+            
+            if (autoTotalBid) autoTotalBid.textContent = formatCurrency(totalAutoBid);
+            if (autoAfterBid) autoAfterBid.textContent = formatCurrency(afterAutoBid);
             
             const feeWarning = document.getElementById('auto-fee-warning');
             const placeGameBtn = document.getElementById('auto-place-game-btn');
             
             if (autoBidNumbers.length === 0) {
-                document.getElementById('auto-after-bid').style.color = '#333';
-                feeWarning.textContent = 'Click "Start Auto Bidding" to generate numbers';
-                placeGameBtn.disabled = true;
-                placeGameBtn.style.opacity = '0.6';
-                placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> GENERATE NUMBERS FIRST';
+                if (autoAfterBid) autoAfterBid.style.color = '#333';
+                if (feeWarning) feeWarning.textContent = 'Click "Start Auto Bidding" to generate numbers';
+                if (placeGameBtn) {
+                    placeGameBtn.disabled = true;
+                    placeGameBtn.style.opacity = '0.6';
+                    placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> GENERATE NUMBERS FIRST';
+                }
             } else if (afterAutoBid < 0) {
                 // ADJUSTMENT: Remove random numbers until balance is positive
                 while (afterAutoBid < 0 && autoBidNumbers.length > 0) {
@@ -3214,16 +3386,20 @@
                 updateAutoBidNumbersDisplay();
                 updateAutoBidSummary(); // Recursive call to update
             } else {
-                document.getElementById('auto-after-bid').style.color = '#333';
-                feeWarning.textContent = '';
-                placeGameBtn.disabled = false;
-                placeGameBtn.style.opacity = '1';
-                placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+                if (autoAfterBid) autoAfterBid.style.color = '#333';
+                if (feeWarning) feeWarning.textContent = '';
+                if (placeGameBtn) {
+                    placeGameBtn.disabled = false;
+                    placeGameBtn.style.opacity = '1';
+                    placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+                }
             }
         }
         
         function updateAutoBidNumbersDisplay() {
             const autoNumbersGrid = document.getElementById('auto-numbers-grid');
+            if (!autoNumbersGrid) return;
+            
             autoNumbersGrid.innerHTML = '';
             
             autoBidNumbers.forEach((num, index) => {
@@ -3234,8 +3410,9 @@
                 autoNumbersGrid.appendChild(badge);
             });
             
-            if (autoBidNumbers.length > 0) {
-                document.getElementById('auto-numbers-display').style.display = 'block';
+            const autoNumbersDisplay = document.getElementById('auto-numbers-display');
+            if (autoNumbersDisplay) {
+                autoNumbersDisplay.style.display = autoBidNumbers.length > 0 ? 'block' : 'none';
             }
         }
         
@@ -3334,20 +3511,24 @@
                 
                 // Animate button
                 const placeGameBtn = document.getElementById('manual-place-game-btn');
-                placeGameBtn.classList.add('placed');
-                placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
+                if (placeGameBtn) {
+                    placeGameBtn.classList.add('placed');
+                    placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
+                }
                 
                 // Add wallet log for bid
                 addWalletLog(currentUser.uid, 'bid', `Bid placed on ${currentItem.name}`, -correctedBidAmount);
                 
                 const statusDiv = document.getElementById('game-status');
-                statusDiv.innerHTML = `
-                    <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
-                        <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
-                        <p>Bid Number/Amount: <strong>${formatCurrency(correctedBidAmount)}</strong></p>
-                        <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(currentUserData.balance)}</strong></p>
-                    </div>
-                `;
+                if (statusDiv) {
+                    statusDiv.innerHTML = `
+                        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
+                            <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
+                            <p>Bid Number/Amount: <strong>${formatCurrency(correctedBidAmount)}</strong></p>
+                            <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(currentUserData.balance)}</strong></p>
+                        </div>
+                    `;
+                }
                 
                 // Update ALL UI elements
                 updateUI(); // This updates the main wallet balance
@@ -3355,7 +3536,7 @@
                 updateAutoBidSummary(); // This updates the auto bid section
                 
                 // FORCE REFRESH WALLET LOGS AND DEPOSITS
-                if (document.getElementById('wallet-tab').classList.contains('active')) {
+                if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
                     loadDeposits();
                 }
@@ -3365,12 +3546,16 @@
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
-                    placeGameBtn.classList.remove('placed');
-                    placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
+                    if (placeGameBtn) {
+                        placeGameBtn.classList.remove('placed');
+                        placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
+                    }
                     
                     // Clear status after 3 seconds
                     setTimeout(() => {
-                        statusDiv.innerHTML = '';
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '';
+                        }
                     }, 3000);
                 }, 2000);
             })
@@ -3411,9 +3596,13 @@
                 }
                 
                 isAutoBidding = true;
-                autoBidBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Generating...';
-                autoBidBtn.disabled = true;
-                autoBidStatus.innerHTML = `<span style="color: #28a745;"><i class="fas fa-spinner fa-spin"></i> Generating random numbers...</span>`;
+                if (autoBidBtn) {
+                    autoBidBtn.innerHTML = '<i class="fas fa-sync-alt fa-spin"></i> Generating...';
+                    autoBidBtn.disabled = true;
+                }
+                if (autoBidStatus) {
+                    autoBidStatus.innerHTML = `<span style="color: #28a745;"><i class="fas fa-spinner fa-spin"></i> Generating random numbers...</span>`;
+                }
                 
                 // Clear previous numbers
                 autoBidNumbers = [];
@@ -3447,16 +3636,22 @@
                 updateAutoBidNumbersDisplay();
                 
                 // Show the display
-                autoNumbersDisplay.style.display = 'block';
+                if (autoNumbersDisplay) {
+                    autoNumbersDisplay.style.display = 'block';
+                }
                 
                 // Update status
-                autoBidStatus.innerHTML = `Generated ${autoBidNumbers.length} random numbers. Total: ${formatCurrency(totalAmount)}`;
+                if (autoBidStatus) {
+                    autoBidStatus.innerHTML = `Generated ${autoBidNumbers.length} random numbers. Total: ${formatCurrency(totalAmount)}`;
+                }
                 
                 // Reset button
                 setTimeout(() => {
                     isAutoBidding = false;
-                    autoBidBtn.innerHTML = '<i class="fas fa-play"></i> Regenerate Numbers';
-                    autoBidBtn.disabled = false;
+                    if (autoBidBtn) {
+                        autoBidBtn.innerHTML = '<i class="fas fa-play"></i> Regenerate Numbers';
+                        autoBidBtn.disabled = false;
+                    }
                     updateAutoBidSummary();
                 }, 500);
                 
@@ -3471,9 +3666,13 @@
             const autoBidBtn = document.getElementById('auto-bid-btn');
             const autoBidStatus = document.getElementById('auto-bid-status');
             
-            autoBidBtn.innerHTML = '<i class="fas fa-play"></i> Start Auto Bidding';
-            autoBidBtn.disabled = false;
-            autoBidStatus.innerHTML = 'Ready to place random bids automatically. All balance in your wallet will be used.';
+            if (autoBidBtn) {
+                autoBidBtn.innerHTML = '<i class="fas fa-play"></i> Start Auto Bidding';
+                autoBidBtn.disabled = false;
+            }
+            if (autoBidStatus) {
+                autoBidStatus.innerHTML = 'Ready to place random bids automatically. All balance in your wallet will be used.';
+            }
             
             if (autoBidInterval) {
                 clearInterval(autoBidInterval);
@@ -3566,8 +3765,10 @@
                 
                 // Animate button
                 const placeGameBtn = document.getElementById('auto-place-game-btn');
-                placeGameBtn.classList.add('placed');
-                placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
+                if (placeGameBtn) {
+                    placeGameBtn.classList.add('placed');
+                    placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
+                }
                 
                 // Add wallet log for bids
                 addWalletLog(currentUser.uid, 'bid', `Auto bids placed on ${currentItem.name}`, -totalAutoBid);
@@ -3575,13 +3776,15 @@
                 const newBalance = currentUserData.balance;
                 
                 const statusDiv = document.getElementById('game-status');
-                statusDiv.innerHTML = `
-                    <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
-                        <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
-                        <p>Total Bid Amount: <strong class="decimal-format">${formatCurrency(totalAutoBid)}</strong></p>
-                        <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(newBalance)}</strong></p>
-                    </div>
-                `;
+                if (statusDiv) {
+                    statusDiv.innerHTML = `
+                        <div style="background: #d4edda; color: #155724; padding: 15px; border-radius: 10px;">
+                            <h4><i class="fas fa-check-circle"></i> Bid Placed Successfully!</h4>
+                            <p>Total Bid Amount: <strong class="decimal-format">${formatCurrency(totalAutoBid)}</strong></p>
+                            <p>Remaining Balance: <strong class="decimal-format">${formatCurrency(newBalance)}</strong></p>
+                        </div>
+                    `;
+                }
                 
                 // Update ALL UI elements
                 updateUI(); // This updates the main wallet balance
@@ -3589,26 +3792,33 @@
                 updateAutoBidSummary(); // This updates the auto bid section
                 
                 // FORCE REFRESH WALLET LOGS AND DEPOSITS
-                if (document.getElementById('wallet-tab').classList.contains('active')) {
+                if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
                     loadDeposits();
                 }
                 
                 // Clear auto bid numbers
                 autoBidNumbers = [];
-                document.getElementById('auto-numbers-display').style.display = 'none';
-                document.getElementById('auto-numbers-grid').innerHTML = '';
+                const autoNumbersDisplay = document.getElementById('auto-numbers-display');
+                const autoNumbersGrid = document.getElementById('auto-numbers-grid');
+                
+                if (autoNumbersDisplay) autoNumbersDisplay.style.display = 'none';
+                if (autoNumbersGrid) autoNumbersGrid.innerHTML = '';
                 
                 showNotification(`Successfully placed auto bids!`, 'success');
                 
                 // Reset button after 2 seconds
                 setTimeout(() => {
-                    placeGameBtn.classList.remove('placed');
-                    placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+                    if (placeGameBtn) {
+                        placeGameBtn.classList.remove('placed');
+                        placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
+                    }
                     
                     // Clear status after 5 seconds
                     setTimeout(() => {
-                        statusDiv.innerHTML = '';
+                        if (statusDiv) {
+                            statusDiv.innerHTML = '';
+                        }
                     }, 5000);
                 }, 2000);
             })
@@ -3625,6 +3835,8 @@
             database.ref('games').once('value').then((snapshot) => {
                 const games = snapshot.val() || {};
                 const bidsList = document.getElementById('bids-list');
+                
+                if (!bidsList) return;
                 
                 let allUserBids = [];
                 
@@ -3666,7 +3878,7 @@
                 
                 // Show only last 3 items by default, or all if expanded
                 const content = document.getElementById('bidding-history-content');
-                const isExpanded = content.classList.contains('expanded');
+                const isExpanded = content ? content.classList.contains('expanded') : false;
                 const itemsToShow = showAllBids || isExpanded ? Object.entries(bidsByItem) : Object.entries(bidsByItem).slice(0, 3);
                 
                 let html = '';
@@ -3752,24 +3964,29 @@
                 });
                 
                 // Update modal title
-                document.getElementById('bid-details-title').textContent = `Bid Details: ${gameName}`;
-                document.getElementById('bid-details-total').innerHTML = `Total Bid: <span class="decimal-format">${formatCurrency(totalAmount)}</span>`;
+                const bidDetailsTitle = document.getElementById('bid-details-title');
+                const bidDetailsTotal = document.getElementById('bid-details-total');
+                
+                if (bidDetailsTitle) bidDetailsTitle.textContent = `Bid Details: ${gameName}`;
+                if (bidDetailsTotal) bidDetailsTotal.innerHTML = `Total Bid: <span class="decimal-format">${formatCurrency(totalAmount)}</span>`;
                 
                 // Display bid numbers
                 const numbersGrid = document.getElementById('bid-details-numbers');
-                numbersGrid.innerHTML = '';
-                
-                userBids.forEach((bid, index) => {
-                    const numberItem = document.createElement('div');
-                    numberItem.className = 'bid-number-item';
-                    numberItem.style = 'background: white; padding: 10px; border-radius: 5px; text-align: center; font-family: monospace; border: 1px solid #dee2e6;';
-                    numberItem.innerHTML = `
-                        <div style="font-size: 14px; font-weight: bold;">${bid.number.toFixed(3)}</div>
-                        <div style="font-size: 11px; color: #666;">${formatCurrency(bid.amount)}</div>
-                        <div style="font-size: 10px; color: #999;">${new Date(bid.placedAt).toLocaleDateString()}</div>
-                    `;
-                    numbersGrid.appendChild(numberItem);
-                });
+                if (numbersGrid) {
+                    numbersGrid.innerHTML = '';
+                    
+                    userBids.forEach((bid, index) => {
+                        const numberItem = document.createElement('div');
+                        numberItem.className = 'bid-number-item';
+                        numberItem.style = 'background: white; padding: 10px; border-radius: 5px; text-align: center; font-family: monospace; border: 1px solid #dee2e6;';
+                        numberItem.innerHTML = `
+                            <div style="font-size: 14px; font-weight: bold;">${bid.number.toFixed(3)}</div>
+                            <div style="font-size: 11px; color: #666;">${formatCurrency(bid.amount)}</div>
+                            <div style="font-size: 10px; color: #999;">${new Date(bid.placedAt).toLocaleDateString()}</div>
+                        `;
+                        numbersGrid.appendChild(numberItem);
+                    });
+                }
                 
                 // Show modal
                 document.getElementById('bid-details-modal').classList.remove('hidden');
@@ -3781,6 +3998,8 @@
             if (!currentUser || !currentUserData || !database) return;
             
             const winsList = document.getElementById('wins-list');
+            if (!winsList) return;
+            
             const userWins = currentUserData.wins || [];
             
             if (userWins.length === 0) {
@@ -3799,7 +4018,7 @@
                 
                 // Show only last 3 wins by default, or all if expanded
                 const content = document.getElementById('my-wins-content');
-                const isExpanded = content.classList.contains('expanded');
+                const isExpanded = content ? content.classList.contains('expanded') : false;
                 const winsToShow = showAllWins || isExpanded ? sortedWins : sortedWins.slice(0, 3);
                 
                 let html = '';
@@ -3837,17 +4056,20 @@
         // ================ CASH IN FUNCTIONS ================
         function showCashIn() {
             selectedAmount = 0;
-            document.getElementById('selected-amount').textContent = '0.000';
+            const selectedAmountEl = document.getElementById('selected-amount');
+            if (selectedAmountEl) selectedAmountEl.textContent = '0.000';
             
             const expiryDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
-            document.getElementById('expiry-date').textContent = expiryDate.toLocaleDateString();
+            const expiryDateEl = document.getElementById('expiry-date');
+            if (expiryDateEl) expiryDateEl.textContent = expiryDate.toLocaleDateString();
             
             document.getElementById('cashin-modal').classList.remove('hidden');
         }
         
         function selectAmount(amount) {
             selectedAmount = amount;
-            document.getElementById('selected-amount').textContent = formatDecimal(amount);
+            const selectedAmountEl = document.getElementById('selected-amount');
+            if (selectedAmountEl) selectedAmountEl.textContent = formatDecimal(amount);
             
             document.querySelectorAll('.cashin-option').forEach(btn => {
                 btn.style.background = '#f8f9fa';
@@ -3891,7 +4113,7 @@
                     updateAutoBidSummary();
                     
                     // FORCE REFRESH WALLET LOGS AND DEPOSITS
-                    if (document.getElementById('wallet-tab').classList.contains('active')) {
+                    if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                         loadWalletLogs();
                         loadDeposits();
                     }
@@ -4062,7 +4284,7 @@
                     updateAutoBidSummary();
                     
                     // Force refresh wallet logs to show the transaction immediately
-                    if (document.getElementById('wallet-tab').classList.contains('active')) {
+                    if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                         loadWalletLogs();
                         loadDeposits();
                     }
@@ -4085,8 +4307,11 @@
         function showWalletSetup() {
             if (!currentUserData) return;
             
-            document.getElementById('shopee-input').value = currentUserData.walletInfo?.shopee || '';
-            document.getElementById('lazada-input').value = currentUserData.walletInfo?.lazada || '';
+            const shopeeInput = document.getElementById('shopee-input');
+            const lazadaInput = document.getElementById('lazada-input');
+            
+            if (shopeeInput) shopeeInput.value = currentUserData.walletInfo?.shopee || '';
+            if (lazadaInput) lazadaInput.value = currentUserData.walletInfo?.lazada || '';
             
             document.getElementById('wallet-modal').classList.remove('hidden');
         }
@@ -4134,6 +4359,8 @@
                 const messages = snapshot.val() || {};
                 const chatMessages = document.getElementById('chat-messages');
                 
+                if (!chatMessages) return;
+                
                 // Convert to array and sort by timestamp
                 const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
                 
@@ -4155,6 +4382,48 @@
                 
                 // Scroll to bottom
                 chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        }
+        
+        // ================ ONLINE USERS FUNCTIONS ================
+        function loadOnlineUsers() {
+            if (!database) return;
+            
+            // Remove existing listener if any
+            if (onlineUsersListener) {
+                onlineUsersListener();
+            }
+            
+            // Listen for online users
+            onlineUsersListener = database.ref('online').on('value', (snapshot) => {
+                const onlineUsers = snapshot.val() || {};
+                const onlineUsersList = document.getElementById('online-users-list');
+                
+                if (!onlineUsersList) return;
+                
+                if (Object.keys(onlineUsers).length === 0) {
+                    onlineUsersList.innerHTML = '<div style="text-align: center; color: #999; padding: 20px;">No online users</div>';
+                    return;
+                }
+                
+                // Convert to array and sort by username
+                const usersArray = Object.values(onlineUsers)
+                    .filter(user => user.uid !== currentUser.uid) // Exclude current user
+                    .sort((a, b) => (a.username || a.email).localeCompare(b.username || b.email));
+                
+                let html = '';
+                usersArray.forEach(user => {
+                    html += `
+                        <div class="online-user-item">
+                            <div class="user-status-indicator"></div>
+                            <div class="user-username" title="${user.email}">
+                                ${user.username || user.email.split('@')[0]}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                onlineUsersList.innerHTML = html;
             });
         }
         
@@ -4198,13 +4467,15 @@
             // Load online users
             database.ref('online').on('value', (snapshot) => {
                 const onlineUsers = snapshot.val() || {};
-                document.getElementById('admin-online-count').textContent = Object.keys(onlineUsers).length;
+                const adminOnlineCount = document.getElementById('admin-online-count');
+                if (adminOnlineCount) adminOnlineCount.textContent = Object.keys(onlineUsers).length;
             });
             
             // FIXED: Use real-time listener for total users and total balance
             database.ref('users').on('value', (snapshot) => {
                 const users = snapshot.val() || {};
-                document.getElementById('admin-total-users').textContent = Object.keys(users).length;
+                const adminTotalUsers = document.getElementById('admin-total-users');
+                if (adminTotalUsers) adminTotalUsers.textContent = Object.keys(users).length;
                 
                 let totalBalance = 0;
                 let activeDeposits = 0;
@@ -4227,8 +4498,11 @@
                     }
                 });
                 
-                document.getElementById('admin-total-balance').textContent = formatCurrency(totalBalance);
-                document.getElementById('admin-active-deposits').textContent = activeDeposits;
+                const adminTotalBalance = document.getElementById('admin-total-balance');
+                const adminActiveDeposits = document.getElementById('admin-active-deposits');
+                
+                if (adminTotalBalance) adminTotalBalance.textContent = formatCurrency(totalBalance);
+                if (adminActiveDeposits) adminActiveDeposits.textContent = activeDeposits;
                 
                 // Load users list
                 loadAdminUsersList(users);
@@ -4266,10 +4540,15 @@
                     }
                 });
                 
-                document.getElementById('admin-active-games').textContent = activeCount;
-                document.getElementById('admin-total-bids').textContent = totalBids;
-                document.getElementById('total-pot-money').textContent = formatCurrency(moneyPot);
-                document.getElementById('total-fees').textContent = formatCurrency(serviceFees);
+                const adminActiveGames = document.getElementById('admin-active-games');
+                const adminTotalBids = document.getElementById('admin-total-bids');
+                const totalPotMoney = document.getElementById('total-pot-money');
+                const totalFees = document.getElementById('total-fees');
+                
+                if (adminActiveGames) adminActiveGames.textContent = activeCount;
+                if (adminTotalBids) adminTotalBids.textContent = totalBids;
+                if (totalPotMoney) totalPotMoney.textContent = formatCurrency(moneyPot);
+                if (totalFees) totalFees.textContent = formatCurrency(serviceFees);
                 
                 // Load admin items list
                 loadAdminItemsList(games);
@@ -4281,6 +4560,8 @@
         
         function loadAdminUsersList(users) {
             const usersList = document.getElementById('users-list');
+            if (!usersList) return;
+            
             let usersHtml = '';
             
             const userEntries = Object.entries(users).filter(([uid, user]) => !user.isAdmin);
@@ -4311,6 +4592,8 @@
         
         function loadAdminWinnersList(games) {
             const winnersList = document.getElementById('winners-list');
+            if (!winnersList) return;
+            
             let winnersHtml = '';
             
             const completedItems = Object.values(games).filter(item => item.winner);
@@ -4367,6 +4650,8 @@
         
         function loadAdminItemsList(games) {
             const itemsList = document.getElementById('admin-items-list');
+            if (!itemsList) return;
+            
             let itemsHtml = '';
             
             const itemsArray = Object.entries(games).map(([id, item]) => ({ id, ...item }));
@@ -4421,13 +4706,21 @@
                 return date.toISOString().slice(0, 16);
             };
             
-            document.getElementById('item-name-input').value = '';
-            document.getElementById('item-price').value = '';
-            document.getElementById('item-image-url').value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
-            document.getElementById('start-date').value = formatDateTime(now);
-            document.getElementById('end-date').value = formatDateTime(nextWeek);
-            document.getElementById('draw-date').value = formatDateTime(nextWeek);
-            document.getElementById('winner-date-input').value = formatDateTime(weekAfter);
+            const itemNameInput = document.getElementById('item-name-input');
+            const itemPrice = document.getElementById('item-price');
+            const itemImageUrl = document.getElementById('item-image-url');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const drawDate = document.getElementById('draw-date');
+            const winnerDate = document.getElementById('winner-date-input');
+            
+            if (itemNameInput) itemNameInput.value = '';
+            if (itemPrice) itemPrice.value = '';
+            if (itemImageUrl) itemImageUrl.value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
+            if (startDate) startDate.value = formatDateTime(now);
+            if (endDate) endDate.value = formatDateTime(nextWeek);
+            if (drawDate) drawDate.value = formatDateTime(nextWeek);
+            if (winnerDate) winnerDate.value = formatDateTime(weekAfter);
             
             document.getElementById('add-item-modal').classList.remove('hidden');
         }
@@ -4839,13 +5132,21 @@
                 
                 const winDate = new Date(item.winner.announcedAt || item.winnerDate);
                 
-                document.getElementById('winner-details-title').textContent = 'Winner Details';
-                document.getElementById('winner-item-name').textContent = item.name;
-                document.getElementById('winner-item-price').textContent = formatCurrency(item.price);
-                document.getElementById('winner-item-image').src = item.image;
-                document.getElementById('winner-username').textContent = winner.username || winner.email;
-                document.getElementById('winning-number').textContent = item.winner.winningNumber.toFixed(3);
-                document.getElementById('winner-date').textContent = winDate.toLocaleDateString() + ' ' + winDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const winnerDetailsTitle = document.getElementById('winner-details-title');
+                const winnerItemName = document.getElementById('winner-item-name');
+                const winnerItemPrice = document.getElementById('winner-item-price');
+                const winnerItemImage = document.getElementById('winner-item-image');
+                const winnerUsername = document.getElementById('winner-username');
+                const winningNumber = document.getElementById('winning-number');
+                const winnerDateEl = document.getElementById('winner-date');
+                
+                if (winnerDetailsTitle) winnerDetailsTitle.textContent = 'Winner Details';
+                if (winnerItemName) winnerItemName.textContent = item.name;
+                if (winnerItemPrice) winnerItemPrice.textContent = formatCurrency(item.price);
+                if (winnerItemImage) winnerItemImage.src = item.image;
+                if (winnerUsername) winnerUsername.textContent = winner.username || winner.email;
+                if (winningNumber) winningNumber.textContent = item.winner.winningNumber.toFixed(3);
+                if (winnerDateEl) winnerDateEl.textContent = winDate.toLocaleDateString() + ' ' + winDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
                 
                 document.getElementById('winner-details-modal').classList.remove('hidden');
             });
