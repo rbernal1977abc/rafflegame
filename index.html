@@ -38,11 +38,11 @@
             opacity: 0.8;
         }
 
-        /* ===== ADVERTISEMENT STYLES - SINGLE TOP BANNER ===== */
+        /* ===== ADVERTISEMENT STYLES ===== */
         .ad-space {
             background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
             color: white;
-            padding: 0;
+            padding: 15px;
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
@@ -50,18 +50,36 @@
             animation: pulse 3s infinite;
             position: relative;
             overflow: hidden;
+        }
+
+        .ad-space.small {
+            height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 120px; /* Maximized use of space */
+            font-size: 14px;
         }
 
-        .ad-space img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 8px;
-            display: block;
+        .ad-space.medium {
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .ad-space.large {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .ad-space.banner {
+            height: 90px;
+            margin: 10px 0;
+            font-size: 12px;
         }
 
         .ad-label {
@@ -73,12 +91,11 @@
             padding: 2px 8px;
             border-radius: 3px;
             font-size: 10px;
-            z-index: 2;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
-            50% { transform: scale(1.01); }
+            50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
 
@@ -477,7 +494,6 @@
             margin: 20px 0;
         }
         
-        /* 🔴 UPDATE #2: Green highlight for manual bid number */
         #bid-number {
             font-size: 36px;
             text-align: center;
@@ -489,13 +505,13 @@
             font-weight: bold;
             letter-spacing: 2px;
             font-family: monospace;
-            color: #333;
+            color: #999;
             transition: all 0.3s;
         }
         
         #bid-number.has-value {
-            color: #155724;
-            background: #d4edda;
+            color: #28a745;
+            background: #f8fff9;
             border-color: #28a745;
         }
         
@@ -1185,107 +1201,6 @@
                 max-height: 150px;
             }
         }
-
-        /* ===== UPDATE #1: POPUP RULE BOX ===== */
-        .rule-popup {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(145deg, #ffd700, #ffb347);
-            padding: 25px 35px;
-            border-radius: 30px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,215,0,0.6);
-            z-index: 9999;
-            border: 5px solid white;
-            text-align: center;
-            max-width: 380px;
-            width: 90%;
-            color: #1a1a1a;
-            font-weight: bold;
-            animation: coinPop 0.4s ease-out;
-        }
-        .rule-popup i.fa-coins, .rule-popup i.fa-circle {
-            color: #ffd700;
-            text-shadow: 2px 2px 5px black;
-            font-size: 30px;
-            margin: 0 5px;
-        }
-        .rule-popup .big-rule-text {
-            font-size: 24px;
-            font-weight: 900;
-            color: #0a2f44;
-            background: rgba(255,255,255,0.6);
-            padding: 15px;
-            border-radius: 20px;
-            margin: 15px 0;
-            text-shadow: 2px 2px 0 #ffaa00;
-            line-height: 1.4;
-        }
-        .coin-rain {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            overflow: hidden;
-            border-radius: 30px;
-        }
-        .coin-rain i {
-            position: absolute;
-            color: rgba(255,215,0,0.9);
-            text-shadow: 0 0 8px white;
-            animation: floatCoin 2s infinite ease-in-out;
-        }
-        @keyframes floatCoin {
-            0% { transform: translateY(-20px) rotate(0deg); opacity: 0.8; }
-            100% { transform: translateY(150px) rotate(360deg); opacity: 0; }
-        }
-        .close-rule-btn {
-            margin-top: 20px;
-            background: #0a2f44;
-            border: none;
-            color: white;
-            font-weight: bold;
-            padding: 12px 35px;
-            border-radius: 50px;
-            font-size: 18px;
-            cursor: pointer;
-            box-shadow: 0 5px 0 #06202e;
-            transition: 0.1s;
-        }
-        .close-rule-btn:active {
-            transform: translateY(5px);
-            box-shadow: none;
-        }
-
-        /* ===== UPDATE #8: BIDS & WINS CONSOLIDATED ===== */
-        .bids-wins-header {
-            background: #28a745;
-            color: white;
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .bids-wins-tabs {
-            display: flex;
-            gap: 10px;
-        }
-        .bids-wins-tab {
-            background: rgba(255,255,255,0.2);
-            padding: 8px 20px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        .bids-wins-tab.active {
-            background: white;
-            color: #28a745;
-        }
     </style>
 </head>
 <body>
@@ -1312,7 +1227,11 @@
             <div id="login-form" class="auth-form-content">
                 <h2>Login to Your Account</h2>
                 
-                <!-- ADVERTISEMENT REMOVED - only 1 stays at top of page -->
+                <!-- ADVERTISEMENT BANNER 1 -->
+                <div class="ad-space banner">
+                    <div class="ad-label">Ad Space</div>
+                    <div>🚀 AD HERE</div>
+                </div>
                 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
@@ -1333,7 +1252,11 @@
                     <i class="fas fa-key"></i> Forgot Password?
                 </button>
                 
-                <!-- ADVERTISEMENT REMOVED -->
+                <!-- ADVERTISEMENT BANNER 2 -->
+                <div class="ad-space banner">
+                    <div class="ad-label">Sponsored</div>
+                    <div>🎰 AD HERE</div>
+                </div>
                 
                 <div class="admin-login" style="margin-top: 20px;">
                     <button onclick="showAdminLogin()" class="btn-secondary">
@@ -1361,7 +1284,11 @@
                     <input type="password" id="register-password" placeholder="Create password (min 6 chars)">
                 </div>
                 
-                <!-- ADVERTISEMENT REMOVED -->
+                <!-- ADVERTISEMENT -->
+                <div class="ad-space small">
+                    <div class="ad-label">Special Offer</div>
+                    <div>🎁 Register now and start with ₱50 free!</div>
+                </div>
                 
                 <button onclick="registerUser()" class="btn-primary">
                     <i class="fas fa-user-plus"></i> Create Account
@@ -1387,10 +1314,10 @@
             </div>
         </header>
         
-        <!-- 🔴 UPDATE #7: SINGLE ADVERTISEMENT ON TOP - FULL ORANGE BOX WITH IMAGE -->
-        <div id="single-ad-banner" class="ad-space banner">
+        <!-- TOP ADVERTISEMENT -->
+        <div class="ad-space banner">
             <div class="ad-label">Advertisement</div>
-            <img id="ad-image" src="https://via.placeholder.com/500x120/FFA500/FFFFFF?text=YOUR+AD+HERE" alt="Ad" style="width:100%; height:100%; object-fit:cover;">
+            <div>🔥 AD HERE</div>
         </div>
         
         <nav class="tabs">
@@ -1404,9 +1331,11 @@
                 <i class="fas fa-wallet"></i> Wallet
             </button>
             <button class="tab" onclick="showTab('bids')">
-                <i class="fas fa-history"></i> Bids & Wins
+                <i class="fas fa-history"></i> My Bids
             </button>
-            <!-- 🔴 UPDATE #8: My Wins tab removed, merged into Bids & Wins -->
+            <button class="tab" onclick="showTab('wins')">
+                <i class="fas fa-trophy"></i> My Wins
+            </button>
             <button class="tab" onclick="showTab('send')">
                 <i class="fas fa-paper-plane"></i> Send
             </button>
@@ -1416,20 +1345,10 @@
         <div id="play-tab" class="tab-content">
             <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Live Games</h3>
             
-            <!-- 🔴 UPDATE #5: Upcoming Games section placed above Active Games -->
-            <div class="collapsible-header" onclick="toggleCollapsible('upcoming-games')">
-                <h4 style="margin: 0; color: #ff9800;">
-                    <i class="fas fa-clock"></i> Upcoming Games
-                </h4>
-                <i class="fas fa-chevron-down collapsible-icon" id="upcoming-games-icon"></i>
-            </div>
-            <div class="collapsible-content expanded" id="upcoming-games-content">
-                <div class="scrollable-content">
-                    <div id="upcoming-game-items" class="items-grid">
-                        <!-- Upcoming games loaded here -->
-                    </div>
-                </div>
-                <button class="view-all-btn" onclick="viewAllUpcomingGames()">View All Upcoming Games</button>
+            <!-- ADVERTISEMENT -->
+            <div class="ad-space medium">
+                <div class="ad-label">Featured Game</div>
+                <div>📱 AD HERE</div>
             </div>
             
             <div class="collapsible-header" onclick="toggleCollapsible('active-games')">
@@ -1458,13 +1377,17 @@
                     </div>
                     
                     <div id="game-items" class="items-grid">
-                        <!-- Active items loaded from Firebase -->
+                        <!-- Items loaded from Firebase -->
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllGames()">View All Games</button>
             </div>
             
-            <!-- BOTTOM ADVERTISEMENT REMOVED - only 1 banner remains -->
+            <!-- BOTTOM ADVERTISEMENT -->
+            <div class="ad-space banner">
+                <div class="ad-label">Sponsored</div>
+                <div>🎯 AD HERE</div>
+            </div>
         </div>
         
         <!-- CHAT TAB -->
@@ -1477,7 +1400,11 @@
             <div class="wallet-info">
                 <h3 style="color: #667eea; margin-bottom: 20px;">💰 My Wallet</h3>
                 
-                <!-- ADVERTISEMENT REMOVED - only 1 banner at top -->
+                <!-- ADVERTISEMENT -->
+                <div class="ad-space banner">
+                    <div class="ad-label">Ad Space</div>
+                    <div>💸 AD HERE</div>
+                </div>
                 
                 <div class="balance-card">
                     <h4>Available Play Money</h4>
@@ -1552,52 +1479,55 @@
             </div>
         </div>
         
-        <!-- 🔴 UPDATE #8: CONSOLIDATED BIDS & WINS TAB -->
+        <!-- MY BIDS TAB -->
         <div id="bids-tab" class="tab-content">
-            <div class="bids-wins-header">
-                <h3 style="margin:0; color:white;"><i class="fas fa-chart-line"></i> Bids & Wins</h3>
-                <div class="bids-wins-tabs">
-                    <span class="bids-wins-tab active" id="bids-tab-header" onclick="switchBidsWinsTab('bids')">My Bids</span>
-                    <span class="bids-wins-tab" id="wins-tab-header" onclick="switchBidsWinsTab('wins')">My Wins</span>
-                </div>
+            <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Bidding History</h3>
+            
+            <!-- ADVERTISEMENT -->
+            <div class="ad-space banner">
+                <div class="ad-label">Tip</div>
+                <div>🎲 AD HERE</div>
             </div>
             
-            <!-- ADVERTISEMENT REMOVED -->
-            
-            <!-- BIDS SECTION (formerly My Bids) -->
-            <div id="bids-section" style="display:block;">
-                <div class="collapsible-header" onclick="toggleCollapsible('bidding-history')">
-                    <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-history"></i> My Bids
-                    </h4>
-                    <i class="fas fa-chevron-down collapsible-icon" id="bidding-history-icon"></i>
-                </div>
-                <div class="collapsible-content expanded" id="bidding-history-content">
-                    <div class="scrollable-content">
-                        <div id="bids-list">
-                            <!-- Bids loaded here -->
-                        </div>
+            <div class="collapsible-header" onclick="toggleCollapsible('bidding-history')">
+                <h4 style="margin: 0; color: #667eea;">
+                    <i class="fas fa-history"></i> My Bids
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="bidding-history-icon"></i>
+            </div>
+            <div class="collapsible-content expanded" id="bidding-history-content">
+                <div class="scrollable-content">
+                    <div id="bids-list">
+                        <!-- Bids loaded here -->
                     </div>
-                    <button class="view-all-btn" onclick="viewAllBids()">View All Bids</button>
                 </div>
+                <button class="view-all-btn" onclick="viewAllBids()">View All Bids</button>
+            </div>
+        </div>
+        
+        <!-- MY WINS TAB -->
+        <div id="wins-tab" class="tab-content">
+            <h3 style="color: #667eea; margin-bottom: 20px;">🏆 My Winning Items</h3>
+            
+            <!-- ADVERTISEMENT -->
+            <div class="ad-space medium">
+                <div class="ad-label">Winner's Circle</div>
+                <div>🌟 AD HERE</div>
             </div>
             
-            <!-- WINS SECTION (formerly My Wins) moved on top of bids -->
-            <div id="wins-section" style="display:none;">
-                <div class="collapsible-header" onclick="toggleCollapsible('my-wins')">
-                    <h4 style="margin: 0; color: #667eea;">
-                        <i class="fas fa-trophy"></i> My Wins
-                    </h4>
-                    <i class="fas fa-chevron-down collapsible-icon" id="my-wins-icon"></i>
-                </div>
-                <div class="collapsible-content expanded" id="my-wins-content">
-                    <div class="scrollable-content">
-                        <div id="wins-list" class="winner-items-grid">
-                            <!-- Winning items loaded here -->
-                        </div>
+            <div class="collapsible-header" onclick="toggleCollapsible('my-wins')">
+                <h4 style="margin: 0; color: #667eea;">
+                    <i class="fas fa-trophy"></i> My Wins
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="my-wins-icon"></i>
+            </div>
+            <div class="collapsible-content expanded" id="my-wins-content">
+                <div class="scrollable-content">
+                    <div id="wins-list" class="winner-items-grid">
+                        <!-- Winning items loaded here -->
                     </div>
-                    <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
                 </div>
+                <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
             </div>
         </div>
         
@@ -1757,6 +1687,7 @@
                     <button onclick="createDemoGames()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Create Demo Games
                     </button>
+                    <!-- Removed Initialize Admin Account button -->
                     <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Reset Data
                     </button>
@@ -1778,7 +1709,11 @@
             
             <img id="item-image" src="" alt="Item" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin: 15px 0;">
             
-            <!-- ADVERTISEMENT REMOVED - only top banner -->
+            <!-- IN-GAME ADVERTISEMENT -->
+            <div class="ad-space banner">
+                <div class="ad-label">Sponsored</div>
+                <div>🎰 Place more bids to increase your chances!</div>
+            </div>
             
             <div class="bidding-interface">
                 <div class="number-display">
@@ -1989,13 +1924,9 @@
             <div style="display: grid; gap: 15px; margin: 20px 0;">
                 <input type="text" id="item-name-input" placeholder="Item Name (e.g., iPhone 15)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                 
-                <!-- 🔴 UPDATE #9: Price will be stored as number but formatted with commas -->
                 <input type="number" id="item-price" placeholder="Price Value (₱)" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
                 
                 <input type="text" id="item-image-url" placeholder="Image URL" style="padding: 12px; border: 2px solid #ddd; border-radius: 8px;">
-                
-                <!-- 🔴 UPDATE #7: New field for Advertisement Image URL -->
-                <input type="text" id="ad-image-url" placeholder="Advertisement Image URL (admin only)" style="padding: 12px; border: 2px solid #ff9800; border-radius: 8px;">
                 
                 <!-- START GAME DATE & TIME -->
                 <div>
@@ -2200,7 +2131,6 @@
         let showAllWinners = false;
         let showAllItems = false;
         let showAllGames = false;
-        let showAllUpcomingGames = false;
         let isSendingMoney = false;
         let chatListener = null;
         let onlineUsersListener = null;
@@ -2432,42 +2362,6 @@
                 });
         }
         
-        // ================ 🔴 UPDATE #1: SHOW RULE POPUP ================
-        function showGameRulePopup() {
-            const popup = document.createElement('div');
-            popup.className = 'rule-popup';
-            popup.id = 'game-rule-popup';
-            popup.innerHTML = `
-                <div style="position:relative; z-index:2;">
-                    <div style="font-size:28px; font-weight:900; color:#FFD700; text-shadow:3px 3px 0 #B8860B;">🎯 RULE</div>
-                    <div class="big-rule-text">
-                        LOWEST UNIQUE NUMBER WINS!<br>NO DUPLICATES ALLOWED
-                    </div>
-                    <div style="font-size:22px; font-weight:bold; background:white; padding:12px; border-radius:20px; margin:10px 0;">
-                        Format: X.XXX<br>0.001, 1.111, 123.456
-                    </div>
-                    <div style="font-size:20px; margin-top:5px;">💎 Good Luck! 💎</div>
-                </div>
-                <div class="coin-rain">
-                    <i class="fas fa-coins" style="left:5%; top:-10px; animation-delay:0s;"></i>
-                    <i class="fas fa-coins" style="left:25%; top:-20px; animation-delay:0.5s;"></i>
-                    <i class="fas fa-circle" style="left:50%; top:-5px; animation-delay:1s; color:silver;"></i>
-                    <i class="fas fa-coins" style="left:70%; top:-15px; animation-delay:1.8s;"></i>
-                    <i class="fas fa-circle" style="left:90%; top:-25px; animation-delay:0.8s; color:silver;"></i>
-                    <i class="fas fa-coins" style="left:15%; top:-30px; animation-delay:1.2s;"></i>
-                    <i class="fas fa-coins" style="left:40%; top:-8px; animation-delay:2s;"></i>
-                    <i class="fas fa-circle" style="left:80%; top:-18px; animation-delay:0.3s; color:silver;"></i>
-                </div>
-                <button class="close-rule-btn" onclick="closeRulePopup()"><i class="fas fa-check"></i> GOT IT</button>
-            `;
-            document.body.appendChild(popup);
-        }
-
-        function closeRulePopup() {
-            const popup = document.getElementById('game-rule-popup');
-            if (popup) popup.remove();
-        }
-        
         function loginUser() {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
@@ -2499,13 +2393,6 @@
                     
                     // Load user data immediately
                     loadUserData();
-                    
-                    // 🔴 UPDATE #1: Show popup after successful login
-                    setTimeout(() => {
-                        if (!document.getElementById('game-rule-popup')) {
-                            showGameRulePopup();
-                        }
-                    }, 500);
                 })
                 .catch((error) => {
                     console.error('❌ Login error:', error);
@@ -2678,7 +2565,6 @@
                         loadUserWins();
                         setupChatListener();
                         loadOnlineUsers();
-                        loadUpcomingGames();
                     }
                 } else {
                     // Create user data if it doesn't exist
@@ -2717,7 +2603,6 @@
                                 loadUserWins();
                                 setupChatListener();
                                 loadOnlineUsers();
-                                loadUpcomingGames();
                             }
                         })
                         .catch(error => {
@@ -2757,6 +2642,11 @@
                 if (document.getElementById('bids-tab').classList.contains('active')) {
                     loadUserBids();
                 }
+                
+                // Refresh wins if on wins tab
+                if (document.getElementById('wins-tab').classList.contains('active')) {
+                    loadUserWins();
+                }
             });
         }
         
@@ -2787,7 +2677,7 @@
             // Initialize all collapsible sections as expanded
             initializeCollapsibleSections();
             
-            // Show wallet tab by default
+            // Show wallet tab by default (FIXED: Issue #3)
             setTimeout(() => {
                 showTab('wallet');
             }, 100);
@@ -2805,7 +2695,7 @@
         function initializeCollapsibleSections() {
             // Set all collapsible sections to expanded by default
             const sections = [
-                'active-games', 'upcoming-games', 'wallet-logs', 'deposits', 'bidding-history', 
+                'active-games', 'wallet-logs', 'deposits', 'bidding-history', 
                 'my-wins', 'admin-users', 'admin-winners', 'admin-items'
             ];
             
@@ -2849,35 +2739,13 @@
             if (tabName === 'wallet') {
                 loadDeposits();
                 loadWalletLogs();
-                updateUI();
+                updateUI(); // Ensure balance is up to date
             } else if (tabName === 'bids') {
                 loadUserBids();
+            } else if (tabName === 'wins') {
                 loadUserWins();
             } else if (tabName === 'play') {
                 loadGameItems();
-                loadUpcomingGames();
-            }
-        }
-        
-        // ================ 🔴 UPDATE #8: SWITCH BIDS/WINS TABS ================
-        function switchBidsWinsTab(section) {
-            const bidsSection = document.getElementById('bids-section');
-            const winsSection = document.getElementById('wins-section');
-            const bidsTabHeader = document.getElementById('bids-tab-header');
-            const winsTabHeader = document.getElementById('wins-tab-header');
-            
-            if (section === 'bids') {
-                bidsSection.style.display = 'block';
-                winsSection.style.display = 'none';
-                bidsTabHeader.classList.add('active');
-                winsTabHeader.classList.remove('active');
-                loadUserBids();
-            } else {
-                bidsSection.style.display = 'none';
-                winsSection.style.display = 'block';
-                bidsTabHeader.classList.remove('active');
-                winsTabHeader.classList.add('active');
-                loadUserWins();
             }
         }
         
@@ -2933,11 +2801,6 @@
         function viewAllGames() {
             showAllGames = !showAllGames;
             loadGameItems();
-        }
-
-        function viewAllUpcomingGames() {
-            showAllUpcomingGames = !showAllUpcomingGames;
-            loadUpcomingGames();
         }
         
         // ================ WALLET LOGS & DEPOSITS ================
@@ -3185,61 +3048,6 @@
         }
         
         // ================ GAME ITEMS FUNCTIONS ================
-        // 🔴 UPDATE #5: Upcoming games loader
-        function loadUpcomingGames() {
-            if (!database) return;
-            
-            database.ref('games').on('value', (snapshot) => {
-                const items = snapshot.val() || {};
-                const container = document.getElementById('upcoming-game-items');
-                const now = new Date();
-                
-                if (!container) return;
-                
-                let html = '';
-                let upcomingCount = 0;
-                
-                const itemsArray = Object.entries(items).map(([id, item]) => ({ id, ...item }));
-                const upcomingItems = itemsArray.filter(item => {
-                    const startDate = new Date(item.startDate);
-                    return item.status === 'active' && startDate > now;
-                }).sort((a, b) => new Date(a.startDate) - new Date(b.startDate));
-                
-                const isExpanded = showAllUpcomingGames || 
-                    (document.getElementById('upcoming-games-content')?.classList.contains('expanded') || false);
-                const itemsToShow = (showAllUpcomingGames || isExpanded) ? upcomingItems : upcomingItems.slice(0, 3);
-                
-                itemsToShow.forEach(item => {
-                    upcomingCount++;
-                    const startDate = new Date(item.startDate);
-                    const endDate = new Date(item.endDate);
-                    
-                    html += `
-                        <div class="item-card" style="border-color: #ff9800;">
-                            <h4 style="color:#ff9800;">⏳ ${item.name} (Upcoming)</h4>
-                            <p style="color: #666; font-size: 14px;">${item.description}</p>
-                            <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
-                            <div class="item-info">
-                                <div>
-                                    <strong style="color: #28a745;" class="decimal-format">₱${formatDecimal(item.price)}</strong><br>
-                                    <small>Prize Value</small>
-                                </div>
-                                <div style="text-align: right;">
-                                    <strong>Starts: ${startDate.toLocaleDateString()}</strong><br>
-                                    <small>${startDate.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</small>
-                                </div>
-                            </div>
-                            <div style="margin-top: 10px; font-size: 12px; color: #666; background: #fff3cd; padding: 10px; border-radius: 8px;">
-                                <i class="fas fa-hourglass-start"></i> Coming soon!
-                            </div>
-                        </div>
-                    `;
-                });
-                
-                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 20px;">No upcoming games</p>';
-            });
-        }
-        
         function loadGameItems() {
             if (!database) return;
             
@@ -3256,15 +3064,16 @@
                 let activeCount = 0;
                 let totalBids = 0;
                 
+                // Convert to array and sort by end date (newest first)
                 const itemsArray = Object.entries(items).map(([id, item]) => ({ id, ...item }));
-                const activeItems = itemsArray.filter(item => {
-                    const startDate = new Date(item.startDate);
-                    const endDate = new Date(item.endDate);
-                    return item.status === 'active' && now >= startDate && now <= endDate;
-                }).sort((a, b) => new Date(b.endDate) - new Date(a.endDate));
+                const sortedItems = itemsArray.sort((a, b) => 
+                    new Date(b.endDate) - new Date(a.endDate)
+                );
                 
-                const isExpanded = document.getElementById('active-games-content')?.classList.contains('expanded') || false;
-                const itemsToShow = (showAllGames || isExpanded) ? activeItems : activeItems.slice(0, 3);
+                // Show only last 3 items by default, or all if expanded or showAllGames is true
+                const content = document.getElementById('active-games-content');
+                const isExpanded = content ? content.classList.contains('expanded') : false;
+                const itemsToShow = (showAllGames || isExpanded) ? sortedItems : sortedItems.slice(0, 3);
                 
                 itemsToShow.forEach(item => {
                     const endDate = new Date(item.endDate);
@@ -3272,25 +3081,27 @@
                     const drawDate = new Date(item.drawDate);
                     const winnerDate = new Date(item.winnerDate);
                     const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                    const isActive = item.status === 'active' && now >= startDate && now <= endDate;
+                    const isEnded = item.status === 'completed' || now > endDate;
                     
-                    activeCount++;
+                    if (isActive) activeCount++;
                     
                     const bids = item.bids || {};
                     const bidCount = Object.keys(bids).length;
                     totalBids += bidCount;
                     
                     html += `
-                        <div class="item-card" onclick="openGameModal('${item.id}')">
-                            <h4>${item.name}</h4>
+                        <div class="item-card ${isEnded ? 'inactive' : ''}" onclick="${isActive ? `openGameModal('${item.id}')` : ''}" style="${!isActive ? 'cursor: not-allowed;' : ''}">
+                            <h4>${item.name} ${isEnded ? '(Ended)' : ''}</h4>
                             <p style="color: #666; font-size: 14px;">${item.description}</p>
                             <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
                             <div class="item-info">
                                 <div>
-                                    <strong style="color: #28a745;" class="decimal-format">₱${formatCurrencyWithCommas(item.price)}</strong><br>
+                                    <strong style="color: #28a745;" class="decimal-format">₱${formatDecimal(item.price)}</strong><br>
                                     <small>Prize Value</small>
                                 </div>
                                 <div style="text-align: right;">
-                                    <strong>${daysLeft} days left</strong><br>
+                                    <strong>${isActive ? daysLeft + ' days left' : 'ENDED'}</strong><br>
                                     <small>${bidCount} bids</small>
                                 </div>
                             </div>
@@ -3303,10 +3114,18 @@
                                     <span>Ends:</span>
                                     <span>${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
+                                    <span>Draw:</span>
+                                    <span>${drawDate.toLocaleDateString()} ${drawDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Winner:</span>
+                                    <span>${winnerDate.toLocaleDateString()} ${winnerDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
-                                <button class="btn-primary" style="padding: 10px 20px; font-size: 14px; width: 100%;">
-                                    <i class="fas fa-play"></i> Play Now
+                                <button class="${isActive ? 'btn-primary' : 'btn-secondary'}" style="padding: 10px 20px; font-size: 14px; width: 100%;" ${!isActive ? 'disabled' : ''}>
+                                    <i class="fas fa-play"></i> ${isActive ? 'Play Now' : 'Game Ended'}
                                 </button>
                             </div>
                         </div>
@@ -3321,6 +3140,7 @@
                 if (activeGamesCount) activeGamesCount.textContent = activeCount;
                 if (totalBidsCount) totalBidsCount.textContent = totalBids;
                 
+                // Update online users count
                 database.ref('online').once('value').then(snapshot => {
                     const onlineUsers = snapshot.val() || {};
                     const onlineCount = document.getElementById('online-count');
@@ -4248,7 +4068,7 @@
                                 <div style="margin-top: 10px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Prize Value:</span>
-                                        <strong class="decimal-format">₱${formatCurrencyWithCommas(game.price)}</strong>
+                                        <strong class="decimal-format">₱${formatDecimal(game.price)}</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Winning Number:</span>
@@ -4567,7 +4387,11 @@
                 chatTab.innerHTML = `
                     <h3 style="color: #667eea; margin-bottom: 20px;">💬 Community Chat</h3>
                     
-                    <!-- ADVERTISEMENT REMOVED - only top banner -->
+                    <!-- ADVERTISEMENT -->
+                    <div class="ad-space banner">
+                        <div class="ad-label">Chat Room</div>
+                        <div>💬 AD HERE</div>
+                    </div>
                     
                     <!-- Online Users Section (Collapsible) -->
                     <div class="online-users-section">
@@ -4718,23 +4542,6 @@
                 
                 onlineUsersList.innerHTML = html;
             });
-        }
-        
-        // ================ 🔴 UPDATE #6: ANNOUNCE WINNER IN CHAT ================
-        function announceWinnerInChat(item, winnerBid) {
-            if (!database) return;
-            
-            const winner = winnerBid.username || winnerBid.userId;
-            const messageText = `🎉 Congratulations to our Winner: '${winner}' for winning ${item.name} with number ${winnerBid.number.toFixed(3)}! 🏆`;
-            
-            const messageData = {
-                userId: 'system',
-                username: '🎯 CENTAVO BOT',
-                text: messageText,
-                timestamp: Date.now()
-            };
-            
-            database.ref('chat/messages').push(messageData);
         }
         
         function sendChatMessage() {
@@ -4985,7 +4792,7 @@
                         <div style="display: flex; justify-content: space-between; align-items: start;">
                             <div>
                                 <strong style="color: #333;">${item.name}</strong><br>
-                                <small class="decimal-format" style="color: ${isActive ? '#28a745' : '#333'};">₱${formatCurrencyWithCommas(item.price)} • ${isActive ? 'ACTIVE' : 'ENDED'}</small>
+                                <small class="decimal-format" style="color: ${isActive ? '#28a745' : '#333'};">₱${formatDecimal(item.price)} • ${isActive ? 'ACTIVE' : 'ENDED'}</small>
                             </div>
                             <div style="text-align: right;">
                                 <small style="color: #666;">Bids: ${bidCount}</small><br>
@@ -5019,7 +4826,6 @@
             const itemNameInput = document.getElementById('item-name-input');
             const itemPrice = document.getElementById('item-price');
             const itemImageUrl = document.getElementById('item-image-url');
-            const adImageUrl = document.getElementById('ad-image-url');
             const startDate = document.getElementById('start-date');
             const endDate = document.getElementById('end-date');
             const drawDate = document.getElementById('draw-date');
@@ -5028,7 +4834,6 @@
             if (itemNameInput) itemNameInput.value = '';
             if (itemPrice) itemPrice.value = '';
             if (itemImageUrl) itemImageUrl.value = 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=300&fit=crop';
-            if (adImageUrl) adImageUrl.value = '';
             if (startDate) startDate.value = formatDateTime(now);
             if (endDate) endDate.value = formatDateTime(nextWeek);
             if (drawDate) drawDate.value = formatDateTime(nextWeek);
@@ -5037,21 +4842,10 @@
             document.getElementById('add-item-modal').classList.remove('hidden');
         }
         
-        // 🔴 UPDATE #9: Add commas to price display
-        function formatCurrencyWithCommas(value) {
-            if (value === undefined || value === null) return '0.000';
-            // Format number with commas and 3 decimal places
-            let num = parseFloat(value).toFixed(3);
-            let parts = num.split('.');
-            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return parts.join('.');
-        }
-        
         function addNewItem() {
             const name = document.getElementById('item-name-input').value.trim();
             const price = parseFloat(document.getElementById('item-price').value);
             const image = document.getElementById('item-image-url').value.trim();
-            const adImageUrl = document.getElementById('ad-image-url').value.trim();
             const startDate = document.getElementById('start-date').value;
             const endDate = document.getElementById('end-date').value;
             const drawDate = document.getElementById('draw-date').value;
@@ -5088,30 +4882,11 @@
             database.ref('games/' + itemId).set(newItem)
                 .then(() => {
                     showNotification(`Added new game item: ${name}`, 'success');
-                    // 🔴 UPDATE #7: Update advertisement image if provided
-                    if (adImageUrl) {
-                        return database.ref('settings/adImage').set(adImageUrl);
-                    }
-                })
-                .then(() => {
                     closeModal();
-                    loadAdminData();
                 })
                 .catch((error) => {
                     showNotification('Error adding item: ' + getFirebaseError(error), 'error');
                 });
-        }
-        
-        // 🔴 UPDATE #7: Load ad image from DB
-        function loadAdImage() {
-            if (!database) return;
-            database.ref('settings/adImage').once('value', (snap) => {
-                const adUrl = snap.val();
-                const adImg = document.getElementById('ad-image');
-                if (adImg) {
-                    adImg.src = adUrl || 'https://via.placeholder.com/500x120/FFA500/FFFFFF?text=YOUR+AD+HERE';
-                }
-            });
         }
         
         function createDemoGames() {
@@ -5120,20 +4895,16 @@
                 return;
             }
             
-            const now = new Date();
-            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-            const format = (d) => d.toISOString().slice(0,16);
-            
             const demoGames = {
                 game1: {
                     name: "iPhone 15 Pro",
                     description: "Brand new iPhone 15 Pro 256GB",
                     image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
                     price: 69999.000,
-                    startDate: format(new Date(now.getTime() - 24*60*60*1000)), // started yesterday
-                    endDate: format(nextWeek),
-                    drawDate: format(nextWeek),
-                    winnerDate: format(new Date(nextWeek.getTime() + 24*60*60*1000)),
+                    startDate: new Date().toISOString(),
+                    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+                    winnerDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
                     status: "active",
                     bids: {},
                     winner: null,
@@ -5144,10 +4915,10 @@
                     description: "Latest Samsung flagship phone",
                     image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
                     price: 45999.000,
-                    startDate: format(new Date(now.getTime() + 2*24*60*60*1000)), // starts in 2 days (upcoming)
-                    endDate: format(new Date(now.getTime() + 9*24*60*60*1000)),
-                    drawDate: format(new Date(now.getTime() + 9*24*60*60*1000)),
-                    winnerDate: format(new Date(now.getTime() + 10*24*60*60*1000)),
+                    startDate: new Date().toISOString(),
+                    endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    drawDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                    winnerDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
                     status: "active",
                     bids: {},
                     winner: null,
@@ -5309,9 +5080,6 @@
                     
                     // Add wallet log for win
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
-                    
-                    // 🔴 UPDATE #6: Announce winner in global chat
-                    announceWinnerInChat(item, winningBid);
                     
                     // Group losing bids by user
                     const losingUsers = {};
@@ -5491,7 +5259,7 @@
                 
                 if (winnerDetailsTitle) winnerDetailsTitle.textContent = 'Winner Details';
                 if (winnerItemName) winnerItemName.textContent = item.name;
-                if (winnerItemPrice) winnerItemPrice.textContent = formatCurrencyWithCommas(item.price);
+                if (winnerItemPrice) winnerItemPrice.textContent = formatCurrency(item.price);
                 if (winnerItemImage) winnerItemImage.src = item.image;
                 if (winnerUsername) winnerUsername.textContent = winner.username || winner.email;
                 if (winningNumber) winningNumber.textContent = item.winner.winningNumber.toFixed(3);
@@ -5554,11 +5322,6 @@
             setTimeout(() => {
                 setupAuthListener();
             }, 1500);
-            
-            // Load advertisement image
-            setTimeout(() => {
-                loadAdImage();
-            }, 2000);
             
             showNotification('Welcome to Centavo Number Game! Register or login to start playing.', 'info');
             
