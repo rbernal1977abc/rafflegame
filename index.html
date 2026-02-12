@@ -836,7 +836,7 @@
         }
         
         .collapsible-content.expanded {
-            max-height: 800px;
+            max-height: 800px; /* INCREASED HEIGHT FOR LIVE GAMES - EASIER VIEWING */
         }
         
         .collapsible-icon {
@@ -867,7 +867,7 @@
         
         /* ===== SCROLLABLE CONTENT ===== */
         .scrollable-content {
-            max-height: 250px;
+            max-height: 450px; /* INCREASED to better view upcoming/active games without tiny scroll */
             overflow-y: auto;
             margin: 10px 0;
             padding-right: 5px;
@@ -1296,6 +1296,73 @@
         .price-with-comma {
             font-family: monospace;
             letter-spacing: 1px;
+        }
+
+        /* ===== NEW: WRONG CREDENTIALS MODAL (CENTER POPUP) ===== */
+        .wrong-credentials-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 3000;
+        }
+
+        .wrong-credentials-content {
+            background: white;
+            padding: 35px 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 350px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border-left: 8px solid #dc3545;
+            animation: shake 0.5s ease;
+        }
+
+        .wrong-credentials-content i {
+            font-size: 60px;
+            color: #dc3545;
+            margin-bottom: 15px;
+        }
+
+        .wrong-credentials-content h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .wrong-credentials-content p {
+            color: #666;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .wrong-credentials-content button {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 35px;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 2px solid white;
+        }
+
+        .wrong-credentials-content button:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
         }
         
         /* ===== RESPONSIVE ===== */
@@ -2205,12 +2272,22 @@
         </div>
     </div>
 
+    <!-- WRONG CREDENTIALS MODAL (REPLACES OLD RED BOTTOM ERROR) -->
+    <div id="wrong-credentials-modal" class="wrong-credentials-modal hidden">
+        <div class="wrong-credentials-content">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h3>⚠️ Wrong Credentials</h3>
+            <p>Invalid email or password.<br>Please try again.</p>
+            <button onclick="closeWrongCredentialsModal()">OK</button>
+        </div>
+    </div>
+
     <!-- NOTIFICATION AREA -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
 
     <!-- FOOTER -->
     <div class="footer">
-        Developed and Patented by RP8 and Dimax Team
+        Developed and Patented by RP8 / Dimax Team
     </div>
 
     <!-- JAVASCRIPT -->
@@ -2507,12 +2584,13 @@
                 });
         }
         
+        // ===== UPDATED LOGIN USER: REPLACE RED BOTTOM ERROR WITH CENTER MODAL =====
         function loginUser() {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
             
             if (!email || !password) {
-                showNotification('Please enter email and password', 'error');
+                showWrongCredentialsModal(); // SHOW WRONG CREDENTIALS MODAL
                 return;
             }
             
@@ -2536,12 +2614,32 @@
                 })
                 .catch((error) => {
                     console.error('❌ Login error:', error);
-                    const errorMsg = getFirebaseError(error);
-                    showNotification('❌ ' + errorMsg, 'error');
+                    // REPLACE: Do not show old red bottom error
+                    // Instead show the beautiful center modal
+                    showWrongCredentialsModal();
                 });
+        }
+
+        // NEW FUNCTION: Display wrong credentials modal (center)
+        function showWrongCredentialsModal() {
+            const modal = document.getElementById('wrong-credentials-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+            }
+        }
+
+        // Close wrong credentials modal
+        function closeWrongCredentialsModal() {
+            const modal = document.getElementById('wrong-credentials-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
         }
         
         function logout() {
+            // Close any open wrong credentials modal when logging out
+            closeWrongCredentialsModal();
+            
             console.log('Logout initiated...');
             
             if (idleTimer) {
@@ -4637,13 +4735,14 @@
         }
         
         // ================ ANNOUNCE WINNER IN CHAT ================
+        // UPDATED: Announce winner in global chat room using "my win" format "Congratulations to Winner: username"
         function announceWinnerInChat(winnerUsername, itemName) {
-            if (!currentUser || !currentUserData || !database) return;
+            if (!database) return;
             
             const messageData = {
                 userId: 'system',
                 username: '🎯 SYSTEM',
-                text: `🏆 Congratulations to our Winner: '${winnerUsername}' for winning ${itemName}!`,
+                text: `🏆 Congratulations to Winner: ${winnerUsername} for winning ${itemName}!`,
                 timestamp: Date.now()
             };
             
@@ -5245,7 +5344,7 @@
                     
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // ANNOUNCE WINNER IN GLOBAL CHAT
+                    // ANNOUNCE WINNER IN GLOBAL CHAT - UPDATED FORMAT
                     announceWinnerInChat(winningBid.username, item.name);
                     
                     const losingUsers = {};
