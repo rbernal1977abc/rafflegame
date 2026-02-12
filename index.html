@@ -38,11 +38,11 @@
             opacity: 0.8;
         }
 
-        /* ===== ADVERTISEMENT STYLES ===== */
+        /* ===== ADVERTISEMENT STYLES - FIXED ===== */
         .ad-space {
             background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
             color: white;
-            padding: 0; /* Remove padding, image will fill */
+            padding: 0;
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
@@ -50,17 +50,18 @@
             animation: pulse 3s infinite;
             position: relative;
             overflow: hidden;
-            height: 150px; /* Fixed height for banner */
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: 150px;
+            width: 100%;
+            display: block !important; /* Force display */
+            visibility: visible !important; /* Force visibility */
         }
 
         .ad-space img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover entire container */
-            display: block;
+            object-fit: cover;
+            display: block !important;
+            visibility: visible !important;
         }
 
         .ad-space.small {
@@ -76,8 +77,9 @@
         }
 
         .ad-space.banner {
-            height: 150px; /* Make banner larger for image */
+            height: 150px;
             margin: 10px 0;
+            display: block !important;
         }
 
         .ad-label {
@@ -1377,11 +1379,10 @@
             <div id="login-form" class="auth-form-content">
                 <h2>Login to Your Account</h2>
                 
-                <!-- SINGLE ADVERTISEMENT IMAGE - TOP OF PAGE -->
+                <!-- SINGLE ADVERTISEMENT IMAGE - TOP OF PAGE - FIXED: Always visible -->
                 <div id="global-ad-space" class="ad-space banner">
                     <div class="ad-label">Advertisement</div>
-                    <!-- FIXED: Hardcoded static image link - stays even after logout -->
-                    <img id="global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement">
+                    <img id="global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement" style="display: block; width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 
                 <div class="input-group">
@@ -1453,11 +1454,10 @@
             </div>
         </header>
         
-        <!-- SINGLE GLOBAL ADVERTISEMENT IMAGE (STATIC LINK) -->
+        <!-- SINGLE GLOBAL ADVERTISEMENT IMAGE - FIXED: Always visible -->
         <div id="user-global-ad-space" class="ad-space banner">
             <div class="ad-label">Advertisement</div>
-            <!-- FIXED: Hardcoded static image link - stays even after logout -->
-            <img id="user-global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement">
+            <img id="user-global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement" style="display: block; width: 100%; height: 100%; object-fit: cover;">
         </div>
         
         <nav class="tabs">
@@ -2212,7 +2212,7 @@
 
     <!-- FOOTER -->
     <div class="footer">
-        Developed and Patented by RP8 / Dimax Team
+        Developed and Patented by RP8 and Dimax Team
     </div>
 
     <!-- JAVASCRIPT -->
@@ -2290,6 +2290,47 @@
         let idleTimer = null;
         const IDLE_TIMEOUT = 5 * 60 * 1000;
         let hasShownGameRules = false; // Track if game rules popup has been shown
+        
+        // FIX: Ensure advertisement images are always visible
+        function ensureAdImagesVisible() {
+            const globalAdImage = document.getElementById('global-ad-image');
+            const userGlobalAdImage = document.getElementById('user-global-ad-image');
+            
+            // Set default image if not already set
+            const defaultAdUrl = 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop';
+            
+            if (globalAdImage) {
+                if (!globalAdImage.src || globalAdImage.src === '') {
+                    globalAdImage.src = defaultAdUrl;
+                }
+                // Force display
+                globalAdImage.style.display = 'block';
+                globalAdImage.style.visibility = 'visible';
+            }
+            
+            if (userGlobalAdImage) {
+                if (!userGlobalAdImage.src || userGlobalAdImage.src === '') {
+                    userGlobalAdImage.src = defaultAdUrl;
+                }
+                // Force display
+                userGlobalAdImage.style.display = 'block';
+                userGlobalAdImage.style.visibility = 'visible';
+            }
+            
+            // Ensure parent containers are visible
+            const adSpace1 = document.getElementById('global-ad-space');
+            const adSpace2 = document.getElementById('user-global-ad-space');
+            
+            if (adSpace1) {
+                adSpace1.style.display = 'block';
+                adSpace1.style.visibility = 'visible';
+            }
+            
+            if (adSpace2) {
+                adSpace2.style.display = 'block';
+                adSpace2.style.visibility = 'visible';
+            }
+        }
         
         // ================ IDLE LOGOUT SYSTEM ================
         function resetIdleTimer() {
@@ -2375,6 +2416,9 @@
             document.querySelectorAll('.auth-tab').forEach(btn => {
                 btn.classList.toggle('active', btn.textContent.toLowerCase().includes(tab));
             });
+            
+            // FIX: Ensure ad images are visible when switching tabs
+            ensureAdImagesVisible();
         }
         
         function showAdminLogin() {
@@ -2501,6 +2545,9 @@
                     document.getElementById('register-username').value = '';
                     document.getElementById('register-email').value = '';
                     document.getElementById('register-password').value = '';
+                    
+                    // FIX: Ensure ad images are visible after registration
+                    ensureAdImagesVisible();
                 })
                 .catch((error) => {
                     console.error('❌ Registration error:', error);
@@ -2533,6 +2580,9 @@
                     setUserOnlineStatus();
                     setupIdleListener();
                     showNotification('✅ Login successful!', 'success');
+                    
+                    // FIX: Ensure ad images are visible after login
+                    ensureAdImagesVisible();
                     
                     loadUserData();
                 })
@@ -2609,6 +2659,9 @@
                         document.getElementById('login-email').value = '';
                         document.getElementById('login-password').value = '';
                         
+                        // FIX: Ensure ad images are visible after logout
+                        ensureAdImagesVisible();
+                        
                         showNotification('Logged out successfully', 'success');
                         
                         document.removeEventListener('mousemove', resetIdleTimer);
@@ -2624,6 +2677,10 @@
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('user-dashboard').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.add('hidden');
+                
+                // FIX: Ensure ad images are visible after logout
+                ensureAdImagesVisible();
+                
                 showNotification('Logged out', 'info');
             }
         }
@@ -2637,6 +2694,9 @@
             
             auth.onAuthStateChanged((user) => {
                 console.log('Auth state changed:', user ? 'User: ' + user.email : 'No user');
+                
+                // FIX: Ensure ad images are visible on auth state change
+                ensureAdImagesVisible();
                 
                 if (user) {
                     currentUser = user;
@@ -2694,6 +2754,9 @@
                         // SHOW GAME RULES POPUP ON LOGIN
                         showGameRulesPopup();
                     }
+                    
+                    // FIX: Ensure ad images are visible after loading user data
+                    ensureAdImagesVisible();
                 } else {
                     const userData = {
                         username: currentUser.email.split('@')[0],
@@ -2734,6 +2797,9 @@
                                 // SHOW GAME RULES POPUP ON REGISTER
                                 showGameRulesPopup();
                             }
+                            
+                            // FIX: Ensure ad images are visible after creating user data
+                            ensureAdImagesVisible();
                         })
                         .catch(error => {
                             console.error('Error creating user data:', error);
@@ -2770,8 +2836,23 @@
             const globalAdImage = document.getElementById('global-ad-image');
             const userGlobalAdImage = document.getElementById('user-global-ad-image');
             
-            if (globalAdImage) globalAdImage.src = imageUrl;
-            if (userGlobalAdImage) userGlobalAdImage.src = imageUrl;
+            if (globalAdImage) {
+                globalAdImage.src = imageUrl;
+                globalAdImage.style.display = 'block';
+                globalAdImage.style.visibility = 'visible';
+            }
+            if (userGlobalAdImage) {
+                userGlobalAdImage.src = imageUrl;
+                userGlobalAdImage.style.display = 'block';
+                userGlobalAdImage.style.visibility = 'visible';
+            }
+            
+            // Also update the default in localStorage for persistence
+            try {
+                localStorage.setItem('defaultAdUrl', imageUrl);
+            } catch(e) {
+                console.log('Could not save to localStorage', e);
+            }
             
             showNotification('Global advertisement image updated successfully!', 'success');
             closeModal();
@@ -2798,6 +2879,9 @@
                     loadUserBids();
                     loadUserWinsMini();
                 }
+                
+                // FIX: Ensure ad images are visible on real-time updates
+                ensureAdImagesVisible();
             });
         }
         
@@ -2815,6 +2899,9 @@
             
             updateManualBidSummary();
             updateAutoBidSummary();
+            
+            // FIX: Ensure ad images are visible on UI update
+            ensureAdImagesVisible();
         }
         
         // ================ DASHBOARD FUNCTIONS ================
@@ -2827,6 +2914,8 @@
             
             setTimeout(() => {
                 showTab('wallet');
+                // FIX: Ensure ad images are visible after showing dashboard
+                ensureAdImagesVisible();
             }, 100);
         }
         
@@ -2836,6 +2925,9 @@
             document.getElementById('admin-dashboard').classList.remove('hidden');
             
             initializeCollapsibleSections();
+            
+            // FIX: Ensure ad images are visible in admin dashboard
+            ensureAdImagesVisible();
         }
         
         function initializeCollapsibleSections() {
@@ -2890,6 +2982,9 @@
                 loadGameItems();
                 loadUpcomingGameItems();
             }
+            
+            // FIX: Ensure ad images are visible when switching tabs
+            ensureAdImagesVisible();
         }
         
         // ================ WINS DROPDOWN FUNCTIONS ================
@@ -5468,6 +5563,11 @@
             
             setupChatPage();
             
+            // FIX: Ensure advertisement images are visible on page load
+            setTimeout(() => {
+                ensureAdImagesVisible();
+            }, 100);
+            
             setTimeout(() => {
                 monitorConnection();
             }, 1000);
@@ -5481,6 +5581,11 @@
             setInterval(() => {
                 checkAutoDraws();
             }, 60000);
+            
+            // FIX: Periodic check to ensure ad images are visible
+            setInterval(() => {
+                ensureAdImagesVisible();
+            }, 2000);
         };
     </script>
 </body>
