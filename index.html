@@ -1816,8 +1816,8 @@
                     <h4 style="color: #ff9800; margin-bottom: 15px;">
                         <i class="fas fa-ad"></i> Global Advertisement Image
                     </h4>
-                    <p style="margin-bottom: 10px; color: #666;">Set the advertisement image that all users will see.</p>
-                    <input type="text" id="global-ad-image-url" placeholder="Enter image URL" value="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+                    <p style="margin-bottom: 10px; color: #666;">Set the advertisement image that all users will see. This will be saved permanently.</p>
+                    <input type="text" id="global-ad-image-url" placeholder="Enter image URL" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
                     <button onclick="updateGlobalAdImage()" class="btn-primary" style="margin-bottom: 0;">
                         <i class="fas fa-save"></i> Update Advertisement Image
                     </button>
@@ -2442,6 +2442,55 @@
             userStatusRef.onDisconnect().remove();
         }
         
+        // ================ GLOBAL ADVERTISEMENT FUNCTIONS (PERSISTENT) ================
+        function loadGlobalAdImage() {
+            if (!database) return;
+            
+            database.ref('settings/globalAdImage').once('value', (snapshot) => {
+                const imageUrl = snapshot.val();
+                if (imageUrl) {
+                    updateAdImageElements(imageUrl);
+                } else {
+                    // Set default image if none exists
+                    const defaultImage = 'https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop';
+                    updateAdImageElements(defaultImage);
+                }
+            });
+        }
+        
+        function updateAdImageElements(imageUrl) {
+            const globalAdImage = document.getElementById('global-ad-image');
+            const userGlobalAdImage = document.getElementById('user-global-ad-image');
+            const adminInput = document.getElementById('global-ad-image-url');
+            
+            if (globalAdImage) globalAdImage.src = imageUrl;
+            if (userGlobalAdImage) userGlobalAdImage.src = imageUrl;
+            if (adminInput) adminInput.value = imageUrl;
+        }
+        
+        function updateGlobalAdImage() {
+            const imageUrl = document.getElementById('global-ad-image-url').value.trim();
+            if (!imageUrl) {
+                showNotification('Please enter an image URL', 'error');
+                return;
+            }
+            
+            if (!database) {
+                showNotification('Database not available', 'error');
+                return;
+            }
+            
+            database.ref('settings/globalAdImage').set(imageUrl)
+                .then(() => {
+                    updateAdImageElements(imageUrl);
+                    showNotification('Global advertisement image updated successfully!', 'success');
+                })
+                .catch((error) => {
+                    console.error('Error saving ad image:', error);
+                    showNotification('Error saving image: ' + getFirebaseError(error), 'error');
+                });
+        }
+        
         // ================ AUTHENTICATION FUNCTIONS ================
         function showAuthTab(tab) {
             document.getElementById('login-form').classList.toggle('hidden', tab !== 'login');
@@ -2610,6 +2659,7 @@
                     setupIdleListener();
                     showNotification('✅ Login successful!', 'success');
                     
+                    loadGlobalAdImage(); // Load the persistent ad image
                     loadUserData();
                 })
                 .catch((error) => {
@@ -2854,25 +2904,6 @@
             document.getElementById('game-rules-modal').classList.add('hidden');
         }
         
-        // ================ GLOBAL ADVERTISEMENT FUNCTIONS ================
-        function updateGlobalAdImage() {
-            const imageUrl = document.getElementById('global-ad-image-url').value.trim();
-            if (!imageUrl) {
-                showNotification('Please enter an image URL', 'error');
-                return;
-            }
-            
-            // Update both ad spaces
-            const globalAdImage = document.getElementById('global-ad-image');
-            const userGlobalAdImage = document.getElementById('user-global-ad-image');
-            
-            if (globalAdImage) globalAdImage.src = imageUrl;
-            if (userGlobalAdImage) userGlobalAdImage.src = imageUrl;
-            
-            showNotification('Global advertisement image updated successfully!', 'success');
-            closeModal();
-        }
-        
         function setupRealTimeListeners() {
             if (!currentUser || !database) return;
             
@@ -2893,6 +2924,14 @@
                 if (document.getElementById('bids-tab').classList.contains('active')) {
                     loadUserBids();
                     loadUserWinsMini();
+                }
+            });
+            
+            // Listen for global ad image changes
+            database.ref('settings/globalAdImage').on('value', (snapshot) => {
+                const imageUrl = snapshot.val();
+                if (imageUrl) {
+                    updateAdImageElements(imageUrl);
                 }
             });
         }
@@ -2932,6 +2971,7 @@
             document.getElementById('admin-dashboard').classList.remove('hidden');
             
             initializeCollapsibleSections();
+            loadGlobalAdImage(); // Load current ad image into admin input
         }
         
         function initializeCollapsibleSections() {
@@ -4735,7 +4775,7 @@
         }
         
         // ================ ANNOUNCE WINNER IN CHAT ================
-        // UPDATED: Announce winner in global chat room using "my win" format "Congratulations to Winner: username"
+        // UPDATED: Announce winner in global chat room - REMOVED "Refunded" part
         function announceWinnerInChat(winnerUsername, itemName) {
             if (!database) return;
             
@@ -5344,7 +5384,7 @@
                     
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // ANNOUNCE WINNER IN GLOBAL CHAT - UPDATED FORMAT
+                    // ANNOUNCE WINNER IN GLOBAL CHAT - UPDATED FORMAT (Removed "Refunded")
                     announceWinnerInChat(winningBid.username, item.name);
                     
                     const losingUsers = {};
