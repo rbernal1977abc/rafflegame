@@ -5253,6 +5253,7 @@
                 });
         }
         
+        // ================ RUN ITEM DRAW - UPDATED TO REMOVE REFUND TEXT IN WINNER MESSAGE ================
         function runItemDraw(itemId) {
             if (!database) {
                 showNotification('Database not available', 'error');
@@ -5384,7 +5385,7 @@
                     
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // ANNOUNCE WINNER IN GLOBAL CHAT - UPDATED FORMAT (Removed "Refunded")
+                    // ANNOUNCE WINNER IN GLOBAL CHAT - UPDATED FORMAT (Removed "Refunded" text)
                     announceWinnerInChat(winningBid.username, item.name);
                     
                     const losingUsers = {};
@@ -5444,7 +5445,8 @@
                     
                     return database.ref().update(updates)
                         .then(() => {
-                            showNotification(`Winner declared for ${item.name}: ${winningBid.username} with number ${winningBid.number.toFixed(3)}. Refunded ₱${formatDecimal(totalRefunded)} to losers with 2% fee (₱${formatDecimal(totalFees)})`, 'success');
+                            // UPDATED: Removed refund text from winner notification
+                            showNotification(`Winner declared for ${item.name}: ${winningBid.username} with number ${winningBid.number.toFixed(3)}`, 'success');
                         });
                 }
             })
