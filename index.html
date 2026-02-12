@@ -1095,7 +1095,7 @@
         .chat-container {
             display: flex;
             flex-direction: column;
-            height: 400px;
+            height: 600px; /* INCREASED HEIGHT FOR PLENTY OF SPACE */
             border: 1px solid #ddd;
             border-radius: 10px;
             overflow: hidden;
@@ -1108,6 +1108,7 @@
             padding: 15px;
             text-align: center;
             font-weight: bold;
+            font-size: 16px;
         }
         
         .chat-messages {
@@ -1364,6 +1365,137 @@
             20%, 60% { transform: translateX(-10px); }
             40%, 80% { transform: translateX(10px); }
         }
+
+        /* ===== NEW: WINNER CONGRATULATIONS POPUP ===== */
+        .winner-congrats-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 5000;
+        }
+
+        .winner-congrats-content {
+            background: linear-gradient(145deg, #2c3e50, #1e2b38);
+            color: white;
+            width: 90%;
+            max-width: 500px;
+            border-radius: 20px;
+            padding: 30px 25px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 3px solid gold;
+            overflow: hidden;
+        }
+
+        .fireworks-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .firework {
+            position: absolute;
+            font-size: 30px;
+            animation: explode 2s infinite;
+        }
+
+        .firework1 { top: 20%; left: 10%; animation-delay: 0s; color: #ff4d4d; }
+        .firework2 { top: 30%; right: 15%; animation-delay: 0.5s; color: #ffd700; }
+        .firework3 { bottom: 25%; left: 20%; animation-delay: 1s; color: #4dff4d; }
+        .firework4 { bottom: 35%; right: 25%; animation-delay: 1.5s; color: #4da6ff; }
+        .firework5 { top: 50%; left: 5%; animation-delay: 2s; color: #ff80bf; }
+        .firework6 { top: 60%; right: 5%; animation-delay: 2.5s; color: #ff9933; }
+        .firework7 { bottom: 5%; left: 45%; animation-delay: 3s; color: #cc00cc; }
+        .firework8 { top: 5%; right: 35%; animation-delay: 3.5s; color: #66ffff; }
+
+        .balloon {
+            position: absolute;
+            font-size: 40px;
+            animation: float 4s infinite;
+            opacity: 0.8;
+        }
+
+        .balloon1 { top: 10%; left: 15%; animation-delay: 0s; color: #ff6b6b; transform: rotate(-10deg); }
+        .balloon2 { top: 15%; right: 20%; animation-delay: 1s; color: #4ecdc4; transform: rotate(15deg); }
+        .balloon3 { bottom: 20%; left: 25%; animation-delay: 2s; color: #ffe66d; transform: rotate(5deg); }
+        .balloon4 { bottom: 25%; right: 30%; animation-delay: 3s; color: #a8e6cf; transform: rotate(-5deg); }
+
+        @keyframes explode {
+            0% { transform: scale(0) rotate(0deg); opacity: 1; }
+            50% { transform: scale(1.5) rotate(180deg); opacity: 0.8; }
+            100% { transform: scale(0) rotate(360deg); opacity: 0; }
+        }
+
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(-10deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+            100% { transform: translateY(0px) rotate(-10deg); }
+        }
+
+        .winner-congrats-text {
+            position: relative;
+            z-index: 1;
+        }
+
+        .winner-congrats-text h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+
+        .winner-congrats-text p {
+            font-size: 20px;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        .winner-congrats-text .raffle-item {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffd700;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid gold;
+        }
+
+        .winner-congrats-text .claim-message {
+            font-size: 18px;
+            margin: 20px 0;
+            color: #fff;
+        }
+
+        .winner-congrats-text button {
+            background: gold;
+            color: #1e2b38;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            border: 2px solid white;
+        }
+
+        .winner-congrats-text button:hover {
+            transform: scale(1.1);
+            background: #ffd700;
+            box-shadow: 0 0 20px gold;
+        }
         
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
@@ -1402,7 +1534,7 @@
             }
             
             .chat-container {
-                height: 350px;
+                height: 550px; /* Increased but slightly less for mobile */
             }
             
             .tab-content {
@@ -1411,7 +1543,7 @@
             }
             
             #chat-tab {
-                min-height: 550px;
+                min-height: 650px; /* Adjusted for larger chat */
             }
             
             .online-users-content.expanded {
@@ -1444,11 +1576,7 @@
             <div id="login-form" class="auth-form-content">
                 <h2>Login to Your Account</h2>
                 
-                <!-- SINGLE ADVERTISEMENT IMAGE - TOP OF PAGE -->
-                <div id="global-ad-space" class="ad-space banner">
-                    <div class="ad-label">Advertisement</div>
-                    <img id="global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement">
-                </div>
+                <!-- SINGLE ADVERTISEMENT IMAGE - REMOVED FROM LOGIN PAGE AS REQUESTED -->
                 
                 <div class="input-group">
                     <i class="fas fa-user"></i>
@@ -2282,6 +2410,34 @@
         </div>
     </div>
 
+    <!-- NEW: WINNER CONGRATULATIONS POPUP MODAL -->
+    <div id="winner-congrats-modal" class="winner-congrats-modal hidden">
+        <div class="winner-congrats-content">
+            <div class="fireworks-animation">
+                <div class="firework firework1"><i class="fas fa-star"></i></div>
+                <div class="firework firework2"><i class="fas fa-star"></i></div>
+                <div class="firework firework3"><i class="fas fa-star"></i></div>
+                <div class="firework firework4"><i class="fas fa-star"></i></div>
+                <div class="firework firework5"><i class="fas fa-star"></i></div>
+                <div class="firework firework6"><i class="fas fa-star"></i></div>
+                <div class="firework firework7"><i class="fas fa-star"></i></div>
+                <div class="firework firework8"><i class="fas fa-star"></i></div>
+                <div class="balloon balloon1"><i class="fas fa-gift"></i></div>
+                <div class="balloon balloon2"><i class="fas fa-gift"></i></div>
+                <div class="balloon balloon3"><i class="fas fa-gift"></i></div>
+                <div class="balloon balloon4"><i class="fas fa-gift"></i></div>
+            </div>
+            <div class="winner-congrats-text">
+                <h2>🎉 Congratulations! 🎉</h2>
+                <p class="raffle-item" id="winner-congrats-item">You Win iPhone 15 Pro</p>
+                <p class="claim-message">Go to your My Wins and claim your prize now!</p>
+                <button onclick="closeWinnerCongratsModal()">
+                    <i class="fas fa-gift"></i> Claim Now
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- NOTIFICATION AREA -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
 
@@ -2607,7 +2763,9 @@
                         walletInfo: { shopee: '', lazada: '' },
                         deposits: {},
                         walletLogs: [],
-                        serviceFees: 0.000
+                        serviceFees: 0.000,
+                        // Track shown winner popups to avoid showing again
+                        shownWinnerPopups: []
                     };
                     
                     if (!database) {
@@ -2819,6 +2977,11 @@
                 console.log('User data loaded:', currentUserData);
                 
                 if (currentUserData) {
+                    // Ensure shownWinnerPopups array exists
+                    if (!currentUserData.shownWinnerPopups) {
+                        currentUserData.shownWinnerPopups = [];
+                    }
+                    
                     updateUI();
                     setupRealTimeListeners();
                     
@@ -2839,6 +3002,9 @@
                         
                         // SHOW GAME RULES POPUP ON LOGIN
                         showGameRulesPopup();
+                        
+                        // CHECK FOR NEW WINS AND SHOW CONGRATULATIONS POPUP
+                        checkForNewWinsAndShowPopup();
                     }
                 } else {
                     const userData = {
@@ -2853,7 +3019,8 @@
                         walletInfo: { shopee: '', lazada: '' },
                         deposits: {},
                         walletLogs: [],
-                        serviceFees: 0.000
+                        serviceFees: 0.000,
+                        shownWinnerPopups: []
                     };
                     
                     database.ref('users/' + currentUser.uid).set(userData)
@@ -2892,6 +3059,66 @@
             });
         }
         
+        // ================ WINNER CONGRATULATIONS POPUP ================
+        function checkForNewWinsAndShowPopup() {
+            if (!currentUser || !currentUserData || !currentUserData.wins) return;
+            
+            const userWins = currentUserData.wins || [];
+            const shownPopups = currentUserData.shownWinnerPopups || [];
+            
+            // Sort wins by date (newest first)
+            const sortedWins = [...userWins].sort((a, b) => new Date(b.winDate) - new Date(a.winDate));
+            
+            if (sortedWins.length === 0) return;
+            
+            // Get the most recent win
+            const latestWin = sortedWins[0];
+            
+            // Check if we've already shown a popup for this win
+            if (!shownPopups.includes(latestWin.itemId + '_' + latestWin.winDate)) {
+                // Show the congratulations popup
+                showWinnerCongratsPopup(latestWin);
+                
+                // Mark this win as shown
+                shownPopups.push(latestWin.itemId + '_' + latestWin.winDate);
+                
+                // Save to database
+                database.ref('users/' + currentUser.uid + '/shownWinnerPopups').set(shownPopups)
+                    .catch(error => console.error('Error saving shown popup:', error));
+            }
+        }
+        
+        function showWinnerCongratsPopup(win) {
+            const modal = document.getElementById('winner-congrats-modal');
+            const itemElement = document.getElementById('winner-congrats-item');
+            
+            if (modal && itemElement) {
+                itemElement.textContent = win.itemName || 'Raffle Item';
+                modal.classList.remove('hidden');
+            }
+        }
+        
+        function closeWinnerCongratsModal() {
+            const modal = document.getElementById('winner-congrats-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+            }
+            
+            // Navigate to My Wins tab to claim prizes
+            showTab('bids');
+            
+            // Expand the wins dropdown to show the wins
+            const winsContent = document.getElementById('wins-dropdown-content');
+            const winsIcon = document.getElementById('wins-dropdown-icon');
+            if (winsContent && !winsContent.classList.contains('expanded')) {
+                winsContent.classList.add('expanded');
+                winsIcon.classList.add('expanded');
+                loadUserWinsMini();
+            }
+            
+            showNotification('Go to My Wins to claim your prize!', 'success');
+        }
+        
         // ================ GAME RULES POPUP ================
         function showGameRulesPopup() {
             if (!hasShownGameRules) {
@@ -2913,8 +3140,23 @@
                 const userData = snapshot.val();
                 if (!userData) return;
                 
+                // Store previous wins count to detect new wins
+                const previousWinsCount = currentUserData?.wins?.length || 0;
+                
                 currentUserData = userData;
+                
+                // Ensure shownWinnerPopups array exists
+                if (!currentUserData.shownWinnerPopups) {
+                    currentUserData.shownWinnerPopups = [];
+                }
+                
                 updateUI();
+                
+                // Check for new wins and show popup if needed
+                const currentWinsCount = currentUserData.wins?.length || 0;
+                if (currentWinsCount > previousWinsCount && !currentUserData.isAdmin) {
+                    checkForNewWinsAndShowPopup();
+                }
                 
                 if (document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
@@ -4693,10 +4935,10 @@
                         </div>
                     </div>
                     
-                    <!-- Chat Container -->
+                    <!-- Chat Container with more space for messages -->
                     <div class="chat-container">
                         <div class="chat-header">
-                            <i class="fas fa-comments"></i> Global Chat Room
+                            <i class="fas fa-comments"></i> Global Chat Room - Plenty of space for posting messages!
                         </div>
                         <div class="chat-messages" id="chat-messages">
                             <div style="text-align: center; color: #999; padding: 20px;">
