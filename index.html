@@ -42,7 +42,7 @@
         .ad-space {
             background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
             color: white;
-            padding: 15px;
+            padding: 0; /* Remove padding, image will fill */
             border-radius: 10px;
             margin: 15px 0;
             text-align: center;
@@ -50,36 +50,34 @@
             animation: pulse 3s infinite;
             position: relative;
             overflow: hidden;
+            height: 150px; /* Fixed height for banner */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ad-space img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover entire container */
+            display: block;
         }
 
         .ad-space.small {
             height: 100px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
         }
 
         .ad-space.medium {
             height: 150px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
         }
 
         .ad-space.large {
             height: 200px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
         }
 
         .ad-space.banner {
-            height: 90px;
+            height: 150px; /* Make banner larger for image */
             margin: 10px 0;
-            font-size: 12px;
         }
 
         .ad-label {
@@ -91,12 +89,118 @@
             padding: 2px 8px;
             border-radius: 3px;
             font-size: 10px;
+            z-index: 2;
         }
 
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.02); }
             100% { transform: scale(1); }
+        }
+
+        /* ===== GAME RULES POPUP ===== */
+        .game-rules-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+        
+        .game-rules-content {
+            background: linear-gradient(145deg, #2c3e50, #1e2b38);
+            color: white;
+            width: 90%;
+            max-width: 450px;
+            border-radius: 20px;
+            padding: 30px 25px;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            border: 3px solid gold;
+            overflow: hidden;
+        }
+        
+        .coins-animation {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .coin {
+            position: absolute;
+            font-size: 24px;
+            animation: coinSplash 3s infinite;
+            opacity: 0.7;
+        }
+        
+        .coin1 { top: 10%; left: 5%; animation-delay: 0s; color: gold; }
+        .coin2 { top: 20%; right: 10%; animation-delay: 0.5s; color: silver; }
+        .coin3 { bottom: 15%; left: 15%; animation-delay: 1s; color: gold; }
+        .coin4 { bottom: 25%; right: 20%; animation-delay: 1.5s; color: silver; }
+        .coin5 { top: 50%; left: 5%; animation-delay: 2s; color: gold; }
+        .coin6 { top: 60%; right: 5%; animation-delay: 2.5s; color: silver; }
+        .coin7 { bottom: 5%; left: 50%; animation-delay: 3s; color: gold; }
+        .coin8 { top: 5%; right: 30%; animation-delay: 3.5s; color: silver; }
+        
+        @keyframes coinSplash {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            50% { transform: translateY(-20px) rotate(180deg); opacity: 1; }
+            100% { transform: translateY(0) rotate(360deg); opacity: 0.7; }
+        }
+        
+        .game-rules-text {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .game-rules-text h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: gold;
+            text-shadow: 0 0 10px rgba(255,215,0,0.5);
+        }
+        
+        .game-rules-text p {
+            font-size: 22px;
+            font-weight: bold;
+            margin: 20px 0;
+            line-height: 1.5;
+            color: white;
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 15px;
+            border: 2px solid gold;
+        }
+        
+        .game-rules-text button {
+            background: gold;
+            color: #1e2b38;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: all 0.3s;
+            border: 2px solid white;
+        }
+        
+        .game-rules-text button:hover {
+            transform: scale(1.1);
+            background: #ffd700;
+            box-shadow: 0 0 20px gold;
         }
 
         /* ===== SCREEN CONTAINERS ===== */
@@ -251,12 +355,6 @@
         .btn-success.placed {
             background: #dc3545;
             animation: pulse 0.5s;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(0.95); }
-            100% { transform: scale(1); }
         }
 
         .btn-warning {
@@ -494,6 +592,7 @@
             margin: 20px 0;
         }
         
+        /* ===== HIGHLIGHTED BID NUMBER ===== */
         #bid-number {
             font-size: 36px;
             text-align: center;
@@ -506,13 +605,14 @@
             letter-spacing: 2px;
             font-family: monospace;
             color: #999;
-            transition: all 0.3s;
+            transition: all 0.3s ease;
         }
         
         #bid-number.has-value {
             color: #28a745;
-            background: #f8fff9;
+            background: #e8f5e9;
             border-color: #28a745;
+            box-shadow: 0 0 15px rgba(40, 167, 69, 0.3);
         }
         
         /* ===== CASHIN OPTIONS ===== */
@@ -639,7 +739,7 @@
             background: #f8d7da;
         }
         
-        /* ===== BID LIST ===== */
+        /* ===== BID ITEM ===== */
         .bid-item {
             background: #f8f9fa;
             padding: 15px;
@@ -1148,6 +1248,56 @@
             text-overflow: ellipsis;
         }
         
+        /* ===== BIDS & WINS DROPDOWN ===== */
+        .wins-dropdown-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border-left: 5px solid #28a745;
+            cursor: pointer;
+        }
+        
+        .wins-dropdown-header:hover {
+            background: #e9ecef;
+        }
+        
+        .wins-dropdown-header h4 {
+            margin: 0;
+            color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .wins-dropdown-icon {
+            transition: transform 0.3s;
+        }
+        
+        .wins-dropdown-icon.expanded {
+            transform: rotate(180deg);
+        }
+        
+        .wins-dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+        }
+        
+        .wins-dropdown-content.expanded {
+            max-height: 800px;
+            margin-bottom: 20px;
+        }
+        
+        /* ===== PRICE WITH COMMA ===== */
+        .price-with-comma {
+            font-family: monospace;
+            letter-spacing: 1px;
+        }
+        
         /* ===== RESPONSIVE ===== */
         @media (max-width: 600px) {
             body {
@@ -1227,10 +1377,10 @@
             <div id="login-form" class="auth-form-content">
                 <h2>Login to Your Account</h2>
                 
-                <!-- ADVERTISEMENT BANNER 1 -->
-                <div class="ad-space banner">
-                    <div class="ad-label">Ad Space</div>
-                    <div>🚀 AD HERE</div>
+                <!-- SINGLE ADVERTISEMENT IMAGE - TOP OF PAGE -->
+                <div id="global-ad-space" class="ad-space banner">
+                    <div class="ad-label">Advertisement</div>
+                    <img id="global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement">
                 </div>
                 
                 <div class="input-group">
@@ -1251,12 +1401,6 @@
                 <button onclick="showForgotPassword()" class="btn-link">
                     <i class="fas fa-key"></i> Forgot Password?
                 </button>
-                
-                <!-- ADVERTISEMENT BANNER 2 -->
-                <div class="ad-space banner">
-                    <div class="ad-label">Sponsored</div>
-                    <div>🎰 AD HERE</div>
-                </div>
                 
                 <div class="admin-login" style="margin-top: 20px;">
                     <button onclick="showAdminLogin()" class="btn-secondary">
@@ -1284,12 +1428,6 @@
                     <input type="password" id="register-password" placeholder="Create password (min 6 chars)">
                 </div>
                 
-                <!-- ADVERTISEMENT -->
-                <div class="ad-space small">
-                    <div class="ad-label">Special Offer</div>
-                    <div>🎁 Register now and start with ₱50 free!</div>
-                </div>
-                
                 <button onclick="registerUser()" class="btn-primary">
                     <i class="fas fa-user-plus"></i> Create Account
                 </button>
@@ -1314,10 +1452,10 @@
             </div>
         </header>
         
-        <!-- TOP ADVERTISEMENT -->
-        <div class="ad-space banner">
+        <!-- SINGLE GLOBAL ADVERTISEMENT IMAGE -->
+        <div id="user-global-ad-space" class="ad-space banner">
             <div class="ad-label">Advertisement</div>
-            <div>🔥 AD HERE</div>
+            <img id="user-global-ad-image" src="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" alt="Advertisement">
         </div>
         
         <nav class="tabs">
@@ -1331,10 +1469,7 @@
                 <i class="fas fa-wallet"></i> Wallet
             </button>
             <button class="tab" onclick="showTab('bids')">
-                <i class="fas fa-history"></i> My Bids
-            </button>
-            <button class="tab" onclick="showTab('wins')">
-                <i class="fas fa-trophy"></i> My Wins
+                <i class="fas fa-history"></i> Bids & Wins
             </button>
             <button class="tab" onclick="showTab('send')">
                 <i class="fas fa-paper-plane"></i> Send
@@ -1345,12 +1480,23 @@
         <div id="play-tab" class="tab-content">
             <h3 style="margin-bottom: 20px; color: #667eea;">🎯 Live Games</h3>
             
-            <!-- ADVERTISEMENT -->
-            <div class="ad-space medium">
-                <div class="ad-label">Featured Game</div>
-                <div>📱 AD HERE</div>
+            <!-- UPCOMING GAMES SECTION (PLACED ON TOP) -->
+            <div class="collapsible-header" onclick="toggleCollapsible('upcoming-games')">
+                <h4 style="margin: 0; color: #ff9800;">
+                    <i class="fas fa-clock"></i> Upcoming Games
+                </h4>
+                <i class="fas fa-chevron-down collapsible-icon" id="upcoming-games-icon"></i>
+            </div>
+            <div class="collapsible-content expanded" id="upcoming-games-content">
+                <div class="scrollable-content">
+                    <div id="upcoming-game-items" class="items-grid">
+                        <!-- Upcoming items loaded from Firebase -->
+                    </div>
+                </div>
+                <button class="view-all-btn" onclick="viewAllUpcomingGames()">View All Upcoming Games</button>
             </div>
             
+            <!-- ACTIVE GAMES SECTION -->
             <div class="collapsible-header" onclick="toggleCollapsible('active-games')">
                 <h4 style="margin: 0; color: #667eea;">
                     <i class="fas fa-ticket-alt"></i> Active Games
@@ -1377,16 +1523,10 @@
                     </div>
                     
                     <div id="game-items" class="items-grid">
-                        <!-- Items loaded from Firebase -->
+                        <!-- Active items loaded from Firebase -->
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllGames()">View All Games</button>
-            </div>
-            
-            <!-- BOTTOM ADVERTISEMENT -->
-            <div class="ad-space banner">
-                <div class="ad-label">Sponsored</div>
-                <div>🎯 AD HERE</div>
             </div>
         </div>
         
@@ -1399,12 +1539,6 @@
         <div id="wallet-tab" class="tab-content active">
             <div class="wallet-info">
                 <h3 style="color: #667eea; margin-bottom: 20px;">💰 My Wallet</h3>
-                
-                <!-- ADVERTISEMENT -->
-                <div class="ad-space banner">
-                    <div class="ad-label">Ad Space</div>
-                    <div>💸 AD HERE</div>
-                </div>
                 
                 <div class="balance-card">
                     <h4>Available Play Money</h4>
@@ -1479,16 +1613,25 @@
             </div>
         </div>
         
-        <!-- MY BIDS TAB -->
+        <!-- BIDS & WINS TAB (Consolidated) -->
         <div id="bids-tab" class="tab-content">
-            <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Bidding History</h3>
+            <h3 style="color: #667eea; margin-bottom: 20px;">📊 My Bidding & Wins History</h3>
             
-            <!-- ADVERTISEMENT -->
-            <div class="ad-space banner">
-                <div class="ad-label">Tip</div>
-                <div>🎲 AD HERE</div>
+            <!-- MY WINS DROPDOWN (ON TOP) -->
+            <div class="wins-dropdown-header" onclick="toggleWinsDropdown()">
+                <h4>
+                    <i class="fas fa-trophy" style="color: #28a745;"></i> My Wins
+                </h4>
+                <i class="fas fa-chevron-down wins-dropdown-icon" id="wins-dropdown-icon"></i>
+            </div>
+            <div class="wins-dropdown-content" id="wins-dropdown-content">
+                <div id="wins-list-mini" class="winner-items-grid" style="margin-bottom: 20px;">
+                    <!-- Wins loaded here -->
+                </div>
+                <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
             </div>
             
+            <!-- MY BIDS SECTION -->
             <div class="collapsible-header" onclick="toggleCollapsible('bidding-history')">
                 <h4 style="margin: 0; color: #667eea;">
                     <i class="fas fa-history"></i> My Bids
@@ -1502,32 +1645,6 @@
                     </div>
                 </div>
                 <button class="view-all-btn" onclick="viewAllBids()">View All Bids</button>
-            </div>
-        </div>
-        
-        <!-- MY WINS TAB -->
-        <div id="wins-tab" class="tab-content">
-            <h3 style="color: #667eea; margin-bottom: 20px;">🏆 My Winning Items</h3>
-            
-            <!-- ADVERTISEMENT -->
-            <div class="ad-space medium">
-                <div class="ad-label">Winner's Circle</div>
-                <div>🌟 AD HERE</div>
-            </div>
-            
-            <div class="collapsible-header" onclick="toggleCollapsible('my-wins')">
-                <h4 style="margin: 0; color: #667eea;">
-                    <i class="fas fa-trophy"></i> My Wins
-                </h4>
-                <i class="fas fa-chevron-down collapsible-icon" id="my-wins-icon"></i>
-            </div>
-            <div class="collapsible-content expanded" id="my-wins-content">
-                <div class="scrollable-content">
-                    <div id="wins-list" class="winner-items-grid">
-                        <!-- Winning items loaded here -->
-                    </div>
-                </div>
-                <button class="view-all-btn" onclick="viewAllWins()">View All Wins</button>
             </div>
         </div>
         
@@ -1627,6 +1744,18 @@
             
             <!-- ADMIN ACTIONS -->
             <div class="admin-actions" style="margin-top: 30px;">
+                <!-- ADVERTISEMENT IMAGE FIELD - ADDED ON TOP -->
+                <div style="margin-bottom: 20px; padding: 20px; background: #f8f9fa; border-radius: 10px; border: 2px solid #ff9800;">
+                    <h4 style="color: #ff9800; margin-bottom: 15px;">
+                        <i class="fas fa-ad"></i> Global Advertisement Image
+                    </h4>
+                    <p style="margin-bottom: 10px; color: #666;">Set the advertisement image that all users will see.</p>
+                    <input type="text" id="global-ad-image-url" placeholder="Enter image URL" value="https://images.unsplash.com/photo-1607083206968-13611e3d76db?w=500&h=150&fit=crop" style="width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; margin-bottom: 10px;">
+                    <button onclick="updateGlobalAdImage()" class="btn-primary" style="margin-bottom: 0;">
+                        <i class="fas fa-save"></i> Update Advertisement Image
+                    </button>
+                </div>
+                
                 <button onclick="showAddItemModal()" class="btn-primary" style="margin-bottom: 20px;">
                     <i class="fas fa-plus-circle"></i> Add New Game Item
                 </button>
@@ -1687,7 +1816,6 @@
                     <button onclick="createDemoGames()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Create Demo Games
                     </button>
-                    <!-- Removed Initialize Admin Account button -->
                     <button onclick="resetAllData()" class="btn-secondary" style="margin: 10px 5px; cursor: pointer;">
                         Reset Data
                     </button>
@@ -1708,12 +1836,6 @@
             </div>
             
             <img id="item-image" src="" alt="Item" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin: 15px 0;">
-            
-            <!-- IN-GAME ADVERTISEMENT -->
-            <div class="ad-space banner">
-                <div class="ad-label">Sponsored</div>
-                <div>🎰 Place more bids to increase your chances!</div>
-            </div>
             
             <div class="bidding-interface">
                 <div class="number-display">
@@ -1867,7 +1989,7 @@
             <div style="text-align: center; margin: 20px 0;">
                 <img id="winner-item-image" src="" alt="Item" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 10px; margin: 15px 0;">
                 <h4 id="winner-item-name" style="color: #28a745;"></h4>
-                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="winner-item-price" class="decimal-format"></div>
+                <div style="font-size: 24px; font-weight: bold; margin: 10px 0;" id="winner-item-price" class="price-with-comma"></div>
             </div>
             
             <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
@@ -2054,6 +2176,34 @@
             </button>
         </div>
     </div>
+    
+    <!-- GAME RULES POPUP MODAL -->
+    <div id="game-rules-modal" class="game-rules-modal hidden">
+        <div class="game-rules-content">
+            <div class="coins-animation">
+                <div class="coin coin1"><i class="fas fa-coins"></i></div>
+                <div class="coin coin2"><i class="fas fa-coins"></i></div>
+                <div class="coin coin3"><i class="fas fa-coins"></i></div>
+                <div class="coin coin4"><i class="fas fa-coins"></i></div>
+                <div class="coin coin5"><i class="fas fa-coins"></i></div>
+                <div class="coin coin6"><i class="fas fa-coins"></i></div>
+                <div class="coin coin7"><i class="fas fa-coins"></i></div>
+                <div class="coin coin8"><i class="fas fa-coins"></i></div>
+            </div>
+            <div class="game-rules-text">
+                <h2>🎯 Game Rules</h2>
+                <p style="font-size: 24px; font-weight: 800;">
+                    Lowest unique number wins!<br>
+                    No duplicate numbers allowed.<br>
+                    Format: X.XXX (e.g., 0.001, 1.111, 123.456).<br>
+                    <span style="color: gold;">Good Luck!</span>
+                </p>
+                <button onclick="closeGameRulesPopup()">
+                    <i class="fas fa-check-circle"></i> Let's Play!
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- NOTIFICATION AREA -->
     <div id="notification-area" style="position: fixed; top: 20px; right: 20px; z-index: 1001;"></div>
@@ -2115,7 +2265,7 @@
         let selectedAmount = 0;
         let bidNumber = '0.000';
         let currentDepositId = null;
-        let serviceFeePercent = 2; // Changed from $2.00 to 2%
+        let serviceFeePercent = 2;
         let refundFeePercent = 2;
         let isAutoBidding = false;
         let autoBidInterval = null;
@@ -2131,11 +2281,13 @@
         let showAllWinners = false;
         let showAllItems = false;
         let showAllGames = false;
+        let showAllUpcomingGames = false;
         let isSendingMoney = false;
         let chatListener = null;
         let onlineUsersListener = null;
         let idleTimer = null;
-        const IDLE_TIMEOUT = 5 * 60 * 1000; // 5 minutes in milliseconds
+        const IDLE_TIMEOUT = 5 * 60 * 1000;
+        let hasShownGameRules = false; // Track if game rules popup has been shown
         
         // ================ IDLE LOGOUT SYSTEM ================
         function resetIdleTimer() {
@@ -2143,7 +2295,6 @@
                 clearTimeout(idleTimer);
             }
             
-            // Set idle timer for 5 minutes
             idleTimer = setTimeout(() => {
                 if (currentUser) {
                     console.log('🕒 User idle for 5 minutes, logging out...');
@@ -2154,13 +2305,10 @@
         }
         
         function setupIdleListener() {
-            // Reset timer on user activity
             document.addEventListener('mousemove', resetIdleTimer);
             document.addEventListener('keypress', resetIdleTimer);
             document.addEventListener('click', resetIdleTimer);
             document.addEventListener('scroll', resetIdleTimer);
-            
-            // Start the timer
             resetIdleTimer();
         }
         
@@ -2214,7 +2362,6 @@
                 console.error('Error setting online status:', err);
             });
             
-            // Remove from online when disconnected
             userStatusRef.onDisconnect().remove();
         }
         
@@ -2322,7 +2469,6 @@
                     const user = userCredential.user;
                     console.log('✅ User created:', user.uid);
                     
-                    // Create user data in database
                     const userData = {
                         username: username,
                         email: email,
@@ -2350,7 +2496,6 @@
                     document.getElementById('login-email').value = email;
                     document.getElementById('login-password').value = password;
                     
-                    // Clear registration form
                     document.getElementById('register-username').value = '';
                     document.getElementById('register-email').value = '';
                     document.getElementById('register-password').value = '';
@@ -2383,15 +2528,10 @@
                     currentUser = userCredential.user;
                     console.log('✅ User logged in:', currentUser.uid, 'Email:', email);
                     
-                    // Set user as online
                     setUserOnlineStatus();
-                    
-                    // Setup idle logout timer
                     setupIdleListener();
-                    
                     showNotification('✅ Login successful!', 'success');
                     
-                    // Load user data immediately
                     loadUserData();
                 })
                 .catch((error) => {
@@ -2401,17 +2541,14 @@
                 });
         }
         
-        // ================ FIXED LOGOUT FUNCTION ================
         function logout() {
             console.log('Logout initiated...');
             
-            // Clear idle timer
             if (idleTimer) {
                 clearTimeout(idleTimer);
                 idleTimer = null;
             }
             
-            // Remove from online users
             if (currentUser && database) {
                 database.ref('online/' + currentUser.uid).remove()
                     .then(() => {
@@ -2422,7 +2559,6 @@
                     });
             }
             
-            // Remove listeners
             if (chatListener) {
                 chatListener();
                 chatListener = null;
@@ -2433,22 +2569,18 @@
                 onlineUsersListener = null;
             }
             
-            // Stop auto bidding
             if (isAutoBidding) {
                 stopAutoBid();
             }
             
-            // Sign out from Firebase
             if (auth) {
                 auth.signOut()
                     .then(() => {
                         console.log('✅ User signed out successfully');
                         
-                        // Reset all user data
                         currentUser = null;
                         currentUserData = null;
                         
-                        // Clear intervals
                         if (autoBidInterval) {
                             clearInterval(autoBidInterval);
                             autoBidInterval = null;
@@ -2464,23 +2596,19 @@
                             expirationCheckInterval = null;
                         }
                         
-                        // Show login screen
                         document.getElementById('auth-screen').classList.remove('hidden');
                         document.getElementById('user-dashboard').classList.add('hidden');
                         document.getElementById('admin-dashboard').classList.add('hidden');
                         
-                        // Clear any open modals
                         document.querySelectorAll('.modal').forEach(modal => {
                             modal.classList.add('hidden');
                         });
                         
-                        // Clear input fields
                         document.getElementById('login-email').value = '';
                         document.getElementById('login-password').value = '';
                         
                         showNotification('Logged out successfully', 'success');
                         
-                        // Remove event listeners for idle timer
                         document.removeEventListener('mousemove', resetIdleTimer);
                         document.removeEventListener('keypress', resetIdleTimer);
                         document.removeEventListener('click', resetIdleTimer);
@@ -2491,7 +2619,6 @@
                         showNotification('Error logging out: ' + error.message, 'error');
                     });
             } else {
-                // If auth is not available, just show login screen
                 document.getElementById('auth-screen').classList.remove('hidden');
                 document.getElementById('user-dashboard').classList.add('hidden');
                 document.getElementById('admin-dashboard').classList.add('hidden');
@@ -2511,7 +2638,6 @@
                 
                 if (user) {
                     currentUser = user;
-                    // Don't call loadUserData here - it's called from loginUser()
                 } else {
                     currentUser = null;
                     currentUserData = null;
@@ -2527,7 +2653,6 @@
         
         // ================ USER DATA FUNCTIONS ================
         function loadUserData() {
-            // Don't reload if we're in the middle of a send transaction
             if (isSendingMoney) {
                 console.log('Preventing profile reload during send transaction');
                 return;
@@ -2537,7 +2662,6 @@
             
             console.log('Loading user data for:', currentUser.uid);
             
-            // Don't attach listeners during send transaction
             if (currentUserData && isSendingMoney) {
                 return;
             }
@@ -2548,26 +2672,27 @@
                 
                 if (currentUserData) {
                     updateUI();
-                    
-                    // SET UP REAL-TIME LISTENERS
                     setupRealTimeListeners();
                     
-                    // Check if user is admin
                     if (currentUserData.isAdmin || currentUser.email === 'admin@raffle.com') {
                         showAdminDashboard();
                         loadAdminData();
                     } else {
                         showUserDashboard();
                         loadGameItems();
+                        loadUpcomingGameItems(); // Load upcoming games
                         loadDeposits();
                         loadWalletLogs();
                         loadUserBids();
                         loadUserWins();
+                        loadUserWinsMini(); // Load wins for dropdown
                         setupChatListener();
                         loadOnlineUsers();
+                        
+                        // SHOW GAME RULES POPUP ON LOGIN
+                        showGameRulesPopup();
                     }
                 } else {
-                    // Create user data if it doesn't exist
                     const userData = {
                         username: currentUser.email.split('@')[0],
                         email: currentUser.email,
@@ -2587,8 +2712,6 @@
                         .then(() => {
                             currentUserData = userData;
                             updateUI();
-                            
-                            // SET UP REAL-TIME LISTENERS
                             setupRealTimeListeners();
                             
                             if (userData.isAdmin) {
@@ -2597,12 +2720,17 @@
                             } else {
                                 showUserDashboard();
                                 loadGameItems();
+                                loadUpcomingGameItems();
                                 loadDeposits();
                                 loadWalletLogs();
                                 loadUserBids();
                                 loadUserWins();
+                                loadUserWinsMini();
                                 setupChatListener();
                                 loadOnlineUsers();
+                                
+                                // SHOW GAME RULES POPUP ON REGISTER
+                                showGameRulesPopup();
                             }
                         })
                         .catch(error => {
@@ -2616,36 +2744,57 @@
             });
         }
         
+        // ================ GAME RULES POPUP ================
+        function showGameRulesPopup() {
+            if (!hasShownGameRules) {
+                document.getElementById('game-rules-modal').classList.remove('hidden');
+                hasShownGameRules = true;
+            }
+        }
+        
+        function closeGameRulesPopup() {
+            document.getElementById('game-rules-modal').classList.add('hidden');
+        }
+        
+        // ================ GLOBAL ADVERTISEMENT FUNCTIONS ================
+        function updateGlobalAdImage() {
+            const imageUrl = document.getElementById('global-ad-image-url').value.trim();
+            if (!imageUrl) {
+                showNotification('Please enter an image URL', 'error');
+                return;
+            }
+            
+            // Update both ad spaces
+            const globalAdImage = document.getElementById('global-ad-image');
+            const userGlobalAdImage = document.getElementById('user-global-ad-image');
+            
+            if (globalAdImage) globalAdImage.src = imageUrl;
+            if (userGlobalAdImage) userGlobalAdImage.src = imageUrl;
+            
+            showNotification('Global advertisement image updated successfully!', 'success');
+            closeModal();
+        }
+        
         function setupRealTimeListeners() {
             if (!currentUser || !database) return;
             
-            // Listen for user data changes (balance, logs, deposits)
             database.ref('users/' + currentUser.uid).on('value', (snapshot) => {
                 if (!snapshot.exists()) return;
                 
                 const userData = snapshot.val();
                 if (!userData) return;
                 
-                // Update local data
                 currentUserData = userData;
-                
-                // Update UI
                 updateUI();
                 
-                // Refresh wallet logs and deposits if on wallet tab
                 if (document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
                     loadDeposits();
                 }
                 
-                // Refresh bids if on bids tab
                 if (document.getElementById('bids-tab').classList.contains('active')) {
                     loadUserBids();
-                }
-                
-                // Refresh wins if on wins tab
-                if (document.getElementById('wins-tab').classList.contains('active')) {
-                    loadUserWins();
+                    loadUserWinsMini();
                 }
             });
         }
@@ -2659,11 +2808,9 @@
             document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance || 0);
             document.getElementById('auto-balance').textContent = formatCurrency(currentUserData.balance || 0);
             
-            // Update wallet info
             document.getElementById('shopee-wallet').textContent = currentUserData.walletInfo?.shopee || '';
             document.getElementById('lazada-wallet').textContent = currentUserData.walletInfo?.lazada || '';
             
-            // Also update manual and auto bid summaries if they're visible
             updateManualBidSummary();
             updateAutoBidSummary();
         }
@@ -2674,10 +2821,8 @@
             document.getElementById('user-dashboard').classList.remove('hidden');
             document.getElementById('admin-dashboard').classList.add('hidden');
             
-            // Initialize all collapsible sections as expanded
             initializeCollapsibleSections();
             
-            // Show wallet tab by default (FIXED: Issue #3)
             setTimeout(() => {
                 showTab('wallet');
             }, 100);
@@ -2688,15 +2833,13 @@
             document.getElementById('user-dashboard').classList.add('hidden');
             document.getElementById('admin-dashboard').classList.remove('hidden');
             
-            // Initialize all collapsible sections as expanded
             initializeCollapsibleSections();
         }
         
         function initializeCollapsibleSections() {
-            // Set all collapsible sections to expanded by default
             const sections = [
-                'active-games', 'wallet-logs', 'deposits', 'bidding-history', 
-                'my-wins', 'admin-users', 'admin-winners', 'admin-items'
+                'active-games', 'upcoming-games', 'wallet-logs', 'deposits', 'bidding-history', 
+                'admin-users', 'admin-winners', 'admin-items'
             ];
             
             sections.forEach(sectionId => {
@@ -2728,25 +2871,106 @@
                 tabContent.classList.add('active');
             }
             
-            // Initialize chat page when switching to chat tab
             if (tabName === 'chat') {
                 setTimeout(() => {
                     initializeChatPage();
                 }, 100);
             }
             
-            // Force refresh when switching tabs
             if (tabName === 'wallet') {
                 loadDeposits();
                 loadWalletLogs();
-                updateUI(); // Ensure balance is up to date
+                updateUI();
             } else if (tabName === 'bids') {
                 loadUserBids();
-            } else if (tabName === 'wins') {
-                loadUserWins();
+                loadUserWinsMini();
             } else if (tabName === 'play') {
                 loadGameItems();
+                loadUpcomingGameItems();
             }
+        }
+        
+        // ================ WINS DROPDOWN FUNCTIONS ================
+        function toggleWinsDropdown() {
+            const content = document.getElementById('wins-dropdown-content');
+            const icon = document.getElementById('wins-dropdown-icon');
+            
+            if (content.classList.contains('expanded')) {
+                content.classList.remove('expanded');
+                icon.classList.remove('expanded');
+            } else {
+                content.classList.add('expanded');
+                icon.classList.add('expanded');
+                loadUserWinsMini(); // Load wins when expanded
+            }
+        }
+        
+        function loadUserWinsMini() {
+            if (!currentUser || !currentUserData || !database) return;
+            
+            const winsList = document.getElementById('wins-list-mini');
+            if (!winsList) return;
+            
+            const userWins = currentUserData.wins || [];
+            
+            if (userWins.length === 0) {
+                winsList.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">No winning items yet. Keep playing!</p>';
+                return;
+            }
+            
+            database.ref('games').once('value').then((snapshot) => {
+                const games = snapshot.val() || {};
+                
+                const sortedWins = [...userWins].sort((a, b) => 
+                    new Date(b.winDate) - new Date(a.winDate)
+                ).slice(0, 3); // Show only last 3 wins
+                
+                let html = '';
+                sortedWins.forEach(win => {
+                    const game = games[win.itemId];
+                    if (game) {
+                        const winDate = new Date(win.winDate);
+                        html += `
+                            <div class="winner-item-card" style="margin-bottom: 10px;">
+                                <div style="display: flex; align-items: center; gap: 10px;">
+                                    <img src="${game.image || 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=100&h=80&fit=crop'}" alt="${game.name}" style="width: 80px; height: 60px; object-fit: cover; border-radius: 8px;">
+                                    <div style="flex: 1;">
+                                        <h4 style="color: #28a745; margin-bottom: 5px;">${game.name}</h4>
+                                        <div><span style="font-weight: bold;">Prize:</span> ${formatCurrencyWithComma(game.price)}</div>
+                                        <div><span style="font-weight: bold;">Number:</span> ${win.winningNumber.toFixed(3)}</div>
+                                        <div style="font-size: 11px; color: #666;">${winDate.toLocaleDateString()}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }
+                });
+                
+                winsList.innerHTML = html || '<p style="text-align: center; color: #999; padding: 20px;">No winning items yet.</p>';
+            });
+        }
+        
+        // ================ PRICE WITH COMMA FORMATTING ================
+        function formatNumberWithComma(number) {
+            if (number === undefined || number === null) return '0.000';
+            
+            // Convert to number if it's a string
+            let num = typeof number === 'string' ? parseFloat(number) : number;
+            if (isNaN(num)) return '0.000';
+            
+            // Split into integer and decimal parts
+            let parts = num.toFixed(3).split('.');
+            let integerPart = parts[0];
+            let decimalPart = parts[1] || '000';
+            
+            // Add commas to integer part
+            integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            
+            return integerPart + '.' + decimalPart;
+        }
+        
+        function formatCurrencyWithComma(value) {
+            return `₱${formatNumberWithComma(value)}`;
         }
         
         // ================ COLLAPSIBLE FUNCTIONS ================
@@ -2783,6 +3007,11 @@
             loadUserWins();
         }
         
+        function viewAllUpcomingGames() {
+            showAllUpcomingGames = !showAllUpcomingGames;
+            loadUpcomingGameItems();
+        }
+        
         function viewAllUsers() {
             showAllUsers = !showAllUsers;
             loadAdminData();
@@ -2812,7 +3041,6 @@
             
             if (!depositsList) return;
             
-            // Filter to ONLY show Cash In deposits (not refunds or transfers)
             const cashInDeposits = Object.values(deposits).filter(deposit => 
                 deposit.source === 'cashin'
             );
@@ -2822,12 +3050,10 @@
                 return;
             }
             
-            // Sort by date (newest first)
             const sortedDeposits = cashInDeposits.sort((a, b) => 
                 new Date(b.depositDate) - new Date(a.depositDate)
             );
             
-            // Show only last 3 deposits by default, or all if showAllDeposits is true
             const depositsToShow = showAllDeposits ? sortedDeposits : sortedDeposits.slice(0, 3);
             
             let html = '';
@@ -2889,12 +3115,10 @@
                 return;
             }
             
-            // Sort by date (newest first)
             const sortedLogs = [...logs].sort((a, b) => 
                 new Date(b.date) - new Date(a.date)
             );
             
-            // Show only last 5 logs by default, or all if showAllLogs is true
             const logsToShow = showAllLogs ? sortedLogs : sortedLogs.slice(0, 5);
             
             let html = '';
@@ -2903,55 +3127,48 @@
                 let logClass = '';
                 let logIcon = '';
                 let displayAmount = log.amount;
-                let amountColor = '#28a745'; // Green for positive amounts
+                let amountColor = '#28a745';
                 
                 switch(log.type) {
                     case 'bid':
                         logClass = 'bid';
                         logIcon = 'fas fa-dice';
-                        amountColor = '#dc3545'; // Red for bids (money going out)
-                        // Ensure bid amount shows as negative
+                        amountColor = '#dc3545';
                         displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'refund':
                         logClass = 'refund';
                         logIcon = 'fas fa-undo';
-                        amountColor = '#28a745'; // Green for refunds (money coming in)
-                        // Refunds are positive
+                        amountColor = '#28a745';
                         displayAmount = Math.abs(displayAmount);
                         break;
                     case 'transfer-fee':
                         logClass = 'transfer-fee';
                         logIcon = 'fas fa-percentage';
-                        amountColor = '#dc3545'; // Red for fees (money going out)
-                        // Fees are negative
+                        amountColor = '#dc3545';
                         displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'money-sent':
                         logClass = 'money-sent';
                         logIcon = 'fas fa-paper-plane';
-                        amountColor = '#dc3545'; // RED for money sent
-                        // Money sent is negative
+                        amountColor = '#dc3545';
                         displayAmount = -Math.abs(displayAmount);
                         break;
                     case 'money-received':
                         logClass = 'money-received';
                         logIcon = 'fas fa-paper-plane';
-                        amountColor = '#28a745'; // GREEN for money received
-                        // Money received is positive
+                        amountColor = '#28a745';
                         displayAmount = Math.abs(displayAmount);
                         break;
                     case 'win':
                         logClass = 'win';
                         logIcon = 'fas fa-trophy';
-                        amountColor = '#20c997'; // Teal for wins
-                        // Wins show as text, not amount
+                        amountColor = '#20c997';
                         break;
                     case 'deposit':
                         logClass = 'deposit';
                         logIcon = 'fas fa-plus-circle';
-                        amountColor = '#28a745'; // Green for cash deposits
-                        // Deposits are positive
+                        amountColor = '#28a745';
                         displayAmount = Math.abs(displayAmount);
                         break;
                     default:
@@ -2959,12 +3176,10 @@
                         amountColor = displayAmount >= 0 ? '#28a745' : '#dc3545';
                 }
                 
-                // Format the amount display
                 let amountDisplay = '';
                 if (log.type === 'win') {
                     amountDisplay = `<span style="color: ${amountColor}; font-weight: bold;">WINNER!</span>`;
                 } else {
-                    // Show + for positive, - for negative
                     const sign = displayAmount >= 0 ? '+' : '-';
                     amountDisplay = `<span class="decimal-format" style="font-weight: bold; color: ${amountColor}">
                         ${sign}₱${formatDecimal(Math.abs(displayAmount))}
@@ -2990,7 +3205,6 @@
             
             logsList.innerHTML = html;
             
-            // Update View All button text
             const viewAllBtn = document.querySelector('#wallet-logs-content .view-all-btn');
             if (viewAllBtn) {
                 viewAllBtn.textContent = showAllLogs ? 'Show Less' : 'View All Activity';
@@ -3000,15 +3214,11 @@
         function addWalletLog(userId, type, description, amount) {
             if (!database) return;
             
-            // Ensure amount has the correct sign based on type
             let logAmount = amount;
             
-            // For certain types, ensure negative sign if needed
             if (type === 'bid' || type === 'transfer-fee' || type === 'money-sent') {
-                // These should be negative amounts (money going out)
                 logAmount = -Math.abs(amount);
             } else if (type === 'refund' || type === 'money-received' || type === 'deposit') {
-                // These should be positive amounts (money coming in)
                 logAmount = Math.abs(amount);
             }
             
@@ -3016,15 +3226,12 @@
                 date: new Date().toISOString(),
                 type: type,
                 description: description,
-                amount: logAmount  // Use the adjusted amount
+                amount: logAmount
             };
             
-            // Get current logs
             database.ref('users/' + userId + '/walletLogs').once('value').then(snapshot => {
                 const currentLogs = snapshot.val() || [];
                 const newLogs = [...currentLogs, logEntry];
-                
-                // Keep only last 50 logs to prevent database from getting too large
                 const trimmedLogs = newLogs.slice(-50);
                 
                 return database.ref('users/' + userId + '/walletLogs').set(trimmedLogs);
@@ -3047,11 +3254,83 @@
             database.ref('users/' + userId + '/deposits').push(deposit);
         }
         
+        // ================ UPCOMING GAME ITEMS FUNCTIONS ================
+        function loadUpcomingGameItems() {
+            if (!database) return;
+            
+            console.log('Loading upcoming game items...');
+            
+            database.ref('games').on('value', (snapshot) => {
+                const items = snapshot.val() || {};
+                const container = document.getElementById('upcoming-game-items');
+                const now = new Date();
+                
+                if (!container) return;
+                
+                let html = '';
+                let upcomingCount = 0;
+                
+                const itemsArray = Object.entries(items).map(([id, item]) => ({ id, ...item }));
+                const sortedItems = itemsArray.sort((a, b) => 
+                    new Date(a.startDate) - new Date(b.startDate)
+                );
+                
+                const upcomingItems = sortedItems.filter(item => {
+                    const startDate = new Date(item.startDate);
+                    return now < startDate && item.status !== 'completed';
+                });
+                
+                upcomingCount = upcomingItems.length;
+                
+                const content = document.getElementById('upcoming-games-content');
+                const isExpanded = content ? content.classList.contains('expanded') : false;
+                const itemsToShow = (showAllUpcomingGames || isExpanded) ? upcomingItems : upcomingItems.slice(0, 3);
+                
+                itemsToShow.forEach(item => {
+                    const startDate = new Date(item.startDate);
+                    const daysUntil = Math.ceil((startDate - now) / (1000 * 60 * 60 * 24));
+                    
+                    html += `
+                        <div class="item-card" style="border-color: #ff9800;">
+                            <h4 style="color: #ff9800;">${item.name} <span style="font-size: 12px; background: #ff9800; color: white; padding: 2px 8px; border-radius: 12px;">UPCOMING</span></h4>
+                            <p style="color: #666; font-size: 14px;">${item.description}</p>
+                            <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
+                            <div class="item-info">
+                                <div>
+                                    <strong style="color: #28a745;" class="price-with-comma">₱${formatNumberWithComma(item.price)}</strong><br>
+                                    <small>Prize Value</small>
+                                </div>
+                                <div style="text-align: right;">
+                                    <strong style="color: #ff9800;">Starts in ${daysUntil} day${daysUntil !== 1 ? 's' : ''}</strong><br>
+                                    <small>Coming Soon</small>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 12px; color: #666; background: #fff3cd; padding: 10px; border-radius: 8px;">
+                                <div style="display: flex; justify-content: space-between;">
+                                    <span>Starts:</span>
+                                    <span>${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
+                                </div>
+                            </div>
+                            <div style="margin-top: 10px; text-align: center;">
+                                <button class="btn-secondary" style="padding: 10px 20px; font-size: 14px; width: 100%;" disabled>
+                                    <i class="fas fa-clock"></i> Not Started Yet
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                container.innerHTML = html || '<p style="text-align: center; color: #999; padding: 40px;">No upcoming games.</p>';
+            }, (error) => {
+                console.error('Error loading upcoming game items:', error);
+            });
+        }
+        
         // ================ GAME ITEMS FUNCTIONS ================
         function loadGameItems() {
             if (!database) return;
             
-            console.log('Loading game items...');
+            console.log('Loading active game items...');
             
             database.ref('games').on('value', (snapshot) => {
                 const items = snapshot.val() || {};
@@ -3064,68 +3343,54 @@
                 let activeCount = 0;
                 let totalBids = 0;
                 
-                // Convert to array and sort by end date (newest first)
                 const itemsArray = Object.entries(items).map(([id, item]) => ({ id, ...item }));
                 const sortedItems = itemsArray.sort((a, b) => 
                     new Date(b.endDate) - new Date(a.endDate)
                 );
                 
-                // Show only last 3 items by default, or all if expanded or showAllGames is true
-                const content = document.getElementById('active-games-content');
-                const isExpanded = content ? content.classList.contains('expanded') : false;
-                const itemsToShow = (showAllGames || isExpanded) ? sortedItems : sortedItems.slice(0, 3);
+                const activeItems = sortedItems.filter(item => {
+                    const startDate = new Date(item.startDate);
+                    const endDate = new Date(item.endDate);
+                    return now >= startDate && now <= endDate && item.status !== 'completed';
+                });
                 
-                itemsToShow.forEach(item => {
+                activeCount = activeItems.length;
+                
+                activeItems.forEach(item => {
                     const endDate = new Date(item.endDate);
                     const startDate = new Date(item.startDate);
                     const drawDate = new Date(item.drawDate);
                     const winnerDate = new Date(item.winnerDate);
                     const daysLeft = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
-                    const isActive = item.status === 'active' && now >= startDate && now <= endDate;
-                    const isEnded = item.status === 'completed' || now > endDate;
-                    
-                    if (isActive) activeCount++;
                     
                     const bids = item.bids || {};
                     const bidCount = Object.keys(bids).length;
                     totalBids += bidCount;
                     
                     html += `
-                        <div class="item-card ${isEnded ? 'inactive' : ''}" onclick="${isActive ? `openGameModal('${item.id}')` : ''}" style="${!isActive ? 'cursor: not-allowed;' : ''}">
-                            <h4>${item.name} ${isEnded ? '(Ended)' : ''}</h4>
+                        <div class="item-card" onclick="openGameModal('${item.id}')">
+                            <h4>${item.name}</h4>
                             <p style="color: #666; font-size: 14px;">${item.description}</p>
                             <img src="${item.image}" alt="${item.name}" style="width: 100%; height: 150px; object-fit: cover; border-radius: 10px; margin: 10px 0;">
                             <div class="item-info">
                                 <div>
-                                    <strong style="color: #28a745;" class="decimal-format">₱${formatDecimal(item.price)}</strong><br>
+                                    <strong style="color: #28a745;" class="price-with-comma">₱${formatNumberWithComma(item.price)}</strong><br>
                                     <small>Prize Value</small>
                                 </div>
                                 <div style="text-align: right;">
-                                    <strong>${isActive ? daysLeft + ' days left' : 'ENDED'}</strong><br>
+                                    <strong>${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</strong><br>
                                     <small>${bidCount} bids</small>
                                 </div>
                             </div>
                             <div style="margin-top: 10px; font-size: 12px; color: #666; background: #f8f9fa; padding: 10px; border-radius: 8px;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                                    <span>Starts:</span>
-                                    <span>${startDate.toLocaleDateString()} ${startDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
                                     <span>Ends:</span>
                                     <span>${endDate.toLocaleDateString()} ${endDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
                                 </div>
-                                <div style="display: flex; justify-content: space-between; margin-bottom: 3px;">
-                                    <span>Draw:</span>
-                                    <span>${drawDate.toLocaleDateString()} ${drawDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                </div>
-                                <div style="display: flex; justify-content: space-between;">
-                                    <span>Winner:</span>
-                                    <span>${winnerDate.toLocaleDateString()} ${winnerDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                </div>
                             </div>
                             <div style="margin-top: 10px; text-align: center;">
-                                <button class="${isActive ? 'btn-primary' : 'btn-secondary'}" style="padding: 10px 20px; font-size: 14px; width: 100%;" ${!isActive ? 'disabled' : ''}>
-                                    <i class="fas fa-play"></i> ${isActive ? 'Play Now' : 'Game Ended'}
+                                <button class="btn-primary" style="padding: 10px 20px; font-size: 14px; width: 100%;">
+                                    <i class="fas fa-play"></i> Play Now
                                 </button>
                             </div>
                         </div>
@@ -3140,7 +3405,6 @@
                 if (activeGamesCount) activeGamesCount.textContent = activeCount;
                 if (totalBidsCount) totalBidsCount.textContent = totalBids;
                 
-                // Update online users count
                 database.ref('online').once('value').then(snapshot => {
                     const onlineUsers = snapshot.val() || {};
                     const onlineCount = document.getElementById('online-count');
@@ -3167,6 +3431,12 @@
                 
                 const now = new Date();
                 const endDate = new Date(currentItem.endDate);
+                const startDate = new Date(currentItem.startDate);
+                
+                if (now < startDate) {
+                    showNotification('This game has not started yet!', 'error');
+                    return;
+                }
                 
                 if (now > endDate || currentItem.status === 'completed') {
                     showNotification('This game has ended', 'error');
@@ -3199,15 +3469,11 @@
         }
         
         function addNumber(num) {
-            // Handle decimal point separately
             if (num === '.') {
-                // If we don't have a decimal point yet, add it
                 if (!bidNumber.includes('.')) {
-                    // If it's "0.000" or "0", change to "0."
                     if (bidNumber === '0.000' || bidNumber === '0' || bidNumber === '0.') {
                         bidNumber = '0.';
                     } else {
-                        // Add decimal to existing number
                         bidNumber = bidNumber.replace('.000', '') + '.';
                     }
                     document.getElementById('bid-number').value = bidNumber;
@@ -3217,77 +3483,56 @@
                 return;
             }
             
-            // Handle number input (0-9)
             let currentDisplay = bidNumber;
             
-            // Remove .000 display formatting if present
             if (currentDisplay.includes('.000') && currentDisplay !== '0.000') {
                 currentDisplay = currentDisplay.replace('.000', '');
             }
             
-            // If current display is '0.000' and we're entering a number
             if (currentDisplay === '0.000') {
                 if (num === '0') {
-                    // Keep as 0.000
                     bidNumber = '0.000';
                 } else {
-                    // Start entering a new number - REMOVE the leading zero
-                    bidNumber = num; // This changes 0.000 to just the entered number
+                    bidNumber = num; // FIXED: No leading zero
                 }
-            } 
-            // If we're at "0." (just entered decimal)
-            else if (currentDisplay === '0.') {
+            } else if (currentDisplay === '0.') {
                 bidNumber = '0.' + num;
-            }
-            // If we have a decimal point already
-            else if (currentDisplay.includes('.')) {
+            } else if (currentDisplay.includes('.')) {
                 const parts = currentDisplay.split('.');
                 const wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Allow up to 3 decimal digits
                 if (decimalPart.length < 3) {
                     bidNumber = wholePart + '.' + decimalPart + num;
                 }
-                // If already 3 digits, do nothing (don't add more)
-            }
-            // No decimal point yet (entering whole number)
-            else {
-                // If we have leading zeros, remove them
+            } else {
                 if (currentDisplay.startsWith('0') && currentDisplay !== '0') {
-                    // Remove all leading zeros
                     currentDisplay = currentDisplay.replace(/^0+/, '');
-                    // If after removing zeros we have empty string, use the new number
                     if (currentDisplay === '') {
                         bidNumber = num;
                     } else {
                         bidNumber = currentDisplay + num;
                     }
                 } else {
-                    // Just append the number
                     bidNumber = currentDisplay + num;
                 }
             }
             
-            // Format for display
             formatBidNumberDisplay();
         }
         
         function formatBidNumberDisplay() {
             let displayValue = bidNumber;
             
-            // If it's empty or just a decimal point, set to 0.
             if (displayValue === '' || displayValue === '.') {
                 displayValue = '0.';
             }
             
-            // Ensure proper formatting
             if (displayValue.includes('.')) {
                 const parts = displayValue.split('.');
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Ensure decimal part has exactly 3 digits
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
                 } else {
@@ -3296,26 +3541,21 @@
                     }
                 }
                 
-                // Handle edge case where decimal part might be empty
                 if (decimalPart === '') {
                     decimalPart = '000';
                 }
                 
                 displayValue = wholePart + '.' + decimalPart;
             } else {
-                // No decimal point, add .000 for display
                 displayValue = displayValue + '.000';
             }
             
-            // Special case: if displayValue starts with ".", add "0" prefix
             if (displayValue.startsWith('.')) {
                 displayValue = '0' + displayValue;
             }
             
-            // Update the display
             document.getElementById('bid-number').value = displayValue;
             
-            // Check if valid number
             const numValue = parseFloat(displayValue);
             if (numValue > 0) {
                 document.getElementById('bid-number').classList.add('has-value');
@@ -3384,7 +3624,6 @@
             const autoBalance = document.getElementById('auto-balance');
             if (autoBalance) autoBalance.textContent = formatCurrency(balance);
             
-            // Calculate total auto bid amount
             let totalAutoBid = 0;
             autoBidNumbers.forEach(num => {
                 totalAutoBid += parseFloat(num);
@@ -3410,16 +3649,14 @@
                     placeGameBtn.innerHTML = '<i class="fas fa-exclamation-circle"></i> GENERATE NUMBERS FIRST';
                 }
             } else if (afterAutoBid < 0) {
-                // ADJUSTMENT: Remove random numbers until balance is positive
                 while (afterAutoBid < 0 && autoBidNumbers.length > 0) {
                     const randomIndex = Math.floor(Math.random() * autoBidNumbers.length);
                     const removedNumber = autoBidNumbers.splice(randomIndex, 1)[0];
                     totalAutoBid -= parseFloat(removedNumber);
                 }
                 
-                // Update display after adjustment
                 updateAutoBidNumbersDisplay();
-                updateAutoBidSummary(); // Recursive call to update
+                updateAutoBidSummary();
             } else {
                 if (autoAfterBid) autoAfterBid.style.color = '#333';
                 if (feeWarning) feeWarning.textContent = '';
@@ -3459,39 +3696,25 @@
                 return;
             }
             
-            // FIXED: Allow any amount, just ensure it has 3 decimal places
-            // No minimum amount restriction
-            // First, get the number as a string
             const numberString = bidNumber.toString();
-            
-            // Split into whole and decimal parts
             const parts = numberString.split('.');
             
-            // If no decimal point, it's a whole number - automatically add .000
             if (parts.length === 1) {
-                // It's a whole number like "10" - treat it as "10.000"
                 bidNumber = bidAmountValue.toFixed(3);
             } else if (parts.length === 2) {
-                // We have a decimal point
                 const decimalPart = parts[1];
                 
-                // Ensure decimal part has exactly 3 digits
                 if (decimalPart.length !== 3) {
-                    // Pad with zeros or truncate to exactly 3 digits
                     if (decimalPart.length < 3) {
-                        // Pad with zeros
                         bidNumber = parts[0] + '.' + decimalPart.padEnd(3, '0');
                     } else {
-                        // Truncate to 3 digits
                         bidNumber = parts[0] + '.' + decimalPart.substring(0, 3);
                     }
                     
-                    // Update the display
                     document.getElementById('bid-number').value = bidNumber;
                 }
             }
             
-            // Re-parse the corrected value
             const correctedBidAmount = parseFloat(bidNumber);
             
             if (!currentUserData || currentUserData.balance < correctedBidAmount) {
@@ -3504,7 +3727,6 @@
                 return;
             }
             
-            // Check if number already exists
             database.ref('games/' + currentItem.id + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
                 const existingBid = Object.values(bids).find(bid => bid.number === correctedBidAmount);
@@ -3535,23 +3757,19 @@
                 updates['users/' + currentUser.uid + '/balance'] = newBalance;
                 updates['users/' + currentUser.uid + '/totalBids'] = (currentUserData.totalBids || 0) + 1;
                 
-                // Add to manual bid tracking
                 manualBidNumbers.push(correctedBidAmount);
                 
                 return database.ref().update(updates);
             })
             .then(() => {
-                // Update local user data immediately
                 currentUserData.balance = currentUserData.balance - correctedBidAmount;
                 
-                // Animate button
                 const placeGameBtn = document.getElementById('manual-place-game-btn');
                 if (placeGameBtn) {
                     placeGameBtn.classList.add('placed');
                     placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
                 }
                 
-                // Add wallet log for bid
                 addWalletLog(currentUser.uid, 'bid', `Bid placed on ${currentItem.name}`, -correctedBidAmount);
                 
                 const statusDiv = document.getElementById('game-status');
@@ -3565,12 +3783,10 @@
                     `;
                 }
                 
-                // Update ALL UI elements
-                updateUI(); // This updates the main wallet balance
-                updateManualBidSummary(); // This updates the manual bid section
-                updateAutoBidSummary(); // This updates the auto bid section
+                updateUI();
+                updateManualBidSummary();
+                updateAutoBidSummary();
                 
-                // FORCE REFRESH WALLET LOGS AND DEPOSITS
                 if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
                     loadDeposits();
@@ -3579,14 +3795,12 @@
                 clearNumber();
                 showNotification(`Bid placed successfully! Balance updated.`, 'success');
                 
-                // Reset button after 2 seconds
                 setTimeout(() => {
                     if (placeGameBtn) {
                         placeGameBtn.classList.remove('placed');
                         placeGameBtn.innerHTML = '<i class="fas fa-play-circle"></i> PLACE GAME (Manual)';
                     }
                     
-                    // Clear status after 3 seconds
                     setTimeout(() => {
                         if (statusDiv) {
                             statusDiv.innerHTML = '';
@@ -3602,8 +3816,7 @@
         
         // ================ AUTO BID FUNCTIONS ================
         function generateRandomNumber() {
-            // Generate random number with infinite digits before decimal and exactly 3 after
-            const wholeDigits = Math.floor(Math.random() * 5) + 1; // 1-5 digits before decimal
+            const wholeDigits = Math.floor(Math.random() * 5) + 1;
             let wholePart = '';
             for (let i = 0; i < wholeDigits; i++) {
                 wholePart += Math.floor(Math.random() * 10).toString();
@@ -3612,7 +3825,6 @@
             const decimalPart = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
             const randomNum = parseFloat(`${wholePart}.${decimalPart}`);
             
-            // No minimum amount restriction
             return randomNum.toFixed(3);
         }
         
@@ -3622,7 +3834,6 @@
             const autoNumbersDisplay = document.getElementById('auto-numbers-display');
             
             if (!isAutoBidding) {
-                // Start auto bidding (generate numbers)
                 const balance = currentUserData.balance || 0;
                 
                 if (balance < 0.001) {
@@ -3639,10 +3850,8 @@
                     autoBidStatus.innerHTML = `<span style="color: #28a745;"><i class="fas fa-spinner fa-spin"></i> Generating random numbers...</span>`;
                 }
                 
-                // Clear previous numbers
                 autoBidNumbers = [];
                 
-                // Generate random numbers within balance
                 let totalAmount = 0;
                 let attempts = 0;
                 const maxAttempts = 1000;
@@ -3652,35 +3861,28 @@
                     const randomNum = generateRandomNumber();
                     const numValue = parseFloat(randomNum);
                     
-                    // Check if adding this number would exceed balance
                     if (totalAmount + numValue <= balance) {
-                        // Ensure uniqueness (not already in array)
                         if (!autoBidNumbers.includes(randomNum)) {
                             autoBidNumbers.push(randomNum);
                             totalAmount += numValue;
                         }
                     }
                     
-                    // Stop if we have enough numbers or can't add more
                     if (autoBidNumbers.length >= 50) {
                         break;
                     }
                 }
                 
-                // Update display
                 updateAutoBidNumbersDisplay();
                 
-                // Show the display
                 if (autoNumbersDisplay) {
                     autoNumbersDisplay.style.display = 'block';
                 }
                 
-                // Update status
                 if (autoBidStatus) {
                     autoBidStatus.innerHTML = `Generated ${autoBidNumbers.length} random numbers. Total: ${formatCurrency(totalAmount)}`;
                 }
                 
-                // Reset button
                 setTimeout(() => {
                     isAutoBidding = false;
                     if (autoBidBtn) {
@@ -3691,8 +3893,7 @@
                 }, 500);
                 
             } else {
-                // Regenerate numbers
-                toggleAutoBid(); // This will restart the process
+                toggleAutoBid();
             }
         }
         
@@ -3728,7 +3929,6 @@
             
             const balance = currentUserData.balance || 0;
             
-            // Calculate total auto bid amount
             let totalAutoBid = 0;
             autoBidNumbers.forEach(num => {
                 totalAutoBid += parseFloat(num);
@@ -3739,7 +3939,6 @@
                 return;
             }
             
-            // Check existing bids for this item
             database.ref('games/' + currentItem.id + '/bids').once('value').then((snapshot) => {
                 const bids = snapshot.val() || {};
                 const existingNumbers = Object.values(bids).map(bid => bid.number);
@@ -3748,13 +3947,11 @@
                 let bidsPlaced = 0;
                 let totalAmount = 0;
                 
-                // Place each auto bid
                 autoBidNumbers.forEach((num, index) => {
                     const numValue = parseFloat(num);
                     
-                    // Check if number already exists
                     if (existingNumbers.includes(numValue)) {
-                        return; // Skip this number
+                        return;
                     }
                     
                     const bidId = database.ref().child('bids').push().key;
@@ -3784,7 +3981,6 @@
                 
                 const newBalance = balance - totalAmount;
                 
-                // Prepare updates
                 const updates = {};
                 newBids.forEach(bid => {
                     updates['games/' + currentItem.id + '/bids/' + bid.key] = bid.data;
@@ -3795,17 +3991,14 @@
                 return database.ref().update(updates);
             })
             .then(() => {
-                // Update local user data immediately
                 currentUserData.balance = currentUserData.balance - totalAutoBid;
                 
-                // Animate button
                 const placeGameBtn = document.getElementById('auto-place-game-btn');
                 if (placeGameBtn) {
                     placeGameBtn.classList.add('placed');
                     placeGameBtn.innerHTML = '<i class="fas fa-check-circle"></i> BID PLACED!';
                 }
                 
-                // Add wallet log for bids
                 addWalletLog(currentUser.uid, 'bid', `Auto bids placed on ${currentItem.name}`, -totalAutoBid);
                 
                 const newBalance = currentUserData.balance;
@@ -3821,18 +4014,15 @@
                     `;
                 }
                 
-                // Update ALL UI elements
-                updateUI(); // This updates the main wallet balance
-                updateManualBidSummary(); // This updates the manual bid section
-                updateAutoBidSummary(); // This updates the auto bid section
+                updateUI();
+                updateManualBidSummary();
+                updateAutoBidSummary();
                 
-                // FORCE REFRESH WALLET LOGS AND DEPOSITS
                 if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                     loadWalletLogs();
                     loadDeposits();
                 }
                 
-                // Clear auto bid numbers
                 autoBidNumbers = [];
                 const autoNumbersDisplay = document.getElementById('auto-numbers-display');
                 const autoNumbersGrid = document.getElementById('auto-numbers-grid');
@@ -3842,14 +4032,12 @@
                 
                 showNotification(`Successfully placed auto bids!`, 'success');
                 
-                // Reset button after 2 seconds
                 setTimeout(() => {
                     if (placeGameBtn) {
                         placeGameBtn.classList.remove('placed');
                         placeGameBtn.innerHTML = '<i class="fas fa-bolt"></i> PLACE GAME (Auto)';
                     }
                     
-                    // Clear status after 5 seconds
                     setTimeout(() => {
                         if (statusDiv) {
                             statusDiv.innerHTML = '';
@@ -3875,7 +4063,6 @@
                 
                 let allUserBids = [];
                 
-                // Collect all bids from all games for this user
                 Object.entries(games).forEach(([gameId, game]) => {
                     const bids = game.bids || {};
                     Object.entries(bids).forEach(([bidId, bid]) => {
@@ -3896,10 +4083,8 @@
                     return;
                 }
                 
-                // Sort by date (newest first)
                 allUserBids.sort((a, b) => new Date(b.placedAt) - new Date(a.placedAt));
                 
-                // Group bids by item
                 const bidsByItem = {};
                 allUserBids.forEach(bid => {
                     if (!bidsByItem[bid.gameId]) {
@@ -3911,7 +4096,6 @@
                     bidsByItem[bid.gameId].bids.push(bid);
                 });
                 
-                // Show only last 3 items by default, or all if expanded
                 const content = document.getElementById('bidding-history-content');
                 const isExpanded = content ? content.classList.contains('expanded') : false;
                 const itemsToShow = showAllBids || isExpanded ? Object.entries(bidsByItem) : Object.entries(bidsByItem).slice(0, 3);
@@ -3921,7 +4105,6 @@
                     const item = itemData.game;
                     const itemBids = itemData.bids;
                     
-                    // Calculate total bid amount for this item
                     let totalBidAmount = 0;
                     itemBids.forEach(bid => {
                         totalBidAmount += parseFloat(bid.amount);
@@ -3933,7 +4116,6 @@
                     let statusClass = '';
                     let statusText = '';
                     
-                    // Check if any bid is won
                     const hasWon = itemBids.some(bid => bid.status === 'won');
                     const hasRefunded = itemBids.some(bid => bid.status === 'refunded');
                     const itemEnded = item.status === 'completed' || now > endDate;
@@ -3992,20 +4174,17 @@
                     return;
                 }
                 
-                // Calculate total bid amount for this item
                 let totalAmount = 0;
                 userBids.forEach(bid => {
                     totalAmount += parseFloat(bid.amount);
                 });
                 
-                // Update modal title
                 const bidDetailsTitle = document.getElementById('bid-details-title');
                 const bidDetailsTotal = document.getElementById('bid-details-total');
                 
                 if (bidDetailsTitle) bidDetailsTitle.textContent = `Bid Details: ${gameName}`;
                 if (bidDetailsTotal) bidDetailsTotal.innerHTML = `Total Bid: <span class="decimal-format">${formatCurrency(totalAmount)}</span>`;
                 
-                // Display bid numbers
                 const numbersGrid = document.getElementById('bid-details-numbers');
                 if (numbersGrid) {
                     numbersGrid.innerHTML = '';
@@ -4023,7 +4202,6 @@
                     });
                 }
                 
-                // Show modal
                 document.getElementById('bid-details-modal').classList.remove('hidden');
             });
         }
@@ -4042,16 +4220,13 @@
                 return;
             }
             
-            // Get all games to match with wins
             database.ref('games').once('value').then((snapshot) => {
                 const games = snapshot.val() || {};
                 
-                // Sort by date (newest first)
                 const sortedWins = [...userWins].sort((a, b) => 
                     new Date(b.winDate) - new Date(a.winDate)
                 );
                 
-                // Show only last 3 wins by default, or all if expanded
                 const content = document.getElementById('my-wins-content');
                 const isExpanded = content ? content.classList.contains('expanded') : false;
                 const winsToShow = showAllWins || isExpanded ? sortedWins : sortedWins.slice(0, 3);
@@ -4068,7 +4243,7 @@
                                 <div style="margin-top: 10px;">
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Prize Value:</span>
-                                        <strong class="decimal-format">₱${formatDecimal(game.price)}</strong>
+                                        <strong class="price-with-comma">₱${formatNumberWithComma(game.price)}</strong>
                                     </div>
                                     <div style="display: flex; justify-content: space-between; margin-bottom: 5px;">
                                         <span>Winning Number:</span>
@@ -4130,24 +4305,17 @@
             
             const newBalance = (currentUserData.balance || 0) + selectedAmount;
             
-            // Update balance
             database.ref('users/' + currentUser.uid + '/balance').set(newBalance)
                 .then(() => {
-                    // Update local user data
                     currentUserData.balance = newBalance;
                     
-                    // Add deposit
                     addDeposit(currentUser.uid, selectedAmount, 'cashin');
-                    
-                    // Add wallet log
                     addWalletLog(currentUser.uid, 'deposit', 'Cash in deposit', selectedAmount);
                     
-                    // Update UI
                     updateUI();
                     updateManualBidSummary();
                     updateAutoBidSummary();
                     
-                    // FORCE REFRESH WALLET LOGS AND DEPOSITS
                     if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                         loadWalletLogs();
                         loadDeposits();
@@ -4161,9 +4329,8 @@
                 });
         }
         
-        // ================ SEND MONEY FUNCTIONS - FIXED ================
+        // ================ SEND MONEY FUNCTIONS ================
         function sendMoney() {
-            // Set flag to prevent profile switching
             isSendingMoney = true;
             
             const recipientEmail = document.getElementById('recipient-email').value.trim();
@@ -4175,7 +4342,6 @@
                 return;
             }
             
-            // Validate email format
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(recipientEmail)) {
                 showNotification('Please enter a valid email address', 'error');
@@ -4195,7 +4361,6 @@
                 return;
             }
             
-            // Prevent sending to yourself
             if (currentUser.email.toLowerCase() === recipientEmail.toLowerCase()) {
                 showNotification('Cannot send money to yourself', 'error');
                 isSendingMoney = false;
@@ -4204,7 +4369,6 @@
             
             console.log('🔍 Looking for user with email:', recipientEmail);
             
-            // Find recipient by email
             database.ref('users').once('value')
                 .then((snapshot) => {
                     const users = snapshot.val();
@@ -4216,7 +4380,6 @@
                         return Promise.reject('No users');
                     }
                     
-                    // Find user by email - CASE INSENSITIVE
                     let recipientId = null;
                     let recipientData = null;
                     
@@ -4241,90 +4404,79 @@
                         return Promise.reject('User not found');
                     }
                     
-            const senderNewBalance = currentUserData.balance - amount;
-            const recipientNewBalance = (recipientData.balance || 0) + amount;
-            
-            const updates = {};
-            updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
-            updates['users/' + recipientId + '/balance'] = recipientNewBalance;
-            
-            // Create wallet log entries
-            const senderLog = {
-                date: new Date().toISOString(),
-                type: 'money-sent',
-                description: `Money sent to ${recipientEmail}`,
-                amount: -amount
-            };
-            
-            const recipientLog = {
-                date: new Date().toISOString(),
-                type: 'money-received',
-                description: `Money received from ${currentUser.email}`,
-                amount: amount
-            };
-            
-            // Get current logs and add new ones
-            return Promise.all([
-                database.ref('users/' + currentUser.uid + '/walletLogs').once('value'),
-                database.ref('users/' + recipientId + '/walletLogs').once('value')
-            ]).then(([senderLogsSnapshot, recipientLogsSnapshot]) => {
-                const senderLogs = senderLogsSnapshot.val() || [];
-                const recipientLogs = recipientLogsSnapshot.val() || [];
-                
-                // Add new logs
-                senderLogs.push(senderLog);
-                recipientLogs.push(recipientLog);
-                
-                // Keep only last 50 logs
-                const trimmedSenderLogs = senderLogs.slice(-50);
-                const trimmedRecipientLogs = recipientLogs.slice(-50);
-                
-                updates['users/' + currentUser.uid + '/walletLogs'] = trimmedSenderLogs;
-                updates['users/' + recipientId + '/walletLogs'] = trimmedRecipientLogs;
-                
-                // Add deposit for recipient
-                const depositData = {
-                    amount: amount,
-                    depositDate: new Date().toISOString(),
-                    expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    status: 'active',
-                    source: 'transfer',
-                    sourceItem: '',
-                    sourceUser: currentUserData.email
-                };
-                
-                database.ref('users/' + recipientId + '/deposits').push(depositData);
-                
-                return database.ref().update(updates);
-            });
+                    const senderNewBalance = currentUserData.balance - amount;
+                    const recipientNewBalance = (recipientData.balance || 0) + amount;
+                    
+                    const updates = {};
+                    updates['users/' + currentUser.uid + '/balance'] = senderNewBalance;
+                    updates['users/' + recipientId + '/balance'] = recipientNewBalance;
+                    
+                    const senderLog = {
+                        date: new Date().toISOString(),
+                        type: 'money-sent',
+                        description: `Money sent to ${recipientEmail}`,
+                        amount: -amount
+                    };
+                    
+                    const recipientLog = {
+                        date: new Date().toISOString(),
+                        type: 'money-received',
+                        description: `Money received from ${currentUser.email}`,
+                        amount: amount
+                    };
+                    
+                    return Promise.all([
+                        database.ref('users/' + currentUser.uid + '/walletLogs').once('value'),
+                        database.ref('users/' + recipientId + '/walletLogs').once('value')
+                    ]).then(([senderLogsSnapshot, recipientLogsSnapshot]) => {
+                        const senderLogs = senderLogsSnapshot.val() || [];
+                        const recipientLogs = recipientLogsSnapshot.val() || [];
+                        
+                        senderLogs.push(senderLog);
+                        recipientLogs.push(recipientLog);
+                        
+                        const trimmedSenderLogs = senderLogs.slice(-50);
+                        const trimmedRecipientLogs = recipientLogs.slice(-50);
+                        
+                        updates['users/' + currentUser.uid + '/walletLogs'] = trimmedSenderLogs;
+                        updates['users/' + recipientId + '/walletLogs'] = trimmedRecipientLogs;
+                        
+                        const depositData = {
+                            amount: amount,
+                            depositDate: new Date().toISOString(),
+                            expiryDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+                            status: 'active',
+                            source: 'transfer',
+                            sourceItem: '',
+                            sourceUser: currentUserData.email
+                        };
+                        
+                        database.ref('users/' + recipientId + '/deposits').push(depositData);
+                        
+                        return database.ref().update(updates);
+                    });
                 })
                 .then(() => {
-                    // Update local user data immediately
                     currentUserData.balance -= amount;
                     
-                    // Clear the form fields
                     document.getElementById('recipient-email').value = '';
                     document.getElementById('send-amount').value = '';
                     
                     showNotification(`Successfully sent ${formatCurrency(amount)} to ${recipientEmail}`, 'success');
                     
-                    // IMMEDIATELY update UI WITHOUT reloading user data
                     document.getElementById('user-balance').textContent = formatDecimal(currentUserData.balance);
                     document.getElementById('wallet-balance').textContent = formatDecimal(currentUserData.balance);
                     document.getElementById('manual-balance').textContent = formatCurrency(currentUserData.balance);
                     document.getElementById('auto-balance').textContent = formatCurrency(currentUserData.balance);
                     
-                    // Update bid summaries
                     updateManualBidSummary();
                     updateAutoBidSummary();
                     
-                    // Force refresh wallet logs to show the transaction immediately
                     if (document.getElementById('wallet-tab') && document.getElementById('wallet-tab').classList.contains('active')) {
                         loadWalletLogs();
                         loadDeposits();
                     }
                     
-                    // Reset the flag after transaction is complete
                     setTimeout(() => {
                         isSendingMoney = false;
                     }, 1000);
@@ -4371,12 +4523,10 @@
         }
         
         function transferToShopee() {
-            // Implementation for transferring to Shopee wallet
             showNotification('Shopee transfer functionality coming soon!', 'info');
         }
         
         function transferToLazada() {
-            // Implementation for transferring to Lazada wallet
             showNotification('Lazada transfer functionality coming soon!', 'info');
         }
         
@@ -4386,12 +4536,6 @@
             if (chatTab) {
                 chatTab.innerHTML = `
                     <h3 style="color: #667eea; margin-bottom: 20px;">💬 Community Chat</h3>
-                    
-                    <!-- ADVERTISEMENT -->
-                    <div class="ad-space banner">
-                        <div class="ad-label">Chat Room</div>
-                        <div>💬 AD HERE</div>
-                    </div>
                     
                     <!-- Online Users Section (Collapsible) -->
                     <div class="online-users-section">
@@ -4460,19 +4604,16 @@
         function setupChatListener() {
             if (!currentUser || !database) return;
             
-            // Remove existing listener if any
             if (chatListener) {
                 chatListener();
             }
             
-            // Listen for chat messages
             chatListener = database.ref('chat/messages').orderByChild('timestamp').limitToLast(50).on('value', (snapshot) => {
                 const messages = snapshot.val() || {};
                 const chatMessages = document.getElementById('chat-messages');
                 
                 if (!chatMessages) return;
                 
-                // Convert to array and sort by timestamp
                 const messagesArray = Object.values(messages).sort((a, b) => a.timestamp - b.timestamp);
                 
                 let html = '';
@@ -4491,21 +4632,38 @@
                 
                 chatMessages.innerHTML = html || '<div style="text-align: center; color: #999; padding: 20px;">No messages yet. Start the conversation!</div>';
                 
-                // Scroll to bottom
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             });
+        }
+        
+        // ================ ANNOUNCE WINNER IN CHAT ================
+        function announceWinnerInChat(winnerUsername, itemName) {
+            if (!currentUser || !currentUserData || !database) return;
+            
+            const messageData = {
+                userId: 'system',
+                username: '🎯 SYSTEM',
+                text: `🏆 Congratulations to our Winner: '${winnerUsername}' for winning ${itemName}!`,
+                timestamp: Date.now()
+            };
+            
+            database.ref('chat/messages').push(messageData)
+                .then(() => {
+                    console.log('Winner announced in chat');
+                })
+                .catch((error) => {
+                    console.error('Error announcing winner in chat:', error);
+                });
         }
         
         // ================ ONLINE USERS FUNCTIONS ================
         function loadOnlineUsers() {
             if (!database) return;
             
-            // Remove existing listener if any
             if (onlineUsersListener) {
                 onlineUsersListener();
             }
             
-            // Listen for online users
             onlineUsersListener = database.ref('online').on('value', (snapshot) => {
                 const onlineUsers = snapshot.val() || {};
                 const onlineUsersList = document.getElementById('online-users-list');
@@ -4513,7 +4671,6 @@
                 
                 if (!onlineUsersList) return;
                 
-                // Update count
                 if (onlineUsersCount) {
                     onlineUsersCount.textContent = Object.keys(onlineUsers).length;
                 }
@@ -4523,9 +4680,8 @@
                     return;
                 }
                 
-                // Convert to array and sort by username
                 const usersArray = Object.values(onlineUsers)
-                    .filter(user => user.uid !== currentUser?.uid) // Exclude current user if logged in
+                    .filter(user => user.uid !== currentUser?.uid)
                     .sort((a, b) => (a.username || a.email).localeCompare(b.username || b.email));
                 
                 let html = '';
@@ -4581,14 +4737,12 @@
         function loadAdminData() {
             if (!database) return;
             
-            // Load online users
             database.ref('online').on('value', (snapshot) => {
                 const onlineUsers = snapshot.val() || {};
                 const adminOnlineCount = document.getElementById('admin-online-count');
                 if (adminOnlineCount) adminOnlineCount.textContent = Object.keys(onlineUsers).length;
             });
             
-            // FIXED: Use real-time listener for total users and total balance
             database.ref('users').on('value', (snapshot) => {
                 const users = snapshot.val() || {};
                 const adminTotalUsers = document.getElementById('admin-total-users');
@@ -4603,7 +4757,6 @@
                         totalBalance += parseFloat(user.balance || 0);
                         totalWins += (user.wins?.length || 0);
                         
-                        // Count active deposits
                         const deposits = user.deposits || {};
                         Object.values(deposits).forEach(deposit => {
                             const expiryDate = new Date(deposit.expiryDate);
@@ -4621,11 +4774,9 @@
                 if (adminTotalBalance) adminTotalBalance.textContent = formatCurrency(totalBalance);
                 if (adminActiveDeposits) adminActiveDeposits.textContent = activeDeposits;
                 
-                // Load users list
                 loadAdminUsersList(users);
             });
             
-            // Load games and calculate totals
             database.ref('games').on('value', (snapshot) => {
                 const games = snapshot.val() || {};
                 let activeCount = 0;
@@ -4636,7 +4787,8 @@
                 Object.values(games).forEach(game => {
                     const now = new Date();
                     const endDate = new Date(game.endDate);
-                    if (game.status === 'active' && now <= endDate) {
+                    const startDate = new Date(game.startDate);
+                    if (game.status === 'active' && now >= startDate && now <= endDate) {
                         activeCount++;
                     }
                     
@@ -4644,7 +4796,6 @@
                     totalBids += Object.keys(bids).length;
                     
                     if (game.status === 'completed') {
-                        // Calculate money pot from winner's bids
                         if (game.winner) {
                             const winnerBids = Object.values(bids).filter(bid => bid.userId === game.winner.userId);
                             winnerBids.forEach(bid => {
@@ -4652,7 +4803,6 @@
                             });
                         }
                         
-                        // Calculate service fees collected
                         serviceFees += parseFloat(game.serviceFeesCollected || 0);
                     }
                 });
@@ -4667,10 +4817,7 @@
                 if (totalPotMoney) totalPotMoney.textContent = formatCurrency(moneyPot);
                 if (totalFees) totalFees.textContent = formatCurrency(serviceFees);
                 
-                // Load admin items list
                 loadAdminItemsList(games);
-                
-                // Load winners list with user info
                 loadAdminWinnersList(games);
             });
         }
@@ -4720,7 +4867,6 @@
             
             const winnersToShow = showAllWinners ? sortedWinners : sortedWinners.slice(0, 3);
             
-            // Get user data for winners
             const winnerPromises = winnersToShow.map(item => {
                 if (!item.winner) return Promise.resolve(null);
                 
@@ -4779,24 +4925,37 @@
             const itemsToShow = showAllItems ? sortedItems : sortedItems.slice(0, 3);
             
             itemsToShow.forEach(item => {
-                const endDate = new Date(item.endDate);
                 const now = new Date();
-                const isActive = item.status === 'active' && now <= endDate;
+                const startDate = new Date(item.startDate);
+                const endDate = new Date(item.endDate);
+                const isActive = item.status === 'active' && now >= startDate && now <= endDate;
+                const isUpcoming = now < startDate && item.status !== 'completed';
                 const isEnded = item.status === 'completed' || now > endDate;
+                
+                let statusColor = '#6c757d';
+                let statusText = 'ENDED';
+                
+                if (isActive) {
+                    statusColor = '#28a745';
+                    statusText = 'ACTIVE';
+                } else if (isUpcoming) {
+                    statusColor = '#ff9800';
+                    statusText = 'UPCOMING';
+                }
                 
                 const bids = item.bids || {};
                 const bidCount = Object.keys(bids).length;
                 
                 itemsHtml += `
-                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid ${isActive ? '#28a745' : '#6c757d'}">
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid ${statusColor}">
                         <div style="display: flex; justify-content: space-between; align-items: start;">
                             <div>
                                 <strong style="color: #333;">${item.name}</strong><br>
-                                <small class="decimal-format" style="color: ${isActive ? '#28a745' : '#333'};">₱${formatDecimal(item.price)} • ${isActive ? 'ACTIVE' : 'ENDED'}</small>
+                                <small class="price-with-comma" style="color: ${statusColor};">₱${formatNumberWithComma(item.price)} • ${statusText}</small>
                             </div>
                             <div style="text-align: right;">
                                 <small style="color: #666;">Bids: ${bidCount}</small><br>
-                                <small style="color: #666;">Ends: ${endDate.toLocaleDateString()}</small>
+                                <small style="color: #666;">${isUpcoming ? 'Starts' : 'Ends'}: ${isUpcoming ? new Date(item.startDate).toLocaleDateString() : new Date(item.endDate).toLocaleDateString()}</small>
                             </div>
                         </div>
                         <div style="margin-top: 10px; display: flex; gap: 5px;">
@@ -4895,16 +5054,22 @@
                 return;
             }
             
+            const now = new Date();
+            const tomorrow = new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000);
+            const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const weekAfter = new Date(nextWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+            const dayAfter = new Date(now.getTime() + 2 * 24 * 60 * 60 * 1000);
+            
             const demoGames = {
                 game1: {
                     name: "iPhone 15 Pro",
                     description: "Brand new iPhone 15 Pro 256GB",
                     image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=400&h=300&fit=crop",
                     price: 69999.000,
-                    startDate: new Date().toISOString(),
-                    endDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    drawDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-                    winnerDate: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
+                    startDate: now.toISOString(),
+                    endDate: nextWeek.toISOString(),
+                    drawDate: nextWeek.toISOString(),
+                    winnerDate: weekAfter.toISOString(),
                     status: "active",
                     bids: {},
                     winner: null,
@@ -4915,10 +5080,24 @@
                     description: "Latest Samsung flagship phone",
                     image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?w=400&h=300&fit=crop",
                     price: 45999.000,
-                    startDate: new Date().toISOString(),
-                    endDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    drawDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-                    winnerDate: new Date(Date.now() + 6 * 24 * 60 * 60 * 1000).toISOString(),
+                    startDate: now.toISOString(),
+                    endDate: dayAfter.toISOString(),
+                    drawDate: dayAfter.toISOString(),
+                    winnerDate: tomorrow.toISOString(),
+                    status: "active",
+                    bids: {},
+                    winner: null,
+                    serviceFeesCollected: 0.000
+                },
+                game3: {
+                    name: "MacBook Pro M3",
+                    description: "Apple MacBook Pro with M3 chip",
+                    image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=400&h=300&fit=crop",
+                    price: 129999.000,
+                    startDate: tomorrow.toISOString(), // Upcoming
+                    endDate: weekAfter.toISOString(),
+                    drawDate: weekAfter.toISOString(),
+                    winnerDate: weekAfter.toISOString(),
                     status: "active",
                     bids: {},
                     winner: null,
@@ -4965,7 +5144,6 @@
                     return;
                 }
                 
-                // Find lowest unique number
                 const numberCounts = {};
                 bidArray.forEach(bid => {
                     numberCounts[bid.number] = (numberCounts[bid.number] || 0) + 1;
@@ -4974,10 +5152,8 @@
                 const uniqueBids = bidArray.filter(bid => numberCounts[bid.number] === 1);
                 
                 if (uniqueBids.length === 0) {
-                    // NO WINNER - Refund all users their total bids with 2% fee
                     showNotification('No unique numbers found. Refunding all bids with 2% service fee.', 'info');
                     
-                    // Group bids by user to calculate total per user
                     const userBids = {};
                     bidArray.forEach(bid => {
                         if (!userBids[bid.userId]) {
@@ -4995,16 +5171,13 @@
                     let totalRefunded = 0;
                     let totalFees = 0;
                     
-                    // Process refund for each user
                     Object.entries(userBids).forEach(([userId, userData]) => {
                         const totalBidAmount = userData.totalAmount;
                         const feeAmount = totalBidAmount * (refundFeePercent/100);
                         const refundAmount = totalBidAmount - feeAmount;
                         
-                        // Update user balance (add refund)
                         updates['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
                         
-                        // Add deposit for the refund (single deposit with total amount)
                         const depositData = {
                             amount: refundAmount,
                             depositDate: new Date().toISOString(),
@@ -5018,24 +5191,20 @@
                         
                         database.ref('users/' + userId + '/deposits').push(depositData);
                         
-                        // Add wallet log for REFUND (total amount after fee)
                         addWalletLog(userId, 'refund', 
                             `Total bid refund for ${item.name}: ₱${formatDecimal(totalBidAmount)} less 2% fee`, 
                             refundAmount);
                         
-                        // Update service fees
                         updates['games/' + itemId + '/serviceFeesCollected'] = firebase.database.ServerValue.increment(feeAmount);
                         
                         totalRefunded += refundAmount;
                         totalFees += feeAmount;
                     });
                     
-                    // Mark all bids as refunded
                     bidArray.forEach(bid => {
                         updates['games/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
                     });
                     
-                    // Update game status
                     updates['games/' + itemId + '/status'] = 'completed';
                     updates['games/' + itemId + '/noWinner'] = true;
                     
@@ -5044,13 +5213,11 @@
                             showNotification(`Refunded ₱${formatDecimal(totalRefunded)} to users with 2% service fee (₱${formatDecimal(totalFees)})`, 'success');
                         });
                 } else {
-                    // THERE IS A WINNER
                     uniqueBids.sort((a, b) => a.number - b.number);
                     const winningBid = uniqueBids[0];
                     
                     const updates = {};
                     
-                    // Mark winner
                     updates['games/' + itemId + '/winner'] = {
                         userId: winningBid.userId,
                         username: winningBid.username,
@@ -5060,7 +5227,6 @@
                     };
                     updates['games/' + itemId + '/status'] = 'completed';
                     
-                    // Add win to user's wins array
                     const winEntry = {
                         itemId: itemId,
                         itemName: item.name,
@@ -5075,13 +5241,13 @@
                         return database.ref('users/' + winningBid.userId + '/wins').set(newWins);
                     });
                     
-                    // Update winning bid status
                     updates['games/' + itemId + '/bids/' + winningBid.id + '/status'] = 'won';
                     
-                    // Add wallet log for win
                     addWalletLog(winningBid.userId, 'win', `Won ${item.name}`, 0);
                     
-                    // Group losing bids by user
+                    // ANNOUNCE WINNER IN GLOBAL CHAT
+                    announceWinnerInChat(winningBid.username, item.name);
+                    
                     const losingUsers = {};
                     bidArray.forEach(bid => {
                         if (bid.userId !== winningBid.userId) {
@@ -5100,16 +5266,13 @@
                     let totalRefunded = 0;
                     let totalFees = 0;
                     
-                    // Refund all OTHER users their total bids with 2% fee
                     Object.entries(losingUsers).forEach(([userId, userData]) => {
                         const totalBidAmount = userData.totalAmount;
                         const feeAmount = totalBidAmount * (refundFeePercent/100);
                         const refundAmount = totalBidAmount - feeAmount;
                         
-                        // Update user balance
                         updates['users/' + userId + '/balance'] = firebase.database.ServerValue.increment(refundAmount);
                         
-                        // Add deposit for the refund
                         const depositData = {
                             amount: refundAmount,
                             depositDate: new Date().toISOString(),
@@ -5123,12 +5286,10 @@
                         
                         database.ref('users/' + userId + '/deposits').push(depositData);
                         
-                        // Add wallet log for REFUND
                         addWalletLog(userId, 'refund', 
                             `Total bid refund for ${item.name}: ₱${formatDecimal(totalBidAmount)} less 2% fee`, 
                             refundAmount);
                         
-                        // Update service fees
                         updates['games/' + itemId + '/serviceFeesCollected'] = 
                             firebase.database.ServerValue.increment(feeAmount);
                         
@@ -5136,7 +5297,6 @@
                         totalFees += feeAmount;
                     });
                     
-                    // Mark losing bids as refunded
                     bidArray.forEach(bid => {
                         if (bid.userId !== winningBid.userId) {
                             updates['games/' + itemId + '/bids/' + bid.id + '/status'] = 'refunded';
@@ -5182,12 +5342,9 @@
             
             showNotification('Resetting all data...', 'info');
             
-            // Clear all data
             database.ref().set(null)
                 .then(() => {
                     showNotification('All data has been reset successfully', 'success');
-                    
-                    // Create demo games
                     createDemoGames();
                 })
                 .catch(error => {
@@ -5208,10 +5365,9 @@
                 
                 Object.entries(games).forEach(([itemId, item]) => {
                     if (item.status === 'active') {
-                        const drawDate = new Date(item.drawDate);
+                        const winnerDate = new Date(item.winnerDate);
                         
-                        // Check if draw date/time has passed
-                        if (now >= drawDate) {
+                        if (now >= winnerDate) {
                             runItemDraw(itemId);
                             drawsRun++;
                         }
@@ -5225,12 +5381,10 @@
         }
         
         function cashOutPot() {
-            // Implementation for cashing out the pot
             showNotification('Cash out functionality coming soon!', 'info');
         }
         
         function cashOutServiceFees() {
-            // Implementation for cashing out service fees
             showNotification('Cash out functionality coming soon!', 'info');
         }
         
@@ -5259,7 +5413,7 @@
                 
                 if (winnerDetailsTitle) winnerDetailsTitle.textContent = 'Winner Details';
                 if (winnerItemName) winnerItemName.textContent = item.name;
-                if (winnerItemPrice) winnerItemPrice.textContent = formatCurrency(item.price);
+                if (winnerItemPrice) winnerItemPrice.textContent = formatCurrencyWithComma(item.price);
                 if (winnerItemImage) winnerItemImage.src = item.image;
                 if (winnerUsername) winnerUsername.textContent = winner.username || winner.email;
                 if (winningNumber) winningNumber.textContent = item.winner.winningNumber.toFixed(3);
@@ -5310,25 +5464,21 @@
         window.onload = function() {
             console.log('App loading...');
             
-            // Initialize chat page structure
             setupChatPage();
             
-            // Start connection monitoring
             setTimeout(() => {
                 monitorConnection();
             }, 1000);
             
-            // Setup auth listener
             setTimeout(() => {
                 setupAuthListener();
             }, 1500);
             
             showNotification('Welcome to Centavo Number Game! Register or login to start playing.', 'info');
             
-            // Start auto draw checker
             setInterval(() => {
                 checkAutoDraws();
-            }, 60000); // Check every minute
+            }, 60000);
         };
     </script>
 </body>
