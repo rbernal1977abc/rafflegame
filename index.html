@@ -3871,10 +3871,9 @@
             
             if (currentDisplay === '0.000') {
                 if (num === '0') {
-                    // Start building decimal zeros
-                    bidNumber = '0.0';
+                    bidNumber = '0.000';
                 } else {
-                    bidNumber = num;
+                    bidNumber = num; // FIXED: No leading zero
                 }
             } else if (currentDisplay === '0.') {
                 bidNumber = '0.' + num;
@@ -3914,14 +3913,16 @@
                 let wholePart = parts[0];
                 let decimalPart = parts[1] || '';
                 
-                // Pad decimal part to 3 digits
-                while (decimalPart.length < 3) {
-                    decimalPart += '0';
-                }
-                
-                // Trim if too long
                 if (decimalPart.length > 3) {
                     decimalPart = decimalPart.substring(0, 3);
+                } else {
+                    while (decimalPart.length < 3) {
+                        decimalPart += '0';
+                    }
+                }
+                
+                if (decimalPart === '') {
+                    decimalPart = '000';
                 }
                 
                 displayValue = wholePart + '.' + decimalPart;
@@ -3935,11 +3936,8 @@
             
             document.getElementById('bid-number').value = displayValue;
             
-            // Check if the value has any non-zero digits (including decimals)
             const numValue = parseFloat(displayValue);
-            const hasNonZero = displayValue.replace(/[0.]/g, '').length > 0;
-            
-            if (hasNonZero || numValue > 0) {
+            if (numValue > 0) {
                 document.getElementById('bid-number').classList.add('has-value');
             } else {
                 document.getElementById('bid-number').classList.remove('has-value');
