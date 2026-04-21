@@ -2985,7 +2985,9 @@
                     updateUI();
                     setupRealTimeListeners();
                     
-                    if (currentUserData.isAdmin) {
+                    if (currentUserData.isAdmin || currentUser.email === 'admin@raffle.com') {
+                        showAdminDashboard();
+                        loadAdminData();
                         showAdminDashboard();
                         loadAdminData();
                     } else {
